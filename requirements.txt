@@ -1,0 +1,6 @@
+flask
+openai
+gunicorn
+Flask-SQLAlchemy
+Flask-WTF
+python-docx
