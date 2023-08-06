@@ -15,6 +15,7 @@ load_dotenv()
 
 # Now you can access the OPENAI_API_KEY environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
+print(os.getenv('OPENAI_API_KEY'))
 
 
 JOBS_API_URL = "https://jsearch.p.rapidapi.com/search"

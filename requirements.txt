@@ -4,3 +4,4 @@ gunicorn
 Flask-SQLAlchemy
 Flask-WTF
 python-docx
+python-dotenv
