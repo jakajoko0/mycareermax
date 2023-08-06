@@ -177,5 +177,78 @@ def search_rapidapi_jobs():
     jobs = response.get('data', [])
     return jsonify({"jobs": jobs})
 
+# INTERVIEW SIMULATOR
+#Question Generator Call to openai
+@app.route('/simulate-interview', methods=['POST'])
+def simulate_interview():
+    # Extract form data
+    job_title = request.form.get('job_title')
+    job_description = request.form.get('job_description')
+    job_requirements = request.form.get('job_requirements')
+    industry = request.form.get('industry')
+
+    # If the resume was uploaded as a file
+    if 'resume' in request.files:
+        file = request.files['resume']
+        if file.filename.endswith('.docx'):
+            # Process the uploaded DOCX file and extract the text content
+            try:
+                document = Document(file)
+                # Extract text content from the document
+                resume = '\n'.join(paragraph.text for paragraph in document.paragraphs)
+            except Exception as e:
+                return jsonify({'error': f'Error processing the file: {e}'}), 500
+        else:
+            return jsonify({'error': 'Invalid file format. Only .docx files are allowed.'}), 400
+    else:
+        # If the resume was typed
+        resume = request.form.get('typed_resume')
+
+    # Define the system message for the AI
+    system_message = f"You are a helpful assistant that generates personalized interview questions."
+    # Define the user message for the AI
+    user_message = f"The candidate is applying for a role as a {job_title} in the {industry} industry. The job description is as follows: {job_description}. The job requirements are: {job_requirements}. The candidate's resume is as follows: {resume}."
+
+    # Use these messages to generate interview questions
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_message},
+        ]
+    )
+
+    # Extract the interview questions from the response
+    interview_questions = response['choices'][0]['message']['content'].split('\n')
+
+    # Return the questions as a JSON response
+    return jsonify({'interview_questions': interview_questions})
+
+
+
+ #User Answers and openai feedback route
+@app.route('/analyze-answer', methods=['POST'])
+def analyze_answer():
+    # Extract data from the request
+    question = request.json.get('question')
+    answer = request.json.get('answer')
+
+    # Use OpenAI API to analyze the answer
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are an AI developed by OpenAI. You are an expert at providing feedback on job interview responses."},
+            {"role": "user", "content": f"Rate the following Question: {question}\n and Answer: {answer} on a 1 through 5 scale. 5 is excellent and 1 is very bad. Provide your reasoning in a detailed, professional format with feedback and tips for improvement"},
+        ]
+    )
+
+    # Extract the feedback from the response
+    feedback = response['choices'][0]['message']['content']
+
+    # Return the feedback as a JSON response
+    return jsonify({'feedback': feedback})
+
+
+
 if __name__ == '__main__':
     app.run()

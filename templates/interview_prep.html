@@ -1,10 +1,243 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Interview Prep</title>
+    <title>InterviewPRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Links to the Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300&display=swap" rel="stylesheet">
+
+    <!-- Add some CSS to style the current question and center everything -->
+    <style>
+        label {
+            font-family: 'Fira Code', monospace;
+        }
+
+        form {
+            margin-top: 100px;
+        }
+
+        /* Gradient Background */
+        body {
+            background-image: linear-gradient(120deg, #ffffff, #606060);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .question-box.current-question {
+            background-color: #eef;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body {
+            padding-top: 50px;
+        }
+
+
+        form,
+        #answer-container,
+        #questions-container,
+        #question-nav {
+            width: 100%;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Interview Prep</h1>
-    <p>COMING SOON - Mock Interviews in realtime tailored to the job you want and your specific background. You will receive a rating on a scale from 1-5, with 1 being not ready at all and 5 being extremely ready for the real interview. With this rating you will receive guidance and tips to improve your interviewing skills.</p>
+    <a href="https://coverme.azurewebsites.net/">
+        <img alt="Resume-Tuner" border="0"
+            src="https://drive.google.com/uc?export=download&id=1ktv9ugYhxQ4UV6v9jGN6IWc2XuQujJ1d"
+            style="position:absolute; top:0; left:0;" />
+    </a>
+    <form id="interview-form" enctype="multipart/form-data">
+        <label for="job_title">Job Title:</label><br>
+        <input type="text" id="job_title" name="job_title"><br>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <label for="job_description">Job Description:</label><br>
+        <textarea id="job_description" name="job_description"></textarea><br>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <label for="job_requirements">Job Requirements:</label><br>
+        <textarea id="job_requirements" name="job_requirements"></textarea><br>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <label for="industry">Industry:</label><br>
+        <input type="text" id="industry" name="industry"><br>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <label for="resume">Upload Your Resume:</label><br>
+        <div>&nbsp;</div>
+        <input type="file" id="resume" name="resume"><br>
+        <div>&nbsp;</div>
+        <label for="typed_resume">Or enter it manually here:</label><br>
+        <textarea id="typed_resume" name="typed_resume"></textarea><br>
+        <div>&nbsp;</div>
+        <input type="submit" value="Simulate Interview">
+    </form>
+
+    <div id="questions-container">
+        <!-- The questions will be inserted here -->
+    </div>
+
+    <div id="answer-container" style="display: none;">
+        <h2 id="current-question"></h2>
+        <textarea id="user-answer" placeholder="Type your answer here..."></textarea>
+        <button id="submit-answer">Submit Answer</button>
+        <button id="next-question">Next Question</button>
+        <div id="answer-feedback"></div>
+    </div>
+
+    <div id="question-nav">
+        <!-- The question navigation buttons will be inserted here -->
+    </div>
+
+    <!-- JavaScript code -->
+    <script>
+
+        // Event listener for file upload
+        $("#resume").change(function () {
+            var form_data = new FormData();
+            var file_data = $("#resume")[0].files[0];
+            form_data.append("file", file_data);
+
+            $.ajax({
+                type: "POST",
+                url: "/upload-docx",
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+                    // Check if data is a string (error message) or an object (JSON response)
+                    if (typeof data === 'string') {
+                        // Display error message in the console
+                        console.error(data);
+                        // Show the error message to the user (You can use an alert or other UI element)
+                        alert(data);
+                    } else {
+                        // Data is an object (JSON response) with a 'content' property
+                        console.log(data.content);
+                        // Set the content in the existing text area (resume)
+                        $("#typed_resume").val(data.content);
+                        // Show the existing text area
+                        $("#typed_resume").show();
+                    }
+                },
+                error: function (xhr, textStatus, error) {
+                    console.error("Error while uploading the file:", error);
+                    alert("An error occurred while uploading the file. Please try again later.");
+                }
+            });
+        });
+
+
+
+
+
+
+        $(document).ready(function () {
+            // When the form is submitted...
+            $("#interview-form").on('submit', function (event) {
+                event.preventDefault();
+
+                // Create a new FormData object
+                var formData = new FormData(this);
+
+                // Send the form data to the server
+                $.ajax({
+                    url: '/simulate-interview',
+                    data: formData,  // formData is now defined
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Insert each question into the page as a read-only text box
+                        response.interview_questions.forEach(function (question, index) {
+                            $("#questions-container").append('<textarea class="question-box" data-index="' + index + '" readonly>' + question + '</textarea>');
+                        });
+
+                        // Create navigation buttons for each question
+                        response.interview_questions.forEach(function (question, index) {
+                            $("#question-nav").append('<button class="nav-button" data-index="' + index + '">Question ' + (index + 1) + '</button>');
+                        });
+                    }
+                });
+            });
+
+            // When a question box is clicked...
+            $(document).on('click', '.question-box', function () {
+                // Remove the "current-question" class from all question boxes
+                $(".question-box").removeClass("current-question");
+
+                // Add the "current-question" class to the clicked question box
+                $(this).addClass("current-question");
+
+                // Show the answer container and set the current question
+                $("#answer-container").show();
+                $("#current-question").text($(this).val());
+
+                // Store the index of the current question
+                $("#answer-container").attr('data-current-index', $(this).attr('data-index'));
+
+                // Clear the previous feedback and answer
+                $("#user-answer").val('');
+                $("#answer-feedback").empty();
+            });
+
+            // When the answer is submitted...
+            $("#submit-answer").on('click', function () {
+    // Define currentQuestion and userAnswer
+    var currentQuestion = $("#current-question").text();
+    var userAnswer = $("#user-answer").val();
+
+    // Send the question and answer to the server for analysis
+    $.ajax({
+        url: '/analyze-answer',
+        data: JSON.stringify({question: currentQuestion, answer: userAnswer}),
+        type: 'POST',
+        contentType: 'application/json',
+        success: function (response) {
+            // Display the feedback
+            $("#answer-feedback").text(response.feedback);
+        }
+    });
+});
+
+
+            // When a navigation button is clicked...
+            $(document).on('click', '.nav-button', function () {
+                // Get the index of the corresponding question
+                var index = $(this).attr('data-index');
+
+                // Get the question box for this question
+                var questionBox = $(".question-box[data-index=" + index + "]");
+
+                // Simulate a click on the question box
+                questionBox.click();
+            });
+        });
+    </script>
+
 </body>
+
 </html>
