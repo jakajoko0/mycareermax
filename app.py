@@ -40,7 +40,7 @@ RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
 RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
 
-openai.api_key = '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'
+openai.api_key = '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'
 
 # Route to handle the "/resume-analysis" endpoint
 @app.route('/resume-analysis')
@@ -146,6 +146,33 @@ def upload_docx():
             return jsonify({'error': f'Error processing the file: {e}'}), 500
     else:
         return jsonify({'error': 'Invalid file format. Only .docx files are allowed.'}), 400
+
+# Route to handle the Coverme button to generate cover
+@app.route('/generate-cover-letter', methods=['POST'])
+def generate_cover_letter():
+    # Extract the content from the request
+    resume_content = request.form.get('resume')
+    job_description = request.form.get('job_description')
+    job_title = request.form.get('job_title')
+    company_name = request.form.get('company_name')
+    focus_areas = request.form.get('focus_areas')
+
+    # Construct the messages for the OpenAI API
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant that generates personalized cover letters."},
+        {"role": "user", "content": f"Generate a cover letter for the following job. Resume: {resume_content}. Job description: {job_description}. Job title: {job_title}. Company name: {company_name}. Focus areas: {focus_areas}"}
+    ]
+    
+    # Send the messages to the OpenAI API
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+    
+    # Extract the model's reply from the response
+    cover_letter = response['choices'][0]['message']['content'].strip()
+    
+    # Return the cover letter to the front end
+    return jsonify({'cover_letter': cover_letter})
+
+
 
 @app.route('/jobs_api.html')
 def index():
