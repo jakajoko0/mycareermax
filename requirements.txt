@@ -1,7 +1,7 @@
 flask
 openai
-gunicorn
 Flask-SQLAlchemy
 Flask-WTF
 python-docx
 python-dotenv
+waitress
