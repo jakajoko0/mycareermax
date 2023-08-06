@@ -8,6 +8,15 @@ import openai
 
 import requests
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Now you can access the OPENAI_API_KEY environment variable
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+
 JOBS_API_URL = "https://jsearch.p.rapidapi.com/search"
 
 
@@ -40,7 +49,8 @@ RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
 RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
 
-openai.api_key = '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'
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
 
 # Route to handle the "/resume-analysis" endpoint
 @app.route('/resume-analysis')
@@ -72,10 +82,10 @@ def interview_prep():
 def application_questions():
     return render_template('application_questions.html')
 
-@app.route('/review-resume', methods=['POST'])
-def review_resume():
+@app.route('/analyze-resume', methods=['POST'])
+def analyze_resume():
     # Extract the content from the request
-    resume_content = request.form.get('resume_content')
+    resume_content = request.form.get('resume')
     
     # Construct the messages for the OpenAI API
     messages = [
@@ -93,32 +103,6 @@ def review_resume():
     return jsonify({'feedback': feedback})
 
 
-@app.route('/make-it-better', methods=['POST'])
-def make_it_better():
-    try:
-        # Extract the content from the request
-        resume_content = request.form.get('resume_content')
-        print("Resume Content:", resume_content)  # Log the resume content
-
-        # Construct the messages for the OpenAI API
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant that reviews and edits resumes."},
-            {"role": "user", "content": f"Please review the provided resume and make the necessary modifications to enhance its professionalism and adherence to professional standards. Additionally, please ensure that it is appropriately formatted. Thank you.: {resume_content}"}
-        ]
-
-        # Send the messages to the OpenAI API
-        response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
-        print("OpenAI API Response:", response)  # Log the API response
-
-        # Extract the model's reply from the response
-        feedback = response['choices'][0]['message']['content'].strip()
-
-        # Return the feedback to the front end
-        return jsonify({'feedback': feedback})
-
-    except Exception as e:
-        print(f"Error: {e}")  # Log the error
-        return jsonify({'error': str(e)})
 
 
 
