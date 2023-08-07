@@ -3,15 +3,15 @@ $("#interview-form").on("submit", function (event) {
   event.preventDefault();
 
   var formData = new FormData();
-  formData.append('job_title', $("#job_title").val());
-  formData.append('job_description', $("#job_description").val());
-  formData.append('job_requirements', $("#job_requirements").val());
-  formData.append('industry', $("#industry").val());
-  formData.append('typed_resume', $("#typed_resume").val());
+  formData.append("job_title", $("#job_title").val());
+  formData.append("job_description", $("#job_description").val());
+  formData.append("job_requirements", $("#job_requirements").val());
+  formData.append("industry", $("#industry").val());
+  formData.append("typed_resume", $("#typed_resume").val());
 
-  var file = $("#resume")[0].files[0];  // Get the file from the input field
+  var file = $("#resume")[0].files[0]; // Get the file from the input field
   if (file) {
-    formData.append('resume', file);  // Only append the file if one is selected
+    formData.append("resume", file); // Only append the file if one is selected
   }
 
   $("input[type='submit']").val("Loading...").prop("disabled", true);
@@ -23,14 +23,45 @@ $("#interview-form").on("submit", function (event) {
     processData: false,
     contentType: false,
     success: function (response) {
-      // Handle the success response...
+      console.log("Response received"); // Add this line
+      // Hide the form fields
+      $("#interview-form").hide();
+      console.log("Form hidden"); // Add this line
+
+      // Store the questions in a global variable
+      window.questions = response.interview_questions.filter(function (
+        question
+      ) {
+        // Remove any empty questions
+        return question.trim() !== "";
+      });
+
+      console.log("Questions array:", window.questions);
+
+      // Display the first question
+      $("#question-display").text("1. " + window.questions[0]);
+      console.log("First question displayed"); // Add this line
+
+      // Show the navigation buttons
+      $("#previous-button, #next-button").show();
+      $("#user-answer, #submit-answer").show();
+      console.log("Navigation buttons shown"); // Add this line
+
+      // Change the button text back to "Simulate Interview" and enable the button
+      $("input[type='submit']")
+        .val("Simulate Interview")
+        .prop("disabled", false);
     },
     error: function (xhr, textStatus, error) {
-      // Handle the error response...
+      alert("An error occurred. Please try again.");
+      $("input[type='submit']")
+        .val("Simulate Interview")
+        .prop("disabled", false);
     },
   });
 });
 
+// ... Remainder of the file ...
 
 $("#submit-answer").on("click", function () {
   // Show the loading spinner
