@@ -62,6 +62,11 @@ def resume_analysis():
 
 
 # Route to handle the root URL (homepage)
+@app.route("/background-image")
+def background_image():
+    return render_template("background_image.html")
+
+
 @app.route("/")
 def home():
     return render_template("home.html")
