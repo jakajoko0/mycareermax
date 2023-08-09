@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        .job-box {
+            border: 1px solid #00c803;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerClick</title>
+    <!-- Bootstrap CSS and JS links -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <!-- Job Search Section -->
+        <div id="job-search-section" class="mb-4">
+            <div class="form-row">
+                <div class="col">
+                    <input type="text" class="form-control" id="job-query"
+                        placeholder="Job title, e.g., Python Developer">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="job-location" placeholder="Location, e.g., Texas, USA">
+                </div>
+                <div class="col">
+                    <button onclick="fetchJobListings()" class="btn btn-primary">Search Jobs</button>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label for="resume-text">Paste your Resume:</label>
+            <textarea class="form-control" id="resume-text" rows="10"></textarea>
+        </div>
+
+        <!-- Job Listings Display -->
+        <div id="job-listings-container" class="mb-4">
+            <!-- Job listings will be populated here -->
+        </div>
+        <!-- Generated Cover Letter Display -->
+        <div id="cover-letter-section" class="mb-4" style="display: none;">
+            <h3>Your Generated Cover Letter</h3>
+            <textarea class="form-control" id="cover-letter-text" rows="10" readonly></textarea>
+            <div class="mt-2">
+                <button onclick="generateCoverLetter()" class="btn btn-success">Generate Cover Letter</button>
+                <button onclick="downloadCoverLetter()" class="btn btn-success">Download Cover Letter</button>
+                <button onclick="copyToClipboard()" class="btn btn-info">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <script>
+            // Fetch job listings based on user input
+            // Fetch job listings based on user input
+            function fetchJobListings() {
+                const jobQuery = document.getElementById('job-query').value;
+                const jobLocation = document.getElementById('job-location').value;
+
+                const requestData = {
+                    query: jobQuery,
+                    location: jobLocation
+                };
+
+                fetch('/fetch-job-listings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Jobs Array:", data.data);  // Log the jobs array
+                        if (data.data) {
+                            displayJobListings({ jobs: data.data }); // Adjusting the data structure
+                        } else {
+                            console.error("No jobs found or unexpected data structure:", data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching job listings:', error);
+                    });
+            }
+
+            function displayJobListings(response) {
+                const jobs = response.jobs;
+                const listingsContainer = document.getElementById('job-listings-container');
+                listingsContainer.innerHTML = '';  // Clear any previous listings
+
+                jobs.forEach(job => {
+                    const jobBox = document.createElement('div');
+                    jobBox.className = 'job-box';
+
+                    const jobTitle = document.createElement('h4');
+                    jobTitle.innerText = job.job_title;
+                    jobBox.appendChild(jobTitle);
+
+                    const jobDescription = document.createElement('p');
+                    jobDescription.innerText = job.job_description;
+                    jobBox.appendChild(jobDescription);
+
+                    const applyButton = document.createElement('a');
+                    applyButton.href = job.job_apply_link;
+                    applyButton.target = '_blank';
+                    applyButton.className = 'btn btn-primary';
+                    applyButton.innerText = 'Apply Now';
+                    jobBox.appendChild(applyButton);
+
+                    // Add the "Generate Cover Letter" button
+                    const generateButton = document.createElement('button');
+                    generateButton.className = 'btn btn-secondary ml-2';
+                    generateButton.innerText = 'Generate Cover Letter';
+                    generateButton.onclick = () => generateCoverLetter(
+                        job.job_description,
+                        document.getElementById('resume-text').value,
+                        job.job_title,
+                        job.employer_name || "Unknown Company"  // Use "Unknown Company" if employer_name is not available
+                    );
+
+                    jobBox.appendChild(generateButton);
+
+
+
+
+                    listingsContainer.appendChild(jobBox);
+                });
+            }
+
+
+
+            // Generate a cover letter using the Flask route
+            // Generate a cover letter using the Flask route
+            function generateCoverLetter(jobDescription, resume, jobTitle, companyName) {
+                console.log("Generate Cover Letter button clicked.");
+
+                console.log("Job Description:", jobDescription);  // Log the job description
+
+                // ... [rest of the code remains the same]
+
+                console.log("Resume:", resume);  // Log the resume text
+
+                // ... [rest of the code remains the same]
+
+                // Make an AJAX call to the Flask backend
+                // Make an AJAX call to the Flask backend
+                fetch('/career_click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume: resume,
+                        job_description: jobDescription,
+                        company_name: companyName, // Add company name field
+                        job_title: jobTitle // Add job title field
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Cover Letter Response:", data);  // Log the response data
+
+                        // Display the generated cover letter
+                        document.getElementById('cover-letter-text').value = data.cover_letter;
+                        document.getElementById('cover-letter-section').style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error generating cover letter:', error);
+                    });
+
+            }
+
+
+            // ... [rest of the JavaScript functions]
+
+
+
+
+            // Download the generated cover letter as a .txt file
+            function downloadCoverLetter() {
+                const coverLetter = document.getElementById('cover-letter-text').value;
+                const blob = new Blob([coverLetter], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.download = 'cover_letter.txt';
+                a.href = URL.createObjectURL(blob);
+                a.click();
+            }
+
+            // Copy the generated cover letter to the clipboard
+            function copyToClipboard() {
+                const coverLetterTextarea = document.getElementById('cover-letter-text');
+                coverLetterTextarea.select();
+                document.execCommand('copy');
+                alert('Cover letter copied to clipboard!');
+            }
+        </script>
+</body>
+
+</html>
