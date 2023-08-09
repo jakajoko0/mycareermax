@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -10,31 +11,33 @@
             border-radius: 5px;
         }
     </style>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>CareerClick</title>
     <!-- Bootstrap CSS and JS links -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 
 <body>
+    <div class="d-flex justify-content-center align-items-center"><img class="img-fluid mb-3"
+            src="https://drive.google.com/uc?export=download&amp;id=1MQupSW1hX96_33cad79B471uW-RZZWcV" /></div>
     <div class="container mt-5">
         <!-- Job Search Section -->
-        <div id="job-search-section" class="mb-4">
+        <div class="mb-4" id="job-search-section">
             <div class="form-row">
                 <div class="col">
-                    <input type="text" class="form-control" id="job-query"
-                        placeholder="Job title, e.g., Python Developer">
+                    <input class="form-control" id="job-query" placeholder="Job title, e.g., Python Developer"
+                        type="text" />
                 </div>
                 <div class="col">
-                    <input type="text" class="form-control" id="job-location" placeholder="Location, e.g., Texas, USA">
+                    <input class="form-control" id="job-location" placeholder="Location, e.g., Texas, USA"
+                        type="text" />
                 </div>
                 <div class="col">
-                    <button onclick="fetchJobListings()" class="btn btn-primary">Search Jobs</button>
+                    <button class="btn btn-primary" onclick="fetchJobListings()">Search Jobs</button>
                 </div>
             </div>
         </div>
@@ -42,22 +45,19 @@
             <label for="resume-text">Paste your Resume:</label>
             <textarea class="form-control" id="resume-text" rows="10"></textarea>
         </div>
-
-        <!-- Job Listings Display -->
-        <div id="job-listings-container" class="mb-4">
-            <!-- Job listings will be populated here -->
-        </div>
         <!-- Generated Cover Letter Display -->
-        <div id="cover-letter-section" class="mb-4" style="display: none;">
+        <div class="mb-4" id="cover-letter-section" style="display: none;">
             <h3>Your Generated Cover Letter</h3>
-            <textarea class="form-control" id="cover-letter-text" rows="10" readonly></textarea>
+            <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
             <div class="mt-2">
-                <button onclick="generateCoverLetter()" class="btn btn-success">Generate Cover Letter</button>
-                <button onclick="downloadCoverLetter()" class="btn btn-success">Download Cover Letter</button>
-                <button onclick="copyToClipboard()" class="btn btn-info">Copy to Clipboard</button>
+                <button class="btn btn-success" onclick="downloadCoverLetter()">Download Cover Letter</button>
+                <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
             </div>
         </div>
-
+        <!-- Job Listings Display -->
+        <div class="mb-4" id="job-listings-container">
+            <!-- Job listings will be populated here -->
+        </div>
         <script>
             // Fetch job listings based on user input
             // Fetch job listings based on user input
@@ -202,6 +202,7 @@
                 alert('Cover letter copied to clipboard!');
             }
         </script>
+    </div>
 </body>
 
 </html>
