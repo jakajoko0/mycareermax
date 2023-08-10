@@ -120,7 +120,7 @@ def analyze_resume():
     ]
 
     # Send the messages to the OpenAI API
-    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+    response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
 
     # Extract the model's reply from the response
     feedback = response["choices"][0]["message"]["content"].strip()
@@ -183,7 +183,7 @@ def generate_cover_letter():
     ]
 
     # Send the messages to the OpenAI API
-    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+    response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
 
     # Extract the model's reply from the response
     cover_letter = response["choices"][0]["message"]["content"].strip()
@@ -229,7 +229,7 @@ def simulate_interview():
 
         # Use these messages to generate interview questions
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
@@ -255,7 +255,7 @@ def analyze_answer():
 
     # Use OpenAI API to analyze the answer
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
@@ -337,13 +337,46 @@ def career_click():
         },
         {
             "role": "user",
-            "content": f"Generate a cover letter for the following job. Resume: {resume}. Job description: {job_description}. Job title: {job_title}. Company name: {company_name},",
+            "content": f"Generate a cover letter for the following job. Do not include any headers. Begin the letter by addressing it to the Hiring Manager. Resume: {resume}. Job description: {job_description}. Job title: {job_title}. Company name: {company_name},",
         },
     ]
 
     # Make the API call to OpenAI's GPT-3.5 model
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
+        messages=messages,
+        max_tokens=500,  # Set a limit on the length of the generated cover letter
+    )
+
+    # Extract the generated cover letter from the response
+    cover_letter = response.choices[0].message["content"].strip()
+
+    # Return the generated cover letter as a JSON response
+    return jsonify({"cover_letter": cover_letter})
+
+
+@app.route("/resume.1", methods=["POST"])
+def resume_1():
+    # Extract the resume, job description, company name, and job title from the request
+    resume = request.json.get("resume")
+    job_description = request.json.get("job_description")
+    job_title = request.json.get("job_title")
+
+    # Construct the conversation history as an array of messages
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that enhances resumes and tailors them to specific jobs.",
+        },
+        {
+            "role": "user",
+            "content": f"Enhance the following resume and tailor it to the following job. Resume: {resume}. Job description: {job_description}. Job title: {job_title},",
+        },
+    ]
+
+    # Make the API call to OpenAI's GPT-3.5 model
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
         messages=messages,
         max_tokens=500,  # Set a limit on the length of the generated cover letter
     )

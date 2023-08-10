@@ -41,25 +41,88 @@
                 </div>
             </div>
         </div>
-        <div class="mb-4">
-            <label for="resume-text">Paste your Resume:</label>
-            <textarea class="form-control" id="resume-text" rows="10"></textarea>
+
+        <!-- Generated Resume Display -->
+        <div id="cover-letter-section-1" class="cover-letter-section" style="display: none;">
+            <h3>Your Tailored Resume</h3>
+            <textarea class="form-control" id="cover-letter-text-1" rows="10" readonly=""></textarea>
+
+            <!-- New buttons added here -->
+            <div class="mt-2">
+                <button id="download-resume-1" class="btn btn-primary mt-2" onclick="downloadResume_1()">Download
+                    resuME</button>
+                <button id="copy-resume-1" class="btn btn-secondary mt-2 ml-2" onclick="copyToClipboard_1()">Copy to
+                    Clipboard</button>
+            </div>
         </div>
+        &nbsp;
+
         <!-- Generated Cover Letter Display -->
         <div class="mb-4" id="cover-letter-section" style="display: none;">
             <h3>Your Generated Cover Letter</h3>
             <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
             <div class="mt-2">
-                <button class="btn btn-success" onclick="downloadCoverLetter()">Download Cover Letter</button>
+                <button class="btn btn-success" onclick="downloadCoverLetter()">Download CoverME</button>
                 <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
             </div>
         </div>
+
         <!-- Job Listings Display -->
         <div class="mb-4" id="job-listings-container">
             <!-- Job listings will be populated here -->
         </div>
+        <div class="mb-4">
+            <label for="resume-text">Paste your Resume:</label>
+            <textarea class="form-control" id="resume-text" rows="10"></textarea>
+        </div>
+        <div id="loading-overlay"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+            <div
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
+                Hold please. Doing AI things
+            </div>
+        </div>
+
         <script>
-            // Fetch job listings based on user input
+
+            function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName) {
+                console.log("Job Description:", jobDescription);
+                console.log("Resume:", resume);
+
+                // Show the loading overlay
+                document.getElementById('loading-overlay').style.display = 'block';
+
+                // Make a POST request to the backend with the required data
+                fetch('/resume.1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume: resume,
+                        job_description: jobDescription,
+                        job_title: jobTitle
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Cover Letter Response:", data);
+
+                        // Hide the loading overlay
+                        document.getElementById('loading-overlay').style.display = 'none';
+
+                        document.getElementById('cover-letter-section-1').style.display = 'block';
+                        document.getElementById('cover-letter-text-1').value = data.cover_letter;
+                    })
+                    .catch(error => {
+                        console.error("Error generating cover letter:", error);
+
+                        // Hide the loading overlay even in case of error
+                        document.getElementById('loading-overlay').style.display = 'none';
+                    });
+            }
+
+
             // Fetch job listings based on user input
             function fetchJobListings() {
                 const jobQuery = document.getElementById('job-query').value;
@@ -118,17 +181,30 @@
                     // Add the "Generate Cover Letter" button
                     const generateButton = document.createElement('button');
                     generateButton.className = 'btn btn-secondary ml-2';
-                    generateButton.innerText = 'Generate Cover Letter';
+                    generateButton.innerText = 'CoverME';
+                    generateButton.style.backgroundColor = 'green'; // Set the background color to green
+                    generateButton.style.color = 'white'; // Set the text color to white (optional)
                     generateButton.onclick = () => generateCoverLetter(
                         job.job_description,
                         document.getElementById('resume-text').value,
                         job.job_title,
                         job.employer_name || "Unknown Company"  // Use "Unknown Company" if employer_name is not available
                     );
-
                     jobBox.appendChild(generateButton);
 
-
+                    // Add the "Generate Cover Letter (Resume.1)" button
+                    const generateButton_1 = document.createElement('button');
+                    generateButton_1.className = 'btn btn-secondary ml-2';
+                    generateButton_1.innerText = 'ResuME';
+                    generateButton_1.style.backgroundColor = 'purple'; // Set the background color to yellow
+                    generateButton_1.style.color = 'white'; // Set the text color to black (optional)
+                    generateButton_1.onclick = () => generateCoverLetter_1(
+                        job.job_description,
+                        document.getElementById('resume-text').value,
+                        job.job_title,
+                        job.employer_name || "Unknown Company"  // Use "Unknown Company" if employer_name is not available
+                    );
+                    jobBox.appendChild(generateButton_1);
 
 
                     listingsContainer.appendChild(jobBox);
@@ -137,20 +213,16 @@
 
 
 
-            // Generate a cover letter using the Flask route
+
             // Generate a cover letter using the Flask route
             function generateCoverLetter(jobDescription, resume, jobTitle, companyName) {
                 console.log("Generate Cover Letter button clicked.");
-
                 console.log("Job Description:", jobDescription);  // Log the job description
-
-                // ... [rest of the code remains the same]
-
                 console.log("Resume:", resume);  // Log the resume text
 
-                // ... [rest of the code remains the same]
+                // Show the loading overlay
+                document.getElementById('loading-overlay').style.display = 'block';
 
-                // Make an AJAX call to the Flask backend
                 // Make an AJAX call to the Flask backend
                 fetch('/career_click', {
                     method: 'POST',
@@ -168,18 +240,23 @@
                     .then(data => {
                         console.log("Cover Letter Response:", data);  // Log the response data
 
+                        // Hide the loading overlay
+                        document.getElementById('loading-overlay').style.display = 'none';
+
                         // Display the generated cover letter
                         document.getElementById('cover-letter-text').value = data.cover_letter;
                         document.getElementById('cover-letter-section').style.display = 'block';
                     })
                     .catch(error => {
                         console.error('Error generating cover letter:', error);
-                    });
 
+                        // Hide the loading overlay even in case of error
+                        document.getElementById('loading-overlay').style.display = 'none';
+                    });
             }
 
 
-            // ... [rest of the JavaScript functions]
+
 
 
 
@@ -201,6 +278,28 @@
                 document.execCommand('copy');
                 alert('Cover letter copied to clipboard!');
             }
+
+            // Function to download the resuME
+            function downloadResume_1() {
+                const textToSave = document.getElementById('cover-letter-text-1').value;
+                const blob = new Blob([textToSave], { type: "text/plain" });
+                const anchor = document.createElement("a");
+                anchor.download = "resume_1.txt";
+                anchor.href = window.URL.createObjectURL(blob);
+                anchor.target = "_blank";
+                anchor.click();
+            }
+
+            // Function to copy the resuME to clipboard
+            function copyToClipboard_1() {
+                const copyText = document.getElementById('cover-letter-text-1');
+                copyText.select();
+                document.execCommand("copy");
+                alert("resuME copied to clipboard!");
+            }
+
+
+
         </script>
     </div>
 </body>
