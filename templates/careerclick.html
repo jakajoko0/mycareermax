@@ -19,11 +19,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .job-box {
+            height: 250px;
+            overflow-y: auto;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .job-box:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
 
 <body>
     <div class="d-flex justify-content-center align-items-center"><img class="img-fluid mb-3"
-            src="https://drive.google.com/uc?export=download&amp;id=1MQupSW1hX96_33cad79B471uW-RZZWcV" /></div>
+            src="https://drive.google.com/uc?export=download&id=1eJoM5Fw8Te3E83vLA9Z1VPt3ULn-VS6u" /></div>
     <div class="container mt-5">
         <!-- Job Search Section -->
         <div class="mb-4" id="job-search-section">
@@ -41,48 +53,48 @@
                 </div>
             </div>
         </div>
-
         <!-- Generated Resume Display -->
-        <div id="cover-letter-section-1" class="cover-letter-section" style="display: none;">
+        <div class="cover-letter-section" id="cover-letter-section-1" style="display: none;">
             <h3>Your Tailored Resume</h3>
-            <textarea class="form-control" id="cover-letter-text-1" rows="10" readonly=""></textarea>
-
+            <textarea class="form-control" id="cover-letter-text-1" readonly="" rows="10"></textarea>
             <!-- New buttons added here -->
             <div class="mt-2">
-                <button id="download-resume-1" class="btn btn-primary mt-2" onclick="downloadResume_1()">Download
-                    resuME</button>
-                <button id="copy-resume-1" class="btn btn-secondary mt-2 ml-2" onclick="copyToClipboard_1()">Copy to
+                <button class="btn btn-primary mt-2" id="download-resume-1"
+                    onclick="downloadResume_1()">Download</button>
+                <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">Copy to
                     Clipboard</button>
             </div>
         </div>
-        &nbsp;
+         
 
         <!-- Generated Cover Letter Display -->
         <div class="mb-4" id="cover-letter-section" style="display: none;">
             <h3>Your Generated Cover Letter</h3>
             <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
             <div class="mt-2">
-                <button class="btn btn-success" onclick="downloadCoverLetter()">Download CoverME</button>
+                <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
                 <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
             </div>
         </div>
-
         <!-- Job Listings Display -->
         <div class="mb-4" id="job-listings-container">
             <!-- Job listings will be populated here -->
         </div>
+        <!-- Resume box -->
         <div class="mb-4">
-            <label for="resume-text">Paste your Resume:</label>
+            <label for="resume-upload">Upload your resume (.docx format) or manually enter below :</label>
+            <input accept=".docx" id="resume-upload" type="file" />
+            <label for="resume-text"></label>
             <textarea class="form-control" id="resume-text" rows="10"></textarea>
         </div>
         <div id="loading-overlay"
             style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
             <div
                 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
-                Hold please. Doing AI things
+                Hold please. Doing AI things. Your generated content will be available at the top of the page when I'm
+                finished.
             </div>
         </div>
-
         <script>
 
             function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName) {
@@ -163,53 +175,61 @@
                     const jobBox = document.createElement('div');
                     jobBox.className = 'job-box';
 
-                    const jobTitle = document.createElement('h4');
-                    jobTitle.innerText = job.job_title;
-                    jobBox.appendChild(jobTitle);
+                    // Create the "Generate Cover Letter" button first
+                    const generateButton = document.createElement('button');
+                    generateButton.className = 'btn btn-secondary ml-2';
+                    generateButton.innerText = 'CoverME';
+                    generateButton.style.backgroundColor = 'green';
+                    generateButton.style.color = 'white';
+                    generateButton.style.marginBottom = '10px';  // Added margin-bottom for spacing
+                    generateButton.onclick = () => generateCoverLetter(
+                        job.job_description,
+                        document.getElementById('resume-text').value,
+                        job.job_title,
+                        job.employer_name || "Unknown Company"
+                    );
+                    jobBox.appendChild(generateButton);
 
-                    const jobDescription = document.createElement('p');
-                    jobDescription.innerText = job.job_description;
-                    jobBox.appendChild(jobDescription);
+                    // Create the "Generate Cover Letter (Resume.1)" button
+                    const generateButton_1 = document.createElement('button');
+                    generateButton_1.className = 'btn btn-secondary ml-2';
+                    generateButton_1.innerText = 'ResuME';
+                    generateButton_1.style.backgroundColor = 'purple';
+                    generateButton_1.style.color = 'white';
+                    generateButton_1.style.marginBottom = '10px';  // Added margin-bottom for spacing
+                    generateButton_1.onclick = () => generateCoverLetter_1(
+                        job.job_description,
+                        document.getElementById('resume-text').value,
+                        job.job_title,
+                        job.employer_name || "Unknown Company"
+                    );
+                    jobBox.appendChild(generateButton_1);
 
+                    // Append the Apply button
                     const applyButton = document.createElement('a');
                     applyButton.href = job.job_apply_link;
                     applyButton.target = '_blank';
                     applyButton.className = 'btn btn-primary';
                     applyButton.innerText = 'Apply Now';
+                    applyButton.style.marginBottom = '10px';  // Existing margin-bottom for spacing
+                    applyButton.style.marginLeft = '10px';    // Added margin-left to move the button to the right
                     jobBox.appendChild(applyButton);
 
-                    // Add the "Generate Cover Letter" button
-                    const generateButton = document.createElement('button');
-                    generateButton.className = 'btn btn-secondary ml-2';
-                    generateButton.innerText = 'CoverME';
-                    generateButton.style.backgroundColor = 'green'; // Set the background color to green
-                    generateButton.style.color = 'white'; // Set the text color to white (optional)
-                    generateButton.onclick = () => generateCoverLetter(
-                        job.job_description,
-                        document.getElementById('resume-text').value,
-                        job.job_title,
-                        job.employer_name || "Unknown Company"  // Use "Unknown Company" if employer_name is not available
-                    );
-                    jobBox.appendChild(generateButton);
 
-                    // Add the "Generate Cover Letter (Resume.1)" button
-                    const generateButton_1 = document.createElement('button');
-                    generateButton_1.className = 'btn btn-secondary ml-2';
-                    generateButton_1.innerText = 'ResuME';
-                    generateButton_1.style.backgroundColor = 'purple'; // Set the background color to yellow
-                    generateButton_1.style.color = 'white'; // Set the text color to black (optional)
-                    generateButton_1.onclick = () => generateCoverLetter_1(
-                        job.job_description,
-                        document.getElementById('resume-text').value,
-                        job.job_title,
-                        job.employer_name || "Unknown Company"  // Use "Unknown Company" if employer_name is not available
-                    );
-                    jobBox.appendChild(generateButton_1);
+                    // Now append the job title
+                    const jobTitle = document.createElement('h4');
+                    jobTitle.innerText = job.job_title;
+                    jobBox.appendChild(jobTitle);
 
+                    // Append the job description
+                    const jobDescription = document.createElement('p');
+                    jobDescription.innerText = job.job_description;
+                    jobBox.appendChild(jobDescription);
 
                     listingsContainer.appendChild(jobBox);
                 });
             }
+
 
 
 
@@ -298,10 +318,54 @@
                 alert("resuME copied to clipboard!");
             }
 
+            // Event listener for file upload
+            $("#resume-upload").change(function () {
+                var form_data = new FormData();
+                var file_data = $("#resume-upload")[0].files[0];
+                form_data.append("file", file_data);
 
+                $.ajax({
+                    type: "POST",
+                    url: "/upload-search",
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (data) {
+                        // Check if data is a string (error message) or an object (JSON response)
+                        if (typeof data === 'string') {
+                            // Display error message in the console
+                            console.error(data);
+                            // Show the error message to the user (You can use an alert or other UI element)
+                            alert(data);
+                        } else {
+                            // Data is an object (JSON response) with a 'content' property
+                            console.log(data.content);
+                            // Set the content in the existing text area (resume)
+                            $("#resume-text").val(data.content);
+
+                            // Show the existing text area
+                            $("#resume-upload").show();
+                        }
+                    },
+                    error: function (xhr, textStatus, error) {
+                        console.error("Error while uploading the file:", error);
+                        alert("An error occurred while uploading the file. Please try again later.");
+                    }
+                });
+            });
 
         </script>
     </div>
+    <script>
+        $(document).ready(function () {
+            $(".job-box").click(function () {
+                // Display the entire content in an alert for now
+                // You can replace this with a modal or another method of your choice
+                alert($(this).text());
+            });
+        });
+    </script>
 </body>
 
 </html>

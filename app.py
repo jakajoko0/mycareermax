@@ -27,7 +27,7 @@ def fetch_jobs_from_rapidapi(query):
         "X-RapidAPI-Key": "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56",
         "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
     }
-    params = {"query": query, "page": "1", "num_pages": "1"}
+    params = {"query": query, "num_pages": "1"}
 
     response = requests.get(url, headers=headers, params=params)
     print(f"API Response: {response.json()}")
@@ -288,7 +288,7 @@ def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page=1&num_pages=1"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=1"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return jsonify(response.json())
@@ -386,6 +386,36 @@ def resume_1():
 
     # Return the generated cover letter as a JSON response
     return jsonify({"cover_letter": cover_letter})
+
+
+@app.route("/upload-search", methods=["POST"])
+def upload_search():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        return jsonify({"error": "No file selected"}), 400
+
+    if file and file.filename.endswith(".docx"):
+        # Process the uploaded DOCX file and extract the text content
+        try:
+            document = Document(file)
+            # Extract text content from the document
+            docx_content = "\n".join(
+                paragraph.text for paragraph in document.paragraphs
+            )
+
+            # Return the content in the JSON response
+            return jsonify({"content": docx_content}), 200
+        except Exception as e:
+            return jsonify({"error": f"Error processing the file: {e}"}), 500
+    else:
+        return (
+            jsonify({"error": "Invalid file format. Only .docx files are allowed."}),
+            400,
+        )
 
 
 if __name__ == "__main__":
