@@ -417,6 +417,38 @@ def upload_search():
             400,
         )
 
+        # Salary button
+
+
+@app.route("/analyze-job", methods=["POST"])
+def analyze_job():
+    job_title = request.form.get("job_title")
+
+    # OpenAI API call with only the job title in the prompt
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that provides salary ranges",
+            },
+            {
+                "role": "user",
+                "content": "Provide the salary range in USD for the following job title. Lean more on the higher side of the salary ranges.\nJob Title: Web Developer\nResponse Requirements:\n1. The range should be no greater than $15,000 USD\n2. Example response: The salary range for (job title) is (salary range)\n\nJob Title: {job_title}",
+            },
+        ],
+        temperature=1,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+    )
+
+    # Extracting the salary range from the response (assuming it's in the last message's content)
+    salary_range = response["choices"][0]["message"]["content"]
+
+    return jsonify({"response": salary_range})
+
 
 if __name__ == "__main__":
     app.debug = True

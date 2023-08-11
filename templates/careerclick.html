@@ -10,6 +10,18 @@
             margin-bottom: 15px;
             border-radius: 5px;
         }
+
+        .job-box {
+            height: 150px;
+            /* You can adjust this value based on your design preference */
+            overflow: hidden;
+            cursor: pointer;
+            /* Optional: Change the cursor to a hand pointer to indicate it's clickable */
+        }
+
+        .job-box.active {
+            overflow: auto;
+        }
     </style>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -35,7 +47,7 @@
 
 <body>
     <div class="d-flex justify-content-center align-items-center"><img class="img-fluid mb-3"
-            src="https://drive.google.com/uc?export=download&id=1eJoM5Fw8Te3E83vLA9Z1VPt3ULn-VS6u" /></div>
+            src="https://drive.google.com/uc?export=download&amp;id=1eJoM5Fw8Te3E83vLA9Z1VPt3ULn-VS6u" /></div>
     <div class="container mt-5">
         <!-- Job Search Section -->
         <div class="mb-4" id="job-search-section">
@@ -49,7 +61,7 @@
                         type="text" />
                 </div>
                 <div class="col">
-                    <button class="btn btn-primary" onclick="fetchJobListings()">Search Jobs</button>
+                    <button class="btn btn-primary" onclick="fetchJobListings()">Search</button>
                 </div>
             </div>
         </div>
@@ -179,8 +191,8 @@
                     const generateButton = document.createElement('button');
                     generateButton.className = 'btn btn-secondary ml-2';
                     generateButton.innerText = 'CoverME';
-                    generateButton.style.backgroundColor = 'green';
-                    generateButton.style.color = 'white';
+                    generateButton.style.backgroundColor = 'orange';
+                    generateButton.style.color = 'black';
                     generateButton.style.marginBottom = '10px';  // Added margin-bottom for spacing
                     generateButton.onclick = () => generateCoverLetter(
                         job.job_description,
@@ -205,15 +217,43 @@
                     );
                     jobBox.appendChild(generateButton_1);
 
+                    const analyzeButton = document.createElement('button');
+                    analyzeButton.className = 'btn btn-secondary ml-2';
+                    analyzeButton.innerText = '$alary';
+                    analyzeButton.style.backgroundColor = 'green';
+                    analyzeButton.style.color = 'yellow';
+                    analyzeButton.style.marginBottom = '10px';
+                    analyzeButton.onclick = () => {
+                        // AJAX call to Flask backend with separate parameters for job title
+                        $.post("/analyze-job", {
+                            job_title: job.job_title
+                        }, function (data) {
+                            // Display the result in the modal
+                            document.getElementById('analyzeResult').innerText = data.response;
+                            $('#analyzeModal').modal('show');  // Trigger the modal to show
+                        });
+                    };
+                    jobBox.appendChild(analyzeButton);
+
                     // Append the Apply button
                     const applyButton = document.createElement('a');
                     applyButton.href = job.job_apply_link;
                     applyButton.target = '_blank';
                     applyButton.className = 'btn btn-primary';
-                    applyButton.innerText = 'Apply Now';
+                    applyButton.innerText = 'Apply!';
                     applyButton.style.marginBottom = '10px';  // Existing margin-bottom for spacing
                     applyButton.style.marginLeft = '10px';    // Added margin-left to move the button to the right
                     jobBox.appendChild(applyButton);
+
+                    jobBox.addEventListener('click', function () {
+                        // Toggle the "active" class on click
+                        if (this.classList.contains('active')) {
+                            this.classList.remove('active');
+                        } else {
+                            this.classList.add('active');
+                        }
+                    });
+
 
 
                     // Now append the job title
@@ -366,6 +406,25 @@
             });
         });
     </script>
+    <div aria-hidden="true" aria-labelledby="analyzeModalLabel" class="modal fade" id="analyzeModal" role="dialog"
+        tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="analyzeModalLabel">Job Analysis Result</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="analyzeResult"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
