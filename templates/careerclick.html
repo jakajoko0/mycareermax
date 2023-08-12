@@ -280,8 +280,8 @@
                             }
                         });
 
-                        // Prevent scrolling on hover unless the job box is clicked/active
-                        jobBox.addEventListener('wheel', function (event) {
+                        // Prevent touch-based scrolling on mobile unless the job box is clicked/active
+                        jobBox.addEventListener('touchmove', function (event) {
                             if (!this.classList.contains('active')) {
                                 event.preventDefault();
                             }

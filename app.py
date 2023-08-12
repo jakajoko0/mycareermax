@@ -343,7 +343,7 @@ def career_click():
 
     # Make the API call to OpenAI's GPT-3.5 model
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=messages,
         max_tokens=500,  # Set a limit on the length of the generated cover letter
     )
@@ -376,7 +376,7 @@ def resume_1():
 
     # Make the API call to OpenAI's GPT-3.5 model
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=messages,
         max_tokens=500,  # Set a limit on the length of the generated cover letter
     )
