@@ -19,8 +19,8 @@
             /* Optional: Change the cursor to a hand pointer to indicate it's clickable */
         }
 
-        .job-box.active {
-            overflow: auto;
+        .job-box {
+            overflow: hidden;
         }
     </style>
     <meta charset="utf-8" />
@@ -273,12 +273,19 @@
                             // Toggle the "active" class on click
                             if (this.classList.contains('active')) {
                                 this.classList.remove('active');
+                                this.style.overflow = 'hidden';  // Prevent scrolling
                             } else {
                                 this.classList.add('active');
+                                this.style.overflow = 'auto';  // Allow scrolling
                             }
                         });
 
-
+                        // Prevent scrolling on hover unless the job box is clicked/active
+                        jobBox.addEventListener('wheel', function (event) {
+                            if (!this.classList.contains('active')) {
+                                event.preventDefault();
+                            }
+                        });
 
                         // Now append the job title
                         const jobTitle = document.createElement('h4');
