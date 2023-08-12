@@ -9,20 +9,18 @@
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 5px;
-        }
-
-        .job-box {
             height: 150px;
-            /* You can adjust this value based on your design preference */
+            /* Adjust based on your design preference */
             overflow: hidden;
             cursor: pointer;
-            /* Optional: Change the cursor to a hand pointer to indicate it's clickable */
+            /* Indicate it's clickable */
         }
 
-        .job-box {
-            overflow: hidden;
+        .job-box.active {
+            overflow-y: auto;
         }
     </style>
+
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>CareerClick</title>
@@ -269,23 +267,19 @@
                         applyButton.style.marginLeft = '10px';    // Added margin-left to move the button to the right
                         jobBox.appendChild(applyButton);
 
-                        jobBox.addEventListener('click', function () {
-                            // Toggle the "active" class on click
-                            if (this.classList.contains('active')) {
-                                this.classList.remove('active');
-                                this.style.overflow = 'hidden';  // Prevent scrolling
-                            } else {
-                                this.classList.add('active');
-                                this.style.overflow = 'auto';  // Allow scrolling
+                        // When a jobBox is clicked, toggle its active state and adjust overflow
+                        document.addEventListener('click', function (event) {
+                            // Deactivate all active job boxes first
+                            document.querySelectorAll('.job-box.active').forEach(function (box) {
+                                box.classList.remove('active');
+                            });
+
+                            // If a jobBox itself was clicked, activate it
+                            if (event.target.classList.contains('job-box')) {
+                                event.target.classList.add('active');
                             }
                         });
 
-                        // Prevent touch-based scrolling on mobile unless the job box is clicked/active
-                        jobBox.addEventListener('touchmove', function (event) {
-                            if (!this.classList.contains('active')) {
-                                event.preventDefault();
-                            }
-                        });
 
                         // Now append the job title
                         const jobTitle = document.createElement('h4');
