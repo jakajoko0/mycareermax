@@ -4,7 +4,6 @@ import logging
 from docx import Document
 from flask import Flask, render_template, request, jsonify
 import openai
-import pyodbc
 import requests
 from dotenv import load_dotenv
 
