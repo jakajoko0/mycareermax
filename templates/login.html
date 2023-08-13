@@ -1,18 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f7f7f7;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 5% auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-width: 80%;
+            /* Adjust based on your preference */
+            height: auto;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="container mt-5">
-        <h2>Login</h2>
-        {% if message %}
-        <p class="text-danger">{{ message }}</p>
+    <div class="container login-container">
+        <div class="login-header">
+            <img src="https://drive.google.com/uc?export=download&id=1N804qCgYQ0AY6zBrU--g0-zjyhWKgxDi" alt="Logo"
+                class="logo">
+            <h2>Login</h2>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-info">
+            {{ messages[0] }}
+        </div>
         {% endif %}
+        {% endwith %}
+
         <form action="/login" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
@@ -22,12 +60,11 @@
                 <label for="password">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
-                <label class="form-check-label" for="remember_me">Remember Me</label>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
+        <div class="text-center mt-3">
+            <a href="/register" class="btn btn-link">Don't have an account? Register here</a>
+        </div>
     </div>
 
 </body>

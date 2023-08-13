@@ -86,7 +86,7 @@ conn_str = (
     f"Pwd={DB_PASSWORD};"
     "Encrypt=yes;"
     "TrustServerCertificate=no;"
-    "Connection Timeout=30;"
+    "Connection Timeout=90;"
 )
 conn = pyodbc.connect(conn_str)
 
