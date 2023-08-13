@@ -5,3 +5,4 @@ Flask-WTF
 python-docx
 python-dotenv
 waitress
+pyodbc
