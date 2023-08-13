@@ -86,7 +86,7 @@ conn_str = (
     f"Pwd={DB_PASSWORD};"
     "Encrypt=yes;"
     "TrustServerCertificate=no;"
-    "Connection Timeout=30;"
+    "ConnectionTimeout=30;"
 )
 conn = pyodbc.connect(conn_str)
 
@@ -127,6 +127,7 @@ def register():
 
     return render_template("register.html")
 
+
 # Login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -152,10 +153,12 @@ def login():
 
     return render_template("login.html", message=message)
 
+
 @app.route("/dashboard")
 @login_required  # Only logged-in users can access this route
 def dashboard():
     return render_template("dashboard.html")
+
 
 @app.route("/logout")
 @login_required  # Only logged-in users can access this route
@@ -163,21 +166,26 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+
 @app.route("/careerclick")
 def careerclick():
     return render_template("careerclick.html")
+
 
 @app.route("/background-image")
 def background_image():
     return render_template("background_image.html")
 
+
 @app.route("/")
 def home():
     return render_template("home.html")
 
+
 @app.route("/cover-letter-generator")
 def cover_letter_generator():
     return render_template("cover_letter_generator.html")
+
 
 @app.route("/resume-enhancer")
 def resume_enhancer():
