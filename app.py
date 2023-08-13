@@ -1,41 +1,14 @@
 # Import necessary libraries
 import os
 import logging
-import requests
 from docx import Document
 from flask import Flask, render_template, request, jsonify
 import openai
-
+import pyodbc
 import requests
-
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
-
-# Now you can access the OPENAI_API_KEY environment variable
-openai.api_key = os.getenv("OPENAI_API_KEY")
-print(os.getenv("OPENAI_API_KEY"))
-
-
-JOBS_API_URL = "https://jsearch.p.rapidapi.com/search"
-
-
-def fetch_jobs_from_rapidapi(query):
-    url = "https://jsearch.p.rapidapi.com/search"
-    headers = {
-        "X-RapidAPI-Key": "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56",
-        "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-    }
-    params = {"query": query, "num_pages": "1"}
-
-    response = requests.get(url, headers=headers, params=params)
-    print(f"API Response: {response.json()}")
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {}
-
 
 # Create a Flask app instance and configure it
 app = Flask(__name__)
@@ -51,7 +24,6 @@ logging.basicConfig(
 RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
 RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
-
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -102,6 +74,7 @@ def application_questions():
     return render_template("application_questions.html")
 
 
+# RESUMETUNER OPENAI API CALLS
 @app.route("/analyze-resume", methods=["POST"])
 def analyze_resume():
     # Extract the content from the request
@@ -129,7 +102,7 @@ def analyze_resume():
     return jsonify({"feedback": feedback})
 
 
-# Route to handle the file upload
+# RESUMETUNER FILE UPLOAD
 @app.route("/upload-docx", methods=["POST"])
 def upload_docx():
     if "file" not in request.files:
@@ -160,7 +133,7 @@ def upload_docx():
         )
 
 
-# Route to handle the Coverme button to generate cover
+# COVERME OPENAI API CALLS
 @app.route("/generate-cover-letter", methods=["POST"])
 def generate_cover_letter():
     # Extract the content from the request
@@ -192,8 +165,7 @@ def generate_cover_letter():
     return jsonify({"cover_letter": cover_letter})
 
 
-# INTERVIEW SIMULATOR
-# Question Generator Call to openai
+# INTERVIEW SIMULATOR OPENAI API CALLS
 @app.route("/simulate-interview", methods=["POST"])
 def simulate_interview():
     try:
@@ -275,10 +247,7 @@ def analyze_answer():
     return jsonify({"feedback": feedback})
 
 
-# CareerClick RapidAPI Routes
-# RapidAPI configuration
-RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
-RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
+# COVERME PRO RapidAPI CALLS
 RAPIDAPI_BASE_URL = "https://jsearch.p.rapidapi.com"
 headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
@@ -296,31 +265,7 @@ def fetch_job_listings():
         return jsonify({"error": "Failed to fetch job listings"}), 500
 
 
-@app.route("/fetch-job-details", methods=["POST"])
-def fetch_job_details():
-    query = request.json.get("query")
-    # Construct the API URL for detailed information
-    url = f"{RAPIDAPI_BASE_URL}/search-filters?query={query}"
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return jsonify(response.json())
-    else:
-        return jsonify({"error": "Failed to fetch job details"}), 500
-
-
-@app.route("/fetch-search-filters", methods=["POST"])
-def fetch_search_filters():
-    query = request.json.get("query")
-    # Construct the API URL for search filters
-    url = f"{RAPIDAPI_BASE_URL}/search-filters?query={query}"
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return jsonify(response.json())
-    else:
-        return jsonify({"error": "Failed to fetch search filters"}), 500
-
-
-# CareerClick OpenAI API Route
+# COVERME PRO - coverME OPENAI API CALLS
 @app.route("/career_click", methods=["POST"])
 def career_click():
     # Extract the resume, job description, company name, and job title from the request
@@ -355,6 +300,7 @@ def career_click():
     return jsonify({"cover_letter": cover_letter})
 
 
+# COVERME PRO - resuME OPENAI API CALLS
 @app.route("/resume.1", methods=["POST"])
 def resume_1():
     # Extract the resume, job description, company name, and job title from the request
@@ -388,38 +334,7 @@ def resume_1():
     return jsonify({"cover_letter": cover_letter})
 
 
-@app.route("/upload-search", methods=["POST"])
-def upload_search():
-    if "file" not in request.files:
-        return jsonify({"error": "No file part in the request"}), 400
-
-    file = request.files["file"]
-
-    if file.filename == "":
-        return jsonify({"error": "No file selected"}), 400
-
-    if file and file.filename.endswith(".docx"):
-        # Process the uploaded DOCX file and extract the text content
-        try:
-            document = Document(file)
-            # Extract text content from the document
-            docx_content = "\n".join(
-                paragraph.text for paragraph in document.paragraphs
-            )
-
-            # Return the content in the JSON response
-            return jsonify({"content": docx_content}), 200
-        except Exception as e:
-            return jsonify({"error": f"Error processing the file: {e}"}), 500
-    else:
-        return (
-            jsonify({"error": "Invalid file format. Only .docx files are allowed."}),
-            400,
-        )
-
-        # Salary button
-
-
+# COVERME PRO - $alary OPENAI API CALLS
 @app.route("/analyze-job", methods=["POST"])
 def analyze_job():
     job_title = request.form.get("job_title")
