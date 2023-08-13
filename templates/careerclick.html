@@ -63,44 +63,26 @@
                 </div>
             </div>
         </div>
-        <!-- Generated Resume Display -->
-        <div class="cover-letter-section" id="cover-letter-section-1" style="display: none;">
-            <h3>Your Tailored Resume</h3>
-            <textarea class="form-control" id="cover-letter-text-1" readonly="" rows="10"></textarea>
-            <!-- New buttons added here -->
-            <div class="mt-2">
-                <button class="btn btn-primary mt-2" id="download-resume-1"
-                    onclick="downloadResume_1()">Download</button>
-                <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">Copy to
-                    Clipboard</button>
-            </div>
-        </div>
-         
 
-        <!-- Generated Cover Letter Display -->
-        <div class="mb-4" id="cover-letter-section" style="display: none;">
-            <h3>Your Generated Cover Letter</h3>
-            <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
-            <div class="mt-2">
-                <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
-                <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
-            </div>
-        </div>
-        <!-- Job Listings Display -->
-        <div class="mb-4" id="job-listings-container">
-            <!-- Job listings will be populated here -->
-        </div>
         <!-- Resume box -->
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-
-        <!-- Resume box -->
         <div class="mb-4">
-            <label for="resume-upload">Upload your resume (.docx format) or manually enter below :</label>
-            <input type="file" id="upload" />
-            <textarea class="form-control mt-2" id="resume-text" rows="10"></textarea>
-
+            <label for="resume-upload">Upload your resume (.docx format) or <a href="#" id="toggle-textarea">manually
+                    enter
+                </a>:</label>
+            <input id="upload" type="file" />
+            <textarea class="form-control mt-2" id="resume-text" rows="10" style="display: none;"></textarea>
             <script>
+                document.getElementById('toggle-textarea').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var textarea = document.getElementById('resume-text');
+                    if (textarea.style.display === 'none') {
+                        textarea.style.display = 'block';
+                    } else {
+                        textarea.style.display = 'none';
+                    }
+                });
+
                 document.getElementById('upload').addEventListener('change', function (event) {
                     var reader = new FileReader();
                     reader.onload = function (event) {
@@ -128,6 +110,35 @@
                     I'm
                     finished.
                 </div>
+            </div>
+            <!-- Generated Resume Display -->
+            <div class="cover-letter-section" id="cover-letter-section-1" style="display: none;">
+                <h3>Your Tailored Resume</h3>
+                <textarea class="form-control" id="cover-letter-text-1" readonly="" rows="10"></textarea>
+                <!-- New buttons added here -->
+                <div class="mt-2">
+                    <button class="btn btn-primary mt-2" id="download-resume-1"
+                        onclick="downloadResume_1()">Download</button>
+                    <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">Copy to
+                        Clipboard</button>
+                </div>
+            </div>
+             
+
+            <!-- Generated Cover Letter Display -->
+            <div class="mb-4" id="cover-letter-section" style="display: none;">
+                <h3>Your Generated Cover Letter</h3>
+                <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
+                <div class="mt-2">
+                    <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
+                    <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
+                </div>
+            </div>
+
+
+            <!-- Job Listings Container -->
+            <div class="mb-4" id="job-listings-container">
+                <!-- Job listings will be populated here -->
             </div>
             <script>
 
