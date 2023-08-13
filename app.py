@@ -2,75 +2,191 @@
 import os
 import logging
 from docx import Document
-from flask import Flask, render_template, request, jsonify
 import openai
 import requests
 from dotenv import load_dotenv
+import pyodbc
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    jsonify,
+)
+import bcrypt
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user,
+)
+
+# noqa: F401
+from flask import flash, get_flashed_messages
+
 
 load_dotenv()
 
-# Create a Flask app instance and configure it
-app = Flask(__name__)
-app.config["DEBUG"] = True
-app.config["PROPAGATE_EXCEPTIONS"] = True
-
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-# API keys
+# keys
 RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
 RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-# Route to handle the "/resume-analysis" endpoint
-@app.route("/resume-analysis")
-def resume_analysis():
-    return render_template("resume_analysis.html")
+# Create a Flask app instance and configure it
+app = Flask(__name__)
+app.config["DEBUG"] = True
+app.config["PROPAGATE_EXCEPTIONS"] = True
+
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SESSION_COOKIE_SECURE"] = True
 
 
-# Route to handle the root URL (homepage)
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Create a LoginManager instance
+login_manager = LoginManager()
+login_manager.login_view = "login"  # The view function that handles logins
+
+# Initialize Flask-Login
+login_manager.init_app(app)
+
+
+# Create a User class (this can be an actual ORM model if you're using SQLAlchemy)
+class User(UserMixin):
+    def __init__(self, user_id):
+        self.id = user_id
+
+
+# Load the user for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
+
+
+DB_SERVER = os.getenv("DB_SERVER")
+DB_NAME = os.getenv("DB_NAME")
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+# Update the connection string to use the fetched environment variables
+conn_str = (
+    "Driver={ODBC Driver 18 for SQL Server};"
+    f"Server=tcp:{DB_SERVER},1433;"
+    f"Database={DB_NAME};"
+    f"Uid={DB_USERNAME};"
+    f"Pwd={DB_PASSWORD};"
+    "Encrypt=yes;"
+    "TrustServerCertificate=no;"
+    "Connection Timeout=30;"
+)
+conn = pyodbc.connect(conn_str)
+
+
+@app.before_request
+def require_login():
+    allowed_routes = [
+        "login",
+        "register",
+    ]  # List of routes that don't require authentication
+    if not current_user.is_authenticated and request.endpoint not in allowed_routes:
+        return redirect(url_for("login"))
+
+
+# Register Route
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"].encode("utf-8")  # Convert to bytes
+        hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+                (username, email, hashed_password),
+            )
+            conn.commit()
+            flash("User registered successfully!", "success")
+            return redirect(url_for("login"))
+        except pyodbc.IntegrityError:
+            flash("Username or email already exists.", "danger")
+            return render_template(
+                "register.html"
+            )  # Render the register template again
+
+    return render_template("register.html")
+
+# Login route
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    message = None
+    if request.method == "POST":
+        username = request.form["username"]
+        password_to_check = request.form["password"].encode("utf-8")
+
+        # Convert the remember_me value to a boolean
+        remember_me = bool(request.form.get("remember_me"))
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+
+        # Decode the hashed password from the database before comparing
+        if user and bcrypt.checkpw(password_to_check, user.password):
+            user_obj = User(user.id)
+            login_user(user_obj, remember=remember_me)
+            return redirect(url_for("dashboard"))
+        else:
+            message = "Invalid credentials"
+
+    return render_template("login.html", message=message)
+
+@app.route("/dashboard")
+@login_required  # Only logged-in users can access this route
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route("/logout")
+@login_required  # Only logged-in users can access this route
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
 @app.route("/careerclick")
 def careerclick():
     return render_template("careerclick.html")
-
 
 @app.route("/background-image")
 def background_image():
     return render_template("background_image.html")
 
-
 @app.route("/")
 def home():
     return render_template("home.html")
 
-
 @app.route("/cover-letter-generator")
 def cover_letter_generator():
     return render_template("cover_letter_generator.html")
-
 
 @app.route("/resume-enhancer")
 def resume_enhancer():
     return render_template("resume_enhancer.html")
 
 
-@app.route("/jobs-api")
-def jobs_api():
-    return render_template("jobs_api.html")
-
-
 @app.route("/interview-prep")
 def interview_prep():
     return render_template("interview_prep.html")
-
-
-@app.route("/application-questions")
-def application_questions():
-    return render_template("application_questions.html")
 
 
 # RESUMETUNER OPENAI API CALLS

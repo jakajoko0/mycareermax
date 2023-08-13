@@ -1,19 +1,53 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
   <title>InterviewPRO</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta content="width=device-width, initial-scale=1" name="viewport">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- Links to the Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
 
-  <!-- Add some CSS to style the current question and center everything -->
+
+  <div id="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+
+  </meta>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #ffffff;
+      color: rgb(0, 0, 0);
+      padding: 10px 0;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      list-style: none;
+      padding: 0;
+    }
+
+    nav li {
+      margin: 0 15px;
+    }
+
+    nav a {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+
+
     /* 
         Adjust this value as needed 
       #question-display {
@@ -22,9 +56,9 @@
       */
     textarea,
     input[type="text"] {
-      border: 2px solid #4CAF50;
+      border: 1px solid #5b87ff;
       /* Green border */
-      border-radius: 10px;
+      border-radius: 5px;
       /* Rounded border */
     }
 
@@ -47,7 +81,7 @@
 
     /* Gradient Background */
     body {
-      background-image: linear-gradient(120deg, #ffffff, #606060);
+      background-image: linear-gradient(120deg, #ffffff, #ffffff);
       background-size: cover;
       background-attachment: fixed;
     }
@@ -95,12 +129,8 @@
       height: 200px;
       /* Adjust this value as needed */
     }
-  </style>
-  <div id="loading-spinner" style="display: none;">
-    <div class="spinner"></div>
-  </div>
 
-  <style>
+
     /* SPINNER CSS */
     #loading-spinner {
       display: none;
@@ -129,57 +159,89 @@
         transform: rotate(360deg);
       }
     }
-  </style>
 
+    /* Responsive centering and full width for main containers */
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Media query for smaller devices */
+    @media only screen and (max-width: 768px) {
+      nav li {
+        margin: 0 5px;
+      }
+
+      form,
+      #answer-container,
+      #questions-container,
+      #question-nav {
+        padding: 0 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <a href="https://coverme.azurewebsites.net/">
-    <img alt="Resume-Tuner" border="0"
-      src="https://drive.google.com/uc?export=download&id=1ktv9ugYhxQ4UV6v9jGN6IWc2XuQujJ1d"
-      style="position: absolute; top: 0; left: 0" />
-  </a>
-
-  <form id="interview-form" enctype="multipart/form-data">
+  <header>
+    <nav>
+      <ul>
+        <a href="/dashboard">Dashboard | </a>
+        <a href="/resume-enhancer">ResuME | </a>
+        <a href="/cover-letter-generator">CoverME | </a>
+        <a href="/careerclick">CoverME PRO | </a>
+        <a href="/logout">Logout </a>
+        <p> </p>
+        <h1>interviewPRO</h1>
+      </ul>
+    </nav>
+  </header>
+  <form enctype="multipart/form-data" id="interview-form">
     <label for="job_title">Job Title:</label><br />
-    <input type="text" id="job_title" name="job_title" /><br />
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
+    <input id="job_title" name="job_title" type="text" /><br />
+    <div> </div>
+    <div> </div>
     <label for="job_description">Job Description:</label><br />
     <textarea id="job_description" name="job_description"></textarea><br />
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
+    <div> </div>
+    <div> </div>
     <label for="job_requirements">Job Requirements:</label><br />
     <textarea id="job_requirements" name="job_requirements"></textarea><br />
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
+    <div> </div>
+    <div> </div>
     <label for="industry">Industry:</label><br />
-    <input type="text" id="industry" name="industry" /><br />
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
+    <input id="industry" name="industry" type="text" /><br />
+    <div> </div>
+    <div> </div>
     <label for="resume">Upload Your Resume:</label><br />
-    <div>&nbsp;</div>
-    <input type="file" id="resume" name="resume" /><br />
-    <div>&nbsp;</div>
+    <div> </div>
+    <input id="resume" name="resume" type="file" /><br />
+    <div> </div>
     <label for="typed_resume">Or enter it manually here:</label><br />
     <textarea id="typed_resume" name="typed_resume"></textarea><br />
-    <div>&nbsp;</div>
+    <div> </div>
     <input type="submit" value="Simulate Interview" />
   </form>
   <div>
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
   </div>
   <div id="interview-container">
     <div id="question-display"></div>
-    <p>&nbsp;</p>
+    <p> </p>
     <textarea id="user-answer" style="display: none"></textarea>
     <div>
-      <p>&nbsp;</p>
+      <p> </p>
     </div>
     <button id="submit-answer" style="display: none">Submit Answer</button>
     <button id="previous-button" style="display: none">Previous</button>

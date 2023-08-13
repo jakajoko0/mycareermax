@@ -14,9 +14,39 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #00f078;
+            color: rgb(0, 0, 0);
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+
+        nav li {
+            margin: 0 15px;
+        }
+
+        nav a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+        }
+    </style>
+    <style>
         /* Gradient Background */
         body {
-            background-image: linear-gradient(120deg, #ffffff, #606060);
+            background-image: linear-gradient(120deg, #ffffff, #ffffff);
             background-size: cover;
             background-attachment: fixed;
         }
@@ -25,7 +55,7 @@
         textarea.form-control {
             border-radius: 15px;
             padding: 8px;
-            border: 1px solid #ff9914;
+            border: 1px solid #3f55ff;
             width: 100%;
         }
 
@@ -53,13 +83,19 @@
     </style>
 </head>
 
-<body><a href="https://coverme.azurewebsites.net/">
-        <img alt="Resume-Tuner" border="0"
-            src="https://drive.google.com/uc?export=download&id=1sGW67lbmmSgqztbnELTPexzvBjSs6lzC"
-            style="position:absolute; top:0; left:0;" />
-    </a>
-    <p> </p>
-    <p> </p>
+<body>
+    <header>
+        <h1>CoverME</h1>
+        <nav>
+            <ul>
+                <a href="/dashboard">Dashboard | </a>
+                <a href="/resume-enhancer">Resume Enhancer | </a>
+                <a href="/interview-prep">interviewPRO | </a>
+                <a href="/careerclick">CoverME PRO | </a>
+                <a href="/logout">Logout</a>
+            </ul>
+        </nav>
+    </header>
     <div class="d-none" id="loading-spinner"
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="spinner-border text-primary" role="status">
