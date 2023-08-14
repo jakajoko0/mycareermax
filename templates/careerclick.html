@@ -14,14 +14,19 @@
         .job-box {
             border: 1px solid #00c803;
             padding: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 35px;
             border-radius: 5px;
-            height: 150px;
+            height: 250px;
             /* Adjust based on your design preference */
             overflow: hidden;
             cursor: pointer;
             /* Indicate it's clickable */
             transition: background-color 0.3s;
+        }
+
+        .job-box {
+            position: relative;
+            /* other styles... */
         }
 
         .job-box:hover {
@@ -59,6 +64,14 @@
         nav a {
             color: rgb(0, 0, 0);
             text-decoration: none;
+        }
+
+        .view-more-label {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            color: gray;
         }
     </style>
 </head>
@@ -262,7 +275,7 @@
                             generateButton.innerText = 'CoverME';
                             generateButton.style.backgroundColor = 'orange';
                             generateButton.style.color = 'black';
-                            generateButton.style.marginBottom = '10px';  // Added margin-bottom for spacing
+                            generateButton.style.marginBottom = '10px';
                             generateButton.onclick = () => generateCoverLetter(
                                 job.job_description,
                                 document.getElementById('resume-text').value,
@@ -277,7 +290,7 @@
                             generateButton_1.innerText = 'ResuME';
                             generateButton_1.style.backgroundColor = 'purple';
                             generateButton_1.style.color = 'white';
-                            generateButton_1.style.marginBottom = '10px';  // Added margin-bottom for spacing
+                            generateButton_1.style.marginBottom = '10px';
                             generateButton_1.onclick = () => generateCoverLetter_1(
                                 job.job_description,
                                 document.getElementById('resume-text').value,
@@ -299,7 +312,7 @@
                                 }, function (data) {
                                     // Display the result in the modal
                                     document.getElementById('analyzeResult').innerText = data.response;
-                                    $('#analyzeModal').modal('show');  // Trigger the modal to show
+                                    $('#analyzeModal').modal('show');
                                 });
                             };
                             jobBox.appendChild(analyzeButton);
@@ -310,23 +323,20 @@
                             applyButton.target = '_blank';
                             applyButton.className = 'btn btn-primary';
                             applyButton.innerText = 'Apply!';
-                            applyButton.style.marginBottom = '10px';  // Existing margin-bottom for spacing
-                            applyButton.style.marginLeft = '10px';    // Added margin-left to move the button to the right
+                            applyButton.style.marginBottom = '10px';
+                            applyButton.style.marginLeft = '10px';
                             jobBox.appendChild(applyButton);
 
-                            // When a jobBox is clicked, toggle its active state and adjust overflow
-                            document.addEventListener('click', function (event) {
-                                // Deactivate all active job boxes first
-                                document.querySelectorAll('.job-box.active').forEach(function (box) {
-                                    box.classList.remove('active');
-                                });
-
-                                // If a jobBox itself was clicked, activate it
-                                if (event.target.classList.contains('job-box')) {
-                                    event.target.classList.add('active');
-                                }
-                            });
-
+                            // Add a "View More" label to the top right of each job box
+                            const viewMoreLabel = document.createElement('span');
+                            viewMoreLabel.className = 'view-more-label';
+                            viewMoreLabel.innerText = 'View More';
+                            viewMoreLabel.style.position = 'absolute';
+                            viewMoreLabel.style.top = '10px';
+                            viewMoreLabel.style.right = '10px';
+                            viewMoreLabel.style.fontSize = '1em';
+                            viewMoreLabel.style.color = 'blue';
+                            jobBox.appendChild(viewMoreLabel);
 
                             // Now append the job title
                             const jobTitle = document.createElement('h4');
@@ -340,7 +350,23 @@
 
                             listingsContainer.appendChild(jobBox);
                         });
+
+                        // When a jobBox or any of its children are clicked, toggle its active state and adjust overflow
+                        document.addEventListener('click', function (event) {
+                            // Deactivate all active job boxes first
+                            document.querySelectorAll('.job-box.active').forEach(function (box) {
+                                box.classList.remove('active');
+                            });
+
+                            // Find the closest .job-box to the clicked element
+                            let closestJobBox = event.target.closest('.job-box');
+
+                            if (closestJobBox) {
+                                closestJobBox.classList.add('active');
+                            }
+                        });
                     }
+
 
 
 
