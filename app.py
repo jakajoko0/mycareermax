@@ -380,7 +380,7 @@ def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=1"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return jsonify(response.json())
@@ -413,7 +413,6 @@ def career_click():
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
-        max_tokens=500,  # Set a limit on the length of the generated cover letter
     )
 
     # Extract the generated cover letter from the response
@@ -447,7 +446,6 @@ def resume_1():
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
-        max_tokens=500,  # Set a limit on the length of the generated cover letter
     )
 
     # Extract the generated cover letter from the response
