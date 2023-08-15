@@ -11,11 +11,12 @@
         .image-button-container {
             background-color: black;
             max-width: 400px;
-            /* Adjust the value to your preference */
             margin: 0 auto;
             /* Center the container horizontally */
             padding: 10px;
             text-align: center;
+            border-radius: 10px;
+            /* This rounds the corners. Adjust the value to your preference */
         }
 
         .image-button {
@@ -29,6 +30,11 @@
             height: auto;
             border: 1px solid #000000;
         }
+
+        .half-size {
+            width: 50%;
+            height: auto;
+        }
     </style>
 </head>
 
@@ -38,7 +44,7 @@
         <!-- Logo centered -->
         <div class="text-center mb-5">
             <img src="https://drive.google.com/uc?export=download&id=1JN_aUU55bNIxRfb6FrZO7RB0fXOPkOio" alt="Logo"
-                class="img-fluid" style="max-width: 500px;">
+                class="img-fluid">
         </div>
 
 
@@ -67,7 +73,7 @@
             <!-- Image button 5 -->
             <a href="https://coverme.azurewebsites.net/logout" class="image-button" target="_blank">
                 <img src="https://drive.google.com/uc?export=download&id=10CJdCexM9B_40xR7-NbcIn2uqSAqFQLT" alt="Logout"
-                    class="img-fluid" style="max-width: 250px;">
+                    class="img-fluid half-size">
             </a>
         </div>
 
