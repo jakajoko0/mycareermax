@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -44,7 +45,7 @@
         }
 
         header {
-            background-color: #00f078;
+            background-color: #ffffff;
             color: rgb(0, 0, 0);
             padding: 10px 0;
             text-align: center;
@@ -82,10 +83,7 @@
         <header>
             <nav>
                 <ul>
-                    <a href="/dashboard">Dashboard | </a>
-                    <a href="/resume-enhancer">ResuME|</a>
-                    <a href="/cover-letter-generator">CoverMe|</a>
-                    <a href="/interview-prep">interviewPRO|</a>
+                    <a href="/">Home | </a>
                     <a href="/logout">Logout</a>
                 </ul>
             </nav>
@@ -109,7 +107,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Resume box -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
             <div class="mb-4">
@@ -170,6 +167,7 @@
                         <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1"
                             onclick="copyToClipboard_1()">Copy to
                             Clipboard</button>
+                        <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">Save</button>
                     </div>
                 </div>
                  
@@ -180,15 +178,17 @@
                     <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
                     <div class="mt-2">
                         <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
-                        <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
+                        <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button><button
+                            class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">Save</button>
                     </div>
                 </div>
-
-
                 <!-- Job Listings Container -->
                 <div class="mb-4" id="job-listings-container">
                     <!-- Job listings will be populated here -->
                 </div>
+                <script>
+                    var userId = {{ user_id }};
+                </script>
                 <script>
 
                     function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName) {
@@ -327,17 +327,6 @@
                             applyButton.style.marginLeft = '10px';
                             jobBox.appendChild(applyButton);
 
-                            // Add a "View More" label to the top right of each job box
-                            const viewMoreLabel = document.createElement('span');
-                            viewMoreLabel.className = 'view-more-label';
-                            viewMoreLabel.innerText = 'View More';
-                            viewMoreLabel.style.position = 'absolute';
-                            viewMoreLabel.style.top = '10px';
-                            viewMoreLabel.style.right = '10px';
-                            viewMoreLabel.style.fontSize = '1em';
-                            viewMoreLabel.style.color = 'blue';
-                            jobBox.appendChild(viewMoreLabel);
-
                             // Now append the job title
                             const jobTitle = document.createElement('h4');
                             jobTitle.innerText = job.job_title;
@@ -412,11 +401,6 @@
                                 document.getElementById('loading-overlay').style.display = 'none';
                             });
                     }
-
-
-
-
-
 
 
                     // Download the generated cover letter as a .txt file
@@ -523,6 +507,50 @@
                     </div>
                 </div>
             </div>
+            <script>
+                var userId = {{ user_id }};
+            </script>
+            <script>
+                function saveDocument() {
+                    const documentContent = document.getElementById('cover-letter-text').value;
+                    const documentName = "Generated Cover Letter";
+                    const documentType = "Cover Letter";
+
+                    // AJAX call to save the document content
+                    $.post("/save_document", {
+                        user_id: userId,
+                        document_name: documentName,
+                        document_content: documentContent,
+                        document_type: documentType
+                    }, function (data) {
+                        if (data.message === "Document saved successfully") {
+                            alert("Feature in beta testing. Thank you for your patience.");
+                        } else {
+                            alert("Error saving document. Please try again.");
+                        }
+                    });
+                }
+
+                function saveResume() {
+                    const resumeContent = document.getElementById('cover-letter-text-1').value;
+                    const resumeName = "Generated Resume";
+                    const documentType = "Resume";
+
+                    // AJAX call to save the resume content
+                    $.post("/save_document", {
+                        user_id: userId,
+                        document_name: resumeName,
+                        document_content: resumeContent,
+                        document_type: documentType
+                    }, function (data) {
+                        if (data.message === "Document saved successfully") {
+                            alert("Feature in beta testing. Thank you for your patience.");
+                        } else {
+                            alert("Error saving resume. Please try again.");
+                        }
+                    });
+                }
+            </script>
     </body>
 
 </html>

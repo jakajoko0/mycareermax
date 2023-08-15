@@ -3,98 +3,88 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>User Dashboard</title>
+
+    <!-- Link to Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #00f078;
-            color: rgb(0, 0, 0);
-            padding: 15px 0;
-            text-align: center;
-        }
-
-        nav ul {
+        .card-footer {
             display: flex;
-            justify-content: center;
-            list-style: none;
-            padding: 0;
-        }
-
-        nav li {
-            margin: 0 10px;
-        }
-
-        nav a {
-            color: rgb(0, 0, 0);
-            text-decoration: none;
-            padding: 5px;
-        }
-
-        nav a:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .logo-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .logo {
-            max-width: 400px;
-            /* Default width */
-            height: auto;
-            margin: 0 auto;
-        }
-
-        /* Adjust image size for smaller screens */
-        @media (max-width: 576px) {
-            .logo {
-                max-width: 250px;
-            }
+            justify-content: space-between;
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <nav>
-            <ul>
-                <a href="/resume-enhancer">ResuME </a>
-                <a href="/cover-letter-generator">CoverME </a>
-                <a href="/interview-prep">interviewPRO </a>
-                <a href="/careerclick">CoverME PRO </a>
-                <a href="/logout">Logout </a>
-            </ul>
-        </nav>
-    </header>
 
     <div class="container mt-5">
-        <div class="row">
-            <div class="col-lg-8 offset-lg-2">
-                <h2>Welcome to your myCareerMax Dashboard</h2>
-                <p>Here is where you will manage all of your AI generated content. Please use the links at the top of
-                    the
-                    screen to navigate the site. Your Dashboard will be ready for you shortly. Happy
-                    hunting</p>
-                <!-- Add any other user-specific features or information here -->
-            </div>
+        <h2>Your Documents</h2>
+        <div class="row" id="document-cards">
+            <!-- Cards will be dynamically generated here -->
         </div>
     </div>
 
-    <div class="logo-container">
-        <img src="https://drive.google.com/uc?export=download&id=1K_wncLJWjtZisnHaqsdpKpMXvfjNS7FE" alt="Logo"
-            class="logo img-fluid">
-    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- Optional: Including Bootstrap's JS files -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4Ck4SOF4y4C
+    <script>
+        $(document).ready(function () {
+            // Fetch documents and populate the dashboard
+            fetchDocuments();
+        });
+
+        function fetchDocuments() {
+            // Assuming you have an endpoint that returns a list of documents for the logged-in user
+            $.get("/get_user_documents", function (data) {
+                let documents = data.documents;
+                let cards = '';
+
+                documents.forEach(doc => {
+                    cards += `
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${doc.document_name}</h5>
+                                <p class="card-text">${doc.document_type}</p>
+                                <p class="text-muted">${new Date(doc.creation_date).toLocaleDateString()}</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary btn-sm" onclick="viewDocument(${doc.id})">View</button>
+                                <button class="btn btn-success btn-sm" onclick="downloadDocument(${doc.id})">Download</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteDocument(${doc.id})">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                });
+
+                $("#document-cards").html(cards);
+            });
+        }
+
+        function viewDocument(docId) {
+            // Logic to view the document, e.g., open in a modal or navigate to a new page
+        }
+
+        function downloadDocument(docId) {
+            $.get(`/get_document_content/${docId}`, function (data) {
+                const doc = data.document;
+                const blob = new Blob([doc.document_content], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.download = `${doc.document_name}.txt`;
+                a.href = URL.createObjectURL(blob);
+                a.click();
+            });
+        }
+
+        function deleteDocument(docId) {
+            // Logic to delete the document
+        }
+    </script>
+
+</body>
+
+</html>

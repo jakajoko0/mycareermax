@@ -1,10 +1,12 @@
 # Import necessary libraries
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import logging
 from docx import Document
 import openai
 import requests
-from dotenv import load_dotenv
 import pyodbc
 from flask import (
     Flask,
@@ -24,12 +26,13 @@ from flask_login import (
     logout_user,
     current_user,
 )
+import urllib.parse
 
 # noqa: F401
 from flask import flash, get_flashed_messages
 
-
-load_dotenv()
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 
 # keys
 RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
@@ -61,7 +64,7 @@ login_manager.init_app(app)
 
 
 # Create a User class (this can be an actual ORM model if you're using SQLAlchemy)
-class User(UserMixin):
+class LoginUser(UserMixin):
     def __init__(self, user_id):
         self.id = user_id
 
@@ -69,7 +72,7 @@ class User(UserMixin):
 # Load the user for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
-    return User(user_id)
+    return LoginUser(user_id)
 
 
 DB_SERVER = os.getenv("DB_SERVER")
@@ -135,8 +138,6 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password_to_check = request.form["password"].encode("utf-8")
-
-        # Convert the remember_me value to a boolean
         remember_me = bool(request.form.get("remember_me"))
 
         cursor = conn.cursor()
@@ -145,13 +146,127 @@ def login():
 
         # Decode the hashed password from the database before comparing
         if user and bcrypt.checkpw(password_to_check, user.password):
-            user_obj = User(user.id)
-            login_user(user_obj, remember=remember_me)
-            return redirect(url_for("dashboard"))
+            user_obj = User.query.get(user.id)
+            if user_obj:
+                login_user(user_obj, remember=remember_me)
+                return redirect(url_for("home"))
+            else:
+                message = "User not found"
         else:
             message = "Invalid credentials"
 
     return render_template("login.html", message=message)
+
+
+# ...
+
+db = SQLAlchemy()
+
+# Quote the username and password to handle special characters
+quoted_username = urllib.parse.quote_plus(os.environ["DB_USERNAME"])
+quoted_password = urllib.parse.quote_plus(os.environ["DB_PASSWORD"])
+
+# Construct the connection string
+connection_string = (
+    f"mssql+pyodbc://{quoted_username}:{quoted_password}@{os.environ['DB_SERVER']}:1433/"
+    f"{os.environ['DB_NAME']}?driver={urllib.parse.quote_plus('ODBC Driver 18 for SQL Server')}"
+)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = connection_string
+db.init_app(app)
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(255), nullable=False, unique=True)
+    password = db.Column(db.LargeBinary, nullable=False)
+    email = db.Column(db.String(255), nullable=True, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class UserDocuments(db.Model):
+    __tablename__ = "UserDocuments"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    document_name = db.Column(db.String(255), nullable=False)
+    document_content = db.Column(db.String, nullable=False)
+    document_type = db.Column(db.String(50), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref=db.backref("documents", lazy=True))
+
+
+@app.route("/save_document", methods=["POST"])
+def save_document():
+    try:
+        user_id = request.form.get("user_id")
+        doc_name = request.form.get("document_name")
+        doc_content = request.form.get("document_content")
+        doc_type = request.form.get("document_type")
+
+        new_document = UserDocuments(
+            user_id=user_id,
+            document_name=doc_name,
+            document_content=doc_content,
+            document_type=doc_type,
+        )
+        db.session.add(new_document)
+        db.session.commit()
+        return jsonify(
+            {"message": "Document saved successfully", "doc_id": new_document.id}
+        )
+    except Exception as e:
+        db.session.rollback()
+        return (
+            jsonify(
+                {
+                    "error": "An error occurred while saving the document: {}".format(
+                        str(e)
+                    )
+                }
+            ),
+            500,
+        )
+
+
+@app.route("/get_user_documents/<int:user_id>", methods=["GET"])
+def get_user_documents(user_id):
+    user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
+
+    documents_list = [
+        {
+            "id": doc.id,
+            "document_name": doc.document_name,
+            "document_content": doc.document_content,
+            "document_type": doc.document_type,
+            "creation_date": doc.creation_date,
+        }
+        for doc in user_documents
+    ]
+
+    return jsonify(documents_list)
+
+
+@app.route("/test_connection")
+def test_connection():
+    documents = UserDocuments.query.all()
+    return jsonify([doc.id for doc in documents])
+
+
+@app.route("/delete_document/<int:doc_id>", methods=["DELETE"])
+def delete_document(doc_id):
+    document = UserDocuments.query.get(doc_id)
+
+    if not document:
+        return jsonify({"message": "Document not found!"}), 404
+
+    db.session.delete(document)
+    db.session.commit()
+
+    return jsonify({"message": "Document deleted successfully!"})
 
 
 @app.route("/dashboard")
@@ -168,8 +283,9 @@ def logout():
 
 
 @app.route("/careerclick")
+@login_required
 def careerclick():
-    return render_template("careerclick.html")
+    return render_template("careerclick.html", user_id=current_user.id)
 
 
 @app.route("/background-image")
@@ -380,7 +496,7 @@ def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=1"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return jsonify(response.json())
