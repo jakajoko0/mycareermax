@@ -284,11 +284,11 @@ def logout():
     logout_user()
 #     return redirect(url_for("login"))
 
-
-@app.route("/careerclick")
-# @login_required
+@app.route('/careerclick')
 def careerclick():
-    return render_template("careerclick.html", user_id=current_user.id)
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("careerclick.html", user_id=user_id)
+
 
 
 @app.route("/background-image")
