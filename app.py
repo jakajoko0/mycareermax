@@ -100,8 +100,11 @@ def require_login():
         "login",
         "register",
     ]  # List of routes that don't require authentication
+
     if not current_user.is_authenticated and request.endpoint not in allowed_routes:
-#         return redirect(url_for("login"))
+        pass  # Temporary placeholder
+
+
 
 
 # Register Route
