@@ -101,7 +101,7 @@ def require_login():
         "register",
     ]  # List of routes that don't require authentication
     if not current_user.is_authenticated and request.endpoint not in allowed_routes:
-        return redirect(url_for("login"))
+#         return redirect(url_for("login"))
 
 
 # Register Route
@@ -121,7 +121,7 @@ def register():
             )
             conn.commit()
             flash("User registered successfully!", "success")
-            return redirect(url_for("login"))
+#             return redirect(url_for("login"))
         except pyodbc.IntegrityError:
             flash("Username or email already exists.", "danger")
             return render_template(
@@ -279,7 +279,7 @@ def dashboard():
 # @login_required  # Only logged-in users can access this route
 def logout():
     logout_user()
-    return redirect(url_for("login"))
+#     return redirect(url_for("login"))
 
 
 @app.route("/careerclick")
