@@ -270,20 +270,20 @@ def delete_document(doc_id):
 
 
 @app.route("/dashboard")
-@login_required  # Only logged-in users can access this route
+# @login_required  # Only logged-in users can access this route
 def dashboard():
     return render_template("dashboard.html")
 
 
 @app.route("/logout")
-@login_required  # Only logged-in users can access this route
+# @login_required  # Only logged-in users can access this route
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
 
 @app.route("/careerclick")
-@login_required
+# @login_required
 def careerclick():
     return render_template("careerclick.html", user_id=current_user.id)
 
