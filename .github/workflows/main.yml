@@ -1,4 +1,7 @@
-name: Build and deploy Python app to Azure Web App - coverme
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - mycareermax
 
 on:
   push:
@@ -13,47 +16,37 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python version
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.10'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v2
+      - name: Log in to container registry
+        uses: docker/login-action@v2
         with:
-          name: python-app
-          path: |
-            . 
-            !venv/
+          registry: https://index.docker.io/v1/
+          username: ${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}
+          password: ${{ secrets.AzureAppService_ContainerPassword_0186a2762bb94b218c58faac36dc6299 }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}
+          file: ./Dockerfile
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: python-app
-          path: .
-          
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: 'coverme'
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+    deploy:
+      runs-on: ubuntu-latest
+      needs: build
+      environment:
+        name: 'production'
+        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+      steps:
+        - name: Deploy to Azure Web App
+          id: deploy-to-webapp
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: 'mycareermax'
+            slot-name: 'production'
+            publish-profile: ${{ secrets.AzureAppService_PublishProfile_9a5c75698ea9412a9ee8d5cb52997529 }}
+            images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}'
