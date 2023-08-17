@@ -2,6 +2,19 @@ docker build -t skalamera/mycareermax-webapp:latest .
 
 docker login
 
-docker push skalamera/mycareermax-webapp:latest
+docker push skalamera/mycareermax-webapp:latest .
 
 az webapp restart --name mycareermax --resource-group MyResourceGroup
+
+docker run -p 5000:5000 mycareermax-webapp
+
+docker ps
+docker run -p 5000:5000 skalamera/mycareermax-webapp:latest
+docker build --no-cache -t skalamera/mycareermax-webapp:latest .
+docker ps -a
+docker stop [container_id]
+docker rm [CONTAINER_ID_OR_NAME]
+docker rm -f [CONTAINER_ID_OR_NAME]
+docker container prune   # clean up all stopped containers
+docker rm $(docker ps -aq) -f  # remove ALL containers
+docker build --no-cache -t skalamera/mycareermax-webapp:latest .

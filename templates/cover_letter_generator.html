@@ -96,16 +96,37 @@
 </head>
 
 <body>
-    <header>
-        <nav>
-            <ul>
-                <a href="/">Home | </a>
-                <a href="/logout">Logout</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">myCareerMax</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick">CoverME PRO</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cover-letter-generator">CoverCraft</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/resume-enhancer">ResumeTuner</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/interview-prep">IntervueME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
             </ul>
-        </nav>
-    </header>
-    <img src="https://drive.google.com/uc?export=download&id=1TqMNQA_uBek_3NaQdo1qc3wwnTvtWRri" alt="Your Logo"
-        class="responsive-logo">
+        </div>
+    </nav>
+    <img alt="Your Logo" class="responsive-logo"
+        src="https://drive.google.com/uc?export=download&amp;id=1TqMNQA_uBek_3NaQdo1qc3wwnTvtWRri" />
     <div class="d-none" id="loading-spinner"
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="spinner-border text-primary" role="status">
@@ -115,7 +136,6 @@
     <div class="center-content">
         <p> </p>
         <p> </p>
-
         <!-- FORM FIELDS -->
         <div class="container-fluid">
             <!-- File upload section -->
@@ -129,7 +149,6 @@
                     <textarea class="form-control" id="resume" rows="10"></textarea>
                 </div>
                 <div class="mt-3">
-
                     <div class="mt-3">
                         <label for="job-description">Job Description:</label>
                         <textarea class="form-control" id="job-description" name="job-description"></textarea>
@@ -152,12 +171,8 @@
                 </div>
             </form>
         </div>
-
-
         <!-- Button section -->
         <div class="mt-3 button-container">
-
-
         </div>
         <!--  section -->
         <div class="mt-3">
@@ -165,126 +180,121 @@
             <!-- Set the rows attribute to match the default size in the cover_letter_generator.html file -->
             <textarea class="form-control" id="output-text" readonly="" rows="10"></textarea>
         </div>
-
         <!-- Copy to Clipboard and Download as Text section -->
         <div class="mt-3 button-container">
             <button class="btn btn-primary" id="btn-copy">Copy to Clipboard</button>
             <button class="btn btn-primary" id="btn-download-txt">Download as Text</button>
         </div>
-
-
-
     </div>
-    </div>
-    <!-- JavaScript/jQuery code for handling button clicks and AJAX requests -->
-    <script>
-
-        $(document).ready(function () {
-            $("#btn-coverme").click(function (event) {
-                // Prevent the form from being submitted in the default way
-                event.preventDefault();
-
-                // Show the loading spinner
-                $("#loading-spinner").removeClass("d-none");
-
-                var resume = $("#resume").val();
-                var jobDescription = $("#job-description").val();
-                var jobTitle = $("#job-title").val();
-                var companyName = $("#company-name").val();
-                var focusAreas = $("#focus-areas").val();
-
-                $.post("/generate-cover-letter", {
-                    resume: resume,
-                    job_description: jobDescription,
-                    job_title: jobTitle,
-                    company_name: companyName,
-                    focus_areas: focusAreas
-                }, function (data) {
-                    // Display the server's response (the generated cover letter) in the output text area
-                    $("#output-text").val(data.cover_letter).show();
-
-                    // Show the "Copy to Clipboard" and "Download as Text" buttons
-                    $("#btn-copy, #btn-download-txt").show();
-
-                    // Hide the loading spinner
-                    $("#loading-spinner").addClass("d-none");
-                });
-            });
-        });
-
-
-
-
-        // Event listener for file upload
-        $("#resume-upload").change(function () {
-            var form_data = new FormData();
-            var file_data = $("#resume-upload")[0].files[0];
-            form_data.append("file", file_data);
-
-            $.ajax({
-                type: "POST",
-                url: "/upload-docx",
-                data: form_data,
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function (data) {
-                    // Check if data is a string (error message) or an object (JSON response)
-                    if (typeof data === 'string') {
-                        // Display error message in the console
-                        console.error(data);
-                        // Show the error message to the user (You can use an alert or other UI element)
-                        alert(data);
-                    } else {
-                        // Data is an object (JSON response) with a 'content' property
-                        console.log(data.content);
-                        // Set the content in the existing text area (resume)
-                        $("#resume").val(data.content);
-                        // Show the existing text area
-                        $("#resume").show();
-                    }
-                },
-                error: function (xhr, textStatus, error) {
-                    console.error("Error while uploading the file:", error);
-                    alert("An error occurred while uploading the file. Please try again later.");
-                }
-            });
-        });
-
-
-
-
-
-
-
-        // Event listener for the "Copy to Clipboard" button
-        $("#btn-copy").click(function () {
-            // Get the content of the output textarea
-            var outputContent = $("#output-text").val();
-
-            // Copy the content to the clipboard
-            navigator.clipboard.writeText(outputContent)
-                .then(function () {
-                    alert("Content copied to clipboard!");
-                })
-                .catch(function () {
-                    alert("Failed to copy content to clipboard. Please try again.");
-                });
-        });
-
-        // Event listener for the "Download as Text" button
-        $("#btn-download-txt").click(function () {
-            // Get the content of the output textarea
-            var outputContent = $("#output-text").val();
-
-            // Create a blob with the content
-            var blob = new Blob([outputContent], { type: "text/plain" });
-
-            // Save the blob as a text file using FileSaver.js
-            saveAs(blob, "formatted_resume.txt");
-        });
-
-    </script>
 </body>
 
 </html>
+<!-- JavaScript/jQuery code for handling button clicks and AJAX requests -->
+<script>
+
+    $(document).ready(function () {
+        $("#btn-coverme").click(function (event) {
+            // Prevent the form from being submitted in the default way
+            event.preventDefault();
+
+            // Show the loading spinner
+            $("#loading-spinner").removeClass("d-none");
+
+            var resume = $("#resume").val();
+            var jobDescription = $("#job-description").val();
+            var jobTitle = $("#job-title").val();
+            var companyName = $("#company-name").val();
+            var focusAreas = $("#focus-areas").val();
+
+            $.post("/generate-cover-letter", {
+                resume: resume,
+                job_description: jobDescription,
+                job_title: jobTitle,
+                company_name: companyName,
+                focus_areas: focusAreas
+            }, function (data) {
+                // Display the server's response (the generated cover letter) in the output text area
+                $("#output-text").val(data.cover_letter).show();
+
+                // Show the "Copy to Clipboard" and "Download as Text" buttons
+                $("#btn-copy, #btn-download-txt").show();
+
+                // Hide the loading spinner
+                $("#loading-spinner").addClass("d-none");
+            });
+        });
+    });
+
+
+
+
+    // Event listener for file upload
+    $("#resume-upload").change(function () {
+        var form_data = new FormData();
+        var file_data = $("#resume-upload")[0].files[0];
+        form_data.append("file", file_data);
+
+        $.ajax({
+            type: "POST",
+            url: "/upload-docx",
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data) {
+                // Check if data is a string (error message) or an object (JSON response)
+                if (typeof data === 'string') {
+                    // Display error message in the console
+                    console.error(data);
+                    // Show the error message to the user (You can use an alert or other UI element)
+                    alert(data);
+                } else {
+                    // Data is an object (JSON response) with a 'content' property
+                    console.log(data.content);
+                    // Set the content in the existing text area (resume)
+                    $("#resume").val(data.content);
+                    // Show the existing text area
+                    $("#resume").show();
+                }
+            },
+            error: function (xhr, textStatus, error) {
+                console.error("Error while uploading the file:", error);
+                alert("An error occurred while uploading the file. Please try again later.");
+            }
+        });
+    });
+
+
+
+
+
+
+
+    // Event listener for the "Copy to Clipboard" button
+    $("#btn-copy").click(function () {
+        // Get the content of the output textarea
+        var outputContent = $("#output-text").val();
+
+        // Copy the content to the clipboard
+        navigator.clipboard.writeText(outputContent)
+            .then(function () {
+                alert("Content copied to clipboard!");
+            })
+            .catch(function () {
+                alert("Failed to copy content to clipboard. Please try again.");
+            });
+    });
+
+    // Event listener for the "Download as Text" button
+    $("#btn-download-txt").click(function () {
+        // Get the content of the output textarea
+        var outputContent = $("#output-text").val();
+
+        // Create a blob with the content
+        var blob = new Blob([outputContent], { type: "text/plain" });
+
+        // Save the blob as a text file using FileSaver.js
+        saveAs(blob, "formatted_resume.txt");
+    });
+
+</script>

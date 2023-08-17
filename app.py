@@ -116,7 +116,53 @@ def require_login():
         return redirect(url_for("login"))
 
 
-# Register Route
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    # Placeholder for password reset functionality
+    # For now, it will just render a message
+    return "Password reset functionality will be added here"
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    message = None
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+
+        # Basic validation
+        if not username or not email or not password or not confirm_password:
+            message = "All fields are required!"
+        elif password != confirm_password:
+            message = "Passwords do not match!"
+        else:
+            # Connect to the database
+            with pyodbc.connect(conn_str) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+                user = cursor.fetchone()
+                if user:
+                    message = "Username already exists!"
+                else:
+                    # Hash the password (assuming you're using bcrypt)
+                    hashed_password = bcrypt.hashpw(
+                        password.encode("utf-8"), bcrypt.gensalt()
+                    )
+
+                    # Insert user data into the database
+                    cursor.execute(
+                        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+                        (username, email, hashed_password),
+                    )
+                    conn.commit()
+                    message = "User registered successfully!"
+                    return redirect(url_for("login"))
+
+    return render_template("register.html", message=message)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     message = None
@@ -331,7 +377,7 @@ def background_image():
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/cover-letter-generator")

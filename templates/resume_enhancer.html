@@ -84,16 +84,40 @@
 </head>
 
 <body>
-    <header>
-        <nav>
-            <ul>
-                <a href="/">Home | </a>
-                <a href="/logout">Logout</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">myCareerMax</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick">CoverME PRO</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cover-letter-generator">CoverCraft</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/resume-enhancer">ResumeTuner</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/interview-prep">IntervueME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
             </ul>
-        </nav>
+        </div>
+    </nav>
+    <header>
         <div style="text-align:center;">
-            <img src="https://drive.google.com/uc?export=download&id=1K0CTibjyfL3W-TTMAp4pfxB_tztqbkuN" alt="Your Logo"
-                style="max-width:100%;">
+            <img alt="Your Logo"
+                src="https://drive.google.com/uc?export=download&amp;id=1K0CTibjyfL3W-TTMAp4pfxB_tztqbkuN"
+                style="max-width:100%;" />
         </div>
     </header>
     <div class="d-none" id="loading-spinner"
@@ -105,7 +129,6 @@
     <div class="center-content">
         <p> </p>
         <p> </p>
-
         <!-- FORM FIELDS -->
         <div class="container-fluid">
             <!-- File upload section -->
@@ -124,8 +147,6 @@
                     </div>
                     <!-- Button section -->
                     <div class="mt-3 button-container">
-
-
                     </div>
                     <!--  section -->
                     <div class="mt-3">
@@ -133,16 +154,13 @@
                         <!-- Set the rows attribute to match the default size in the cover_letter_generator.html file -->
                         <textarea class="form-control" id="output-text" readonly="" rows="10"></textarea>
                     </div>
-
                     <!-- Copy to Clipboard and Download as Text section -->
                     <div class="mt-3 button-container">
                         <button class="btn btn-primary" id="btn-copy">Copy to Clipboard</button>
                         <button class="btn btn-primary" id="btn-download-txt">Download as Text</button>
                     </div>
-
-
-
                 </div>
+            </form>
         </div>
         <!-- JavaScript/jQuery code for handling button clicks and AJAX requests -->
         <script>
@@ -246,6 +264,7 @@
             });
 
         </script>
+    </div>
 </body>
 
 </html>

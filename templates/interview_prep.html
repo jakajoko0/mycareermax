@@ -3,20 +3,17 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <title>InterviewPRO</title>
-  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- Links to the Font -->
   <link href="https://fonts.googleapis.com" rel="preconnect" />
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-
-
   <div id="loading-spinner" style="display: none;">
     <div class="spinner"></div>
   </div>
-
-  </meta>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -178,69 +175,94 @@
       height: auto;
     }
   </style>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <ul>
-        <a href="/">Home | </a>
-        <a href="/logout">Logout</a>
-        <p> </p>
-      </ul>
+  <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">myCareerMax</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">myDashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/careerclick">CoverME PRO</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/cover-letter-generator">CoverCraft</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/resume-enhancer">ResumeTuner</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/interview-prep">IntervueME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
     </nav>
-  </header>
-  <div style="text-align:center;">
-    <img src="https://drive.google.com/uc?export=download&id=1Fdbl-xJ_P22pVjPOlEeLzL1LE2aE144u" alt="Your Logo"
-      style="max-width:100%;">
-  </div>
-  <form enctype="multipart/form-data" id="interview-form">
-    <label for="job_title">Job Title:</label><br />
-    <input id="job_title" name="job_title" type="text" /><br />
-    <div> </div>
-    <div> </div>
-    <label for="job_description">Job Description:</label><br />
-    <textarea id="job_description" name="job_description"></textarea><br />
-    <div> </div>
-    <div> </div>
-    <label for="job_requirements">Job Requirements:</label><br />
-    <textarea id="job_requirements" name="job_requirements"></textarea><br />
-    <div> </div>
-    <div> </div>
-    <label for="industry">Industry:</label><br />
-    <input id="industry" name="industry" type="text" /><br />
-    <div> </div>
-    <div> </div>
-    <label for="resume">Upload Your Resume:</label><br />
-    <div> </div>
-    <input id="resume" name="resume" type="file" /><br />
-    <div> </div>
-    <label for="typed_resume">Or enter it manually here:</label><br />
-    <textarea id="typed_resume" name="typed_resume"></textarea><br />
-    <div> </div>
-    <input type="submit" value="Simulate Interview" />
-  </form>
-  <div>
-    <p> </p>
-    <p> </p>
-    <p> </p>
-    <p> </p>
-    <p> </p>
-    <p> </p>
-  </div>
-  <div id="interview-container">
-    <div id="question-display"></div>
-    <p> </p>
-    <textarea id="user-answer" style="display: none"></textarea>
+    <div style="text-align:center;">
+      <img alt="Your Logo" src="https://drive.google.com/uc?export=download&amp;id=1Fdbl-xJ_P22pVjPOlEeLzL1LE2aE144u"
+        style="max-width:100%;" />
+    </div>
+    <form enctype="multipart/form-data" id="interview-form">
+      <label for="job_title">Job Title:</label><br />
+      <input id="job_title" name="job_title" type="text" /><br />
+      <div> </div>
+      <div> </div>
+      <label for="job_description">Job Description:</label><br />
+      <textarea id="job_description" name="job_description"></textarea><br />
+      <div> </div>
+      <div> </div>
+      <label for="job_requirements">Job Requirements:</label><br />
+      <textarea id="job_requirements" name="job_requirements"></textarea><br />
+      <div> </div>
+      <div> </div>
+      <label for="industry">Industry:</label><br />
+      <input id="industry" name="industry" type="text" /><br />
+      <div> </div>
+      <div> </div>
+      <label for="resume">Upload Your Resume:</label><br />
+      <div> </div>
+      <input id="resume" name="resume" type="file" /><br />
+      <div> </div>
+      <label for="typed_resume">Or enter it manually here:</label><br />
+      <textarea id="typed_resume" name="typed_resume"></textarea><br />
+      <div> </div>
+      <input type="submit" value="Simulate Interview" />
+    </form>
     <div>
       <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
     </div>
-    <button id="submit-answer" style="display: none">Submit Answer</button>
-    <button id="previous-button" style="display: none">Previous</button>
-    <button id="next-button" style="display: none">Next</button>
+    <div id="interview-container">
+      <div id="question-display"></div>
+      <p> </p>
+      <textarea id="user-answer" style="display: none"></textarea>
+      <div>
+        <p> </p>
+      </div>
+      <button id="submit-answer" style="display: none">Submit Answer</button>
+      <button id="previous-button" style="display: none">Previous</button>
+      <button id="next-button" style="display: none">Next</button>
+    </div>
+    <!-- JavaScript code -->
+    <script src="/static/interview.js"></script>
+
   </div>
-  <!-- JavaScript code -->
-  <script src="/static/interview.js"></script>
 </body>
 
 </html>
