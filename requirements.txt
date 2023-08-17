@@ -1,11 +1,13 @@
-flask
-openai
+Flask
 Flask-SQLAlchemy
 Flask-WTF
+Flask-Login
+openai
 python-docx
 python-dotenv
 waitress
 pyodbc
 requests
 bcrypt
-flask_login
+pdfkit
+
