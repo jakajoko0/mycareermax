@@ -20,23 +20,20 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: https://index.docker.io/v1/
-          username: ${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}
-          password: ${{ secrets.AzureAppService_ContainerPassword_0186a2762bb94b218c58faac36dc6299 }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push container image to registry
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
-          tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}
+          tags: index.docker.io/${{ secrets.DOCKER_USERNAME }}/skalamera/mycareermax-webapp:${{ github.sha }}
           file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
       - name: Deploy to Azure Web App
@@ -45,5 +42,5 @@ jobs:
         with:
           app-name: 'mycareermax'
           slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_9a5c75698ea9412a9ee8d5cb52997529 }}
-          images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: 'index.docker.io/${{ secrets.DOCKER_USERNAME }}/skalamera/mycareermax-webapp:${{ github.sha }}'
