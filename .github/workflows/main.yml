@@ -42,5 +42,5 @@ jobs:
         with:
           app-name: 'mycareermax'
           slot-name: 'production'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           images: 'index.docker.io/${{ secrets.DOCKER_USERNAME }}/skalamera/mycareermax-webapp:${{ github.sha }}'
