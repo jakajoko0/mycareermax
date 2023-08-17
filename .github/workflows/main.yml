@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy container app to Azure Web App - mycareermax
 
 on:
@@ -34,19 +31,19 @@ jobs:
           tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}
           file: ./Dockerfile
 
-    deploy:
-      runs-on: ubuntu-latest
-      needs: build
-      environment:
-        name: 'production'
-        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-      steps:
-        - name: Deploy to Azure Web App
-          id: deploy-to-webapp
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: 'mycareermax'
-            slot-name: 'production'
-            publish-profile: ${{ secrets.AzureAppService_PublishProfile_9a5c75698ea9412a9ee8d5cb52997529 }}
-            images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}'
+    steps:
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'mycareermax'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_9a5c75698ea9412a9ee8d5cb52997529 }}
+          images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_5beba181a82f49568af4fa2f0ae9398b }}/skalamera/mycareermax-webapp:${{ github.sha }}'
