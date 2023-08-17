@@ -102,39 +102,10 @@ def require_login():
     ]  # List of routes that don't require authentication
 
     if not current_user.is_authenticated and request.endpoint not in allowed_routes:
-        pass  # Temporary placeholder
-
-
+        return redirect(url_for("login"))
 
 
 # Register Route
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"].encode("utf-8")  # Convert to bytes
-        hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
-
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                (username, email, hashed_password),
-            )
-            conn.commit()
-            flash("User registered successfully!", "success")
-#             return redirect(url_for("login"))
-        except pyodbc.IntegrityError:
-            flash("Username or email already exists.", "danger")
-            return render_template(
-                "register.html"
-            )  # Render the register template again
-
-    return render_template("register.html")
-
-
-# Login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
     message = None
@@ -145,11 +116,12 @@ def login():
 
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-        user = cursor.fetchone()
+        user_record = cursor.fetchone()
 
         # Decode the hashed password from the database before comparing
-        if user and bcrypt.checkpw(password_to_check, user.password):
-            user_obj = User.query.get(user.id)
+        if user_record and bcrypt.checkpw(password_to_check, user_record.password):
+            # Fetch the user object using SQLAlchemy
+            user_obj = User.query.filter_by(id=user_record.id).first()
             if user_obj:
                 login_user(user_obj, remember=remember_me)
                 return redirect(url_for("home"))
@@ -273,22 +245,22 @@ def delete_document(doc_id):
 
 
 @app.route("/dashboard")
-# @login_required  # Only logged-in users can access this route
+@login_required  # Only logged-in users can access this route
 def dashboard():
     return render_template("dashboard.html")
 
 
 @app.route("/logout")
-# @login_required  # Only logged-in users can access this route
+@login_required  # Only logged-in users can access this route
 def logout():
     logout_user()
-#     return redirect(url_for("login"))
+    return redirect(url_for("login"))
 
-@app.route('/careerclick')
+
+@app.route("/careerclick")
 def careerclick():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("careerclick.html", user_id=user_id)
-
 
 
 @app.route("/background-image")
