@@ -1,10 +1,14 @@
 # Import necessary libraries
 import os
 from dotenv import load_dotenv
+from flask import Response, stream_with_context
+import pdfkit
 
 load_dotenv()
 import logging
 from docx import Document
+import io
+from flask import send_file
 import openai
 import requests
 import pyodbc
@@ -49,6 +53,8 @@ app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
 
+path_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
 # Configure logging
 logging.basicConfig(
@@ -207,8 +213,10 @@ def save_document():
         )
 
 
-@app.route("/get_user_documents/<int:user_id>", methods=["GET"])
-def get_user_documents(user_id):
+@app.route("/get_user_documents", methods=["GET"])
+@login_required
+def get_user_documents():
+    user_id = current_user.id
     user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
 
     documents_list = [
@@ -242,6 +250,54 @@ def delete_document(doc_id):
     db.session.commit()
 
     return jsonify({"message": "Document deleted successfully!"})
+
+
+@app.route("/download_document/<int:document_id>", methods=["GET"])
+def download_document(document_id):
+    # Fetch the document from the database
+    doc = UserDocuments.query.filter_by(id=document_id).first()
+    if not doc:
+        return "Document not found", 404
+
+    # Determine the format for download (default is docx)
+    download_format = request.args.get("format", "docx")
+
+    if download_format == "docx":
+        # Create a new Document
+        document = Document()
+        document.add_heading(doc.document_name, 0)
+        document.add_paragraph(doc.document_content)
+
+        # Stream the .docx file back to the user
+        output = io.BytesIO()
+        document.save(output)
+        output.seek(0)
+        return send_file(
+            output,
+            as_attachment=True,
+            download_name=f"{doc.document_name}.docx",
+            mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+
+    elif download_format == "pdf":
+        # Convert the document content to basic HTML
+        html_content = "<h1>{}</h1><p>{}</p>".format(
+            doc.document_name, doc.document_content.replace("\n", "<br>")
+        )
+
+        # Convert the HTML to PDF using pdfkit
+        pdf_content = pdfkit.from_string(html_content, False, configuration=config)
+
+        # Stream the PDF back to the user
+        response = Response(stream_with_context(io.BytesIO(pdf_content)))
+        response.headers["Content-Type"] = "application/pdf"
+        response.headers[
+            "Content-Disposition"
+        ] = f"inline; filename={doc.document_name}.pdf"
+        return response
+
+    else:
+        return "Invalid format specified", 400
 
 
 @app.route("/dashboard")

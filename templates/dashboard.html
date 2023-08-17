@@ -2,89 +2,59 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-
-    <!-- Link to Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>My Dashboard - CareerClick</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-
-    <div class="container mt-5">
-        <h2>Your Documents</h2>
-        <div class="row" id="document-cards">
-            <!-- Cards will be dynamically generated here -->
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">CareerClick</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">My Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
         </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <h2>My Saved Documents</h2>
+        <ul class="list-group" id="saved-documents-list">
+        </ul>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            // Fetch documents and populate the dashboard
-            fetchDocuments();
-        });
-
-        function fetchDocuments() {
-            // Assuming you have an endpoint that returns a list of documents for the logged-in user
-            $.get("/get_user_documents", function (data) {
-                let documents = data.documents;
-                let cards = '';
-
-                documents.forEach(doc => {
-                    cards += `
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">${doc.document_name}</h5>
-                                <p class="card-text">${doc.document_type}</p>
-                                <p class="text-muted">${new Date(doc.creation_date).toLocaleDateString()}</p>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-primary btn-sm" onclick="viewDocument(${doc.id})">View</button>
-                                <button class="btn btn-success btn-sm" onclick="downloadDocument(${doc.id})">Download</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteDocument(${doc.id})">Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                    `;
+    <!-- jQuery, Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script defer>
+        // Ensure jQuery is loaded
+        if (typeof $ !== 'undefined') {
+            $(document).ready(function () {
+                // Fetch the user's documents and populate the list
+                $.get("/get_user_documents", function (data) {
+                    data.forEach(function (doc) {
+                        $("#saved-documents-list").append(`<li class="list-group-item"><a href="/download_document/${doc.id}?format=docx">${doc.document_name} - DOCX</a> | <a href="/download_document/${doc.id}?format=pdf">${doc.document_name} - PDF</a></li>`);
+                    });
                 });
-
-                $("#document-cards").html(cards);
             });
-        }
-
-        function viewDocument(docId) {
-            // Logic to view the document, e.g., open in a modal or navigate to a new page
-        }
-
-        function downloadDocument(docId) {
-            $.get(`/get_document_content/${docId}`, function (data) {
-                const doc = data.document;
-                const blob = new Blob([doc.document_content], { type: 'text/plain' });
-                const a = document.createElement('a');
-                a.download = `${doc.document_name}.txt`;
-                a.href = URL.createObjectURL(blob);
-                a.click();
-            });
-        }
-
-        function deleteDocument(docId) {
-            // Logic to delete the document
+        } else {
+            console.error("jQuery is not loaded.");
         }
     </script>
-
 </body>
 
 </html>
