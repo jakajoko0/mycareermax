@@ -2,7 +2,7 @@ docker build -t skalamera/mycareermax-webapp:latest .
 
 docker login
 
-docker push skalamera/mycareermax-webapp:latest .
+docker push skalamera/mycareermax-webapp:latest 
 
 az webapp restart --name mycareermax --resource-group MyResourceGroup
 
