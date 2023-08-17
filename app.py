@@ -53,8 +53,13 @@ app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
 
-path_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+if os.name == "nt":  # Windows
+    path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
+else:  # Linux/Docker
+    path_wkhtmltopdf = "/usr/bin/wkhtmltopdf"
+
 config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
 
 # Configure logging
 logging.basicConfig(
@@ -634,5 +639,4 @@ def analyze_job():
 
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
