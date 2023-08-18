@@ -581,9 +581,10 @@ def fetch_job_listings():
     url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=10"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        return jsonify(response.json())
-    else:
-        return jsonify({"error": "Failed to fetch job listings"}), 500
+        data = response.json()
+        # Print the first job listing for debugging
+        print(data.get("data", [{}])[0])
+        return jsonify(data)
 
 
 # COVERME PRO - coverME OPENAI API CALLS
