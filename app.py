@@ -181,7 +181,7 @@ def login():
             user_obj = User.query.filter_by(id=user_record.id).first()
             if user_obj:
                 login_user(user_obj, remember=remember_me)
-                return redirect(url_for("home"))
+                return redirect(url_for("careerclick"))
             else:
                 message = "User not found"
         else:
@@ -578,7 +578,7 @@ def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=10"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()

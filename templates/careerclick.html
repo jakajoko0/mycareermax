@@ -11,6 +11,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
+        body {
+            background-color: #20ff5e;
+        }
+
         .job-box-btn {
             display: inline-block;
             vertical-align: middle;
@@ -18,6 +22,7 @@
         }
 
         .job-box {
+            background-color: #ffffff;
             border: 1px solid #ccc;
             padding: 15px;
             margin: 10px;
@@ -82,7 +87,7 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="https://www.mycareermax.com">myCareerMax</a>
+        <a class="navbar-brand" href="https://www.mycareermax.com">myCareerMax.com</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -114,7 +119,7 @@
 
 <body>
     <div class="d-flex justify-content-center align-items-center"><img class="img-fluid mb-3"
-            src="https://drive.google.com/uc?export=download&amp;id=1eJoM5Fw8Te3E83vLA9Z1VPt3ULn-VS6u" /></div>
+            src="https://drive.google.com/uc?export=download&id=1pQtWu7UFTZEQ2hHEXcfljHa1aqfms5Jv" /></div>
     <div class="container mt-5">
         <!-- Job Search Section -->
         <div class="mb-4" id="job-search-section">
@@ -332,6 +337,8 @@
                     jobs.forEach(job => {
                         const jobBox = document.createElement('div');
                         jobBox.className = 'job-box';
+                        jobBox.style.marginBottom = '100px';
+
                         // Add the job identifier as a data attribute to the job box
                         jobBox.dataset.jobIdentifier = job.job_id;
                         // Create the "Generate Cover Letter" button first
@@ -422,7 +429,7 @@
                                     }
                                 },
                                 error: function () {
-                                    alert('COMING SOON! The ability to save jobs to your Dashboard will be available with our next release.');
+                                    alert('Hey there! This feature is a part of our MAX tier. Fancy an upgrade ?');
                                 }
                             });
                         });
