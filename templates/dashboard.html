@@ -7,6 +7,7 @@
     <title>myDashboard - myCareerMax</title>
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         /* New styles for green text */
         .green-text,
@@ -14,10 +15,31 @@
         .green-text .navbar-brand {
             color: green !important;
         }
+
+        /* Added styles for horizontal scrolling */
+        #saved-jobs-container {
+            display: flex;
+            /* make it a flex container */
+            overflow-x: auto;
+            /* enable horizontal scrolling */
+            white-space: nowrap;
+            /* prevent wrapping of cards */
+        }
+
+        .card {
+            flex: 0 0 auto;
+            /* prevent cards from growing or shrinking */
+            max-width: 300px;
+            /* Set a max width for job cards */
+            margin-right: 10px;
+            /* spacing between cards */
+            white-space: normal;
+            /* Make sure the content wraps within the card */
+        }
     </style>
     <style>
         body {
-            background-color: #007BFF;
+            background-color: #4b69ff;
         }
     </style>
 </head>
@@ -57,6 +79,108 @@
 
     <!-- Main Content -->
     <div class="container mt-5" style="color: white;">
+        <h2>Saved Jobs</h2>
+        <div id="saved-jobs-container">
+            <!-- Saved jobs will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- jQuery, Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Fetch and display saved jobs
+        fetch("/get-saved-jobs")
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const savedJobsContainer = document.getElementById("saved-jobs-container");
+                    data.saved_jobs.forEach(job => {
+                        const jobCard = document.createElement("div");
+                        jobCard.className = "card mb-3";
+                        jobCard.style.width = "300px";
+
+                        const cardBody = document.createElement("div");
+                        cardBody.className = "card-body";
+                        cardBody.style.height = "250px";
+                        cardBody.style.overflowY = "auto";
+
+                        // Append the employer logo if it exists
+                        if (job.employer_logo) {
+                            const logoImg = document.createElement('img');
+                            logoImg.src = job.employer_logo;
+                            logoImg.alt = job.company_name + ' logo';
+                            logoImg.style.width = '100px';
+                            cardBody.appendChild(logoImg);
+                        }
+
+                        const applyLink = document.createElement("a");
+                        applyLink.href = job.job_link;
+                        applyLink.target = "_blank";
+                        applyLink.className = "btn btn-primary mr-2";
+                        applyLink.textContent = "Apply Here";
+
+                        const jobTitle = document.createElement("h5");
+                        jobTitle.className = "card-title";
+                        jobTitle.style.color = "blue";
+                        jobTitle.textContent = job.job_title;
+
+                        const companyName = document.createElement("h6");
+                        companyName.className = "card-text";
+                        companyName.style.color = "green";
+                        companyName.textContent = job.company_name;
+
+                        const jobDescription = document.createElement("p");
+                        jobDescription.className = "card-text";
+                        jobDescription.style.color = "blue";
+                        jobDescription.textContent = job.job_description;
+
+                        const removeButton = document.createElement("button");
+                        removeButton.className = "btn btn-danger";
+                        removeButton.textContent = "Remove";
+
+                        removeButton.onclick = function () {
+                            const jobId = job.id;
+
+                            $.ajax({
+                                url: "/remove-saved-job",
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify({ job_id: jobId }),
+                                success: function (response) {
+                                    if (response.success) {
+                                        console.log("Job removed successfully!");
+                                        jobCard.remove();
+                                    } else {
+                                        console.error("Failed to remove job:", response.error);
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Failed to remove job:", error);
+                                }
+                            });
+                        };
+
+
+
+                        
+                        cardBody.appendChild(jobTitle);
+                        cardBody.appendChild(companyName);
+                        cardBody.appendChild(applyLink);
+                        cardBody.appendChild(removeButton);
+                        cardBody.appendChild(jobDescription);
+                        jobCard.appendChild(cardBody);
+
+                        savedJobsContainer.appendChild(jobCard);
+                    });
+                } else {
+                    console.error("Failed to fetch saved jobs:", data.error);
+                }
+            });
+
+    </script>
+    <div class="container mt-5" style="color: white;">
         <h2>My Saved Documents</h2>
         <ul class="list-group" id="saved-documents-list">
         </ul>
@@ -81,6 +205,9 @@
             console.error("jQuery is not loaded.");
         }
     </script>
+
+    
+
 </body>
 
 </html>

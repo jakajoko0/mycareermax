@@ -284,6 +284,99 @@ def get_user_documents():
     return jsonify(documents_list)
 
 
+@app.route("/save-job", methods=["POST"])
+@login_required
+def save_job():
+    try:
+        data = request.get_json()  # Assuming you're sending JSON data from the frontend
+        print("Received JSON data:", data)  # Add this line
+        user_id = current_user.id
+        job_id = data.get("job_id")
+        job_title = data.get("job_title")
+        job_description = data.get("job_description")
+        job_link = data.get("job_link")
+        job_loc = data.get("job_loc")
+        company_name = data.get("company_name")
+        link = data.get("link")
+        employer_logo = data.get(
+            "employer_logo"
+        )  # Capture employer logo from the incoming request
+
+        print("Before executing query")
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO saved_jobs (user_id, job_id, job_title, job_description, job_link, job_loc, company_name, link, employer_logo) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    user_id,
+                    job_id,
+                    job_title,
+                    job_description,
+                    job_link,
+                    job_loc,
+                    company_name,
+                    link,
+                    employer_logo,
+                ),
+            )
+            conn.commit()
+        print("After executing query")
+        return jsonify({"success": True, "message": "Job saved successfully!"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/get-saved-jobs", methods=["GET"])
+@login_required
+def get_saved_jobs():
+    try:
+        user_id = current_user.id
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM saved_jobs WHERE user_id = ?", (user_id,))
+            saved_jobs = cursor.fetchall()
+
+        # Convert the saved_jobs data to a list of dictionaries
+        saved_jobs_list = []
+        for job in saved_jobs:
+            job_dict = {
+                "id": job.id,
+                "job_id": job.job_id,
+                "job_title": job.job_title,
+                "job_description": job.job_description,
+                "job_link": job.job_link,
+                "job_loc": job.job_loc,
+                "company_name": job.company_name,
+                "link": job.link,
+                "employer_logo": job.employer_logo,
+            }
+            saved_jobs_list.append(job_dict)
+
+        return jsonify({"success": True, "saved_jobs": saved_jobs_list})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/remove-saved-job", methods=["POST"])
+@login_required
+def remove_saved_job():
+    try:
+        data = request.get_json()
+        job_to_remove_id = data.get("job_id")
+        user_id = current_user.id
+
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM saved_jobs WHERE user_id = ? AND id = ?",
+                (user_id, job_to_remove_id),
+            )
+            conn.commit()
+
+        return jsonify({"success": True, "message": "Job removed successfully!"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @app.route("/test_connection")
 def test_connection():
     documents = UserDocuments.query.all()
@@ -578,7 +671,7 @@ def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=1"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()

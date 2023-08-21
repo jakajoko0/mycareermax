@@ -10,9 +10,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
     <style>
         body {
-            background-color: #20ff5e;
+            background-color: #ffffff;
         }
 
         .job-box-btn {
@@ -80,7 +82,7 @@
         }
 
         .navbar-light .green-text .navbar-toggler-icon {
-            background-color: green;
+            background-color: rgb(255, 255, 255);
         }
     </style>
 </head>
@@ -341,12 +343,67 @@
 
                         // Add the job identifier as a data attribute to the job box
                         jobBox.dataset.jobIdentifier = job.job_id;
+
+                        // Create the "Save Job" heart-shaped button
+                        const saveJobButton = document.createElement('i');
+                        saveJobButton.className = 'fa fa-heart save-job-btn';
+                        saveJobButton.dataset.jobId = job.job_id;
+                        saveJobButton.style.cursor = 'pointer';
+                        saveJobButton.style.marginRight = '20px';  // Adjusted the margin property name
+                        saveJobButton.style.fontSize = '24px';
+
+                        saveJobButton.onclick = function () {
+                            if (!this.classList.contains('saved')) {
+                                this.classList.add('saved');
+                                this.style.color = 'red';
+
+                                // Capture job details
+                                const jobDetails = {
+                                    job_id: job.job_id,
+                                    job_title: job.job_title,
+                                    job_description: job.job_description,
+                                    job_link: job.job_apply_link,
+                                    job_loc: '',  // You might need to capture this if available in your job object
+                                    company_name: job.employer_name || "Unknown Company",
+                                    link: '',  // You might need to capture this if available in your job object
+                                    employer_logo: job.employer_logo || ""  // Capture the employer logo URL
+                                };
+
+                                // Send job details to backend using AJAX
+                                $.ajax({
+                                    url: "/save-job",
+                                    type: "POST",
+                                    contentType: "application/json",  // Set the Content-Type header
+                                    data: JSON.stringify(jobDetails),
+                                    success: function (response) {
+                                        if (response.success) {
+                                            console.log("Job saved successfully!");
+                                        } else {
+                                            console.error("Failed to save job:", response.error);
+                                        }
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Failed to save job:", error);
+                                    }
+                                });
+
+                            } else {
+                                this.classList.remove('saved');
+                                this.style.color = '';
+                                // TODO: Optionally send a request to backend to unsave the job
+                            }
+                        };
+
+                        jobBox.appendChild(saveJobButton);
+
+
+
                         // Create the "Generate Cover Letter" button first
                         const generateButton = document.createElement('button');
                         generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
                         generateButton.innerText = 'CoverME';
-                        generateButton.style.backgroundColor = 'red';
-                        generateButton.style.color = 'white';
+                        generateButton.style.backgroundColor = 'yellow';
+                        generateButton.style.color = 'black';
                         generateButton.style.marginBottom = '10px';
                         generateButton.onclick = () => generateCoverLetter(
                             job.job_description,
@@ -360,8 +417,8 @@
                         const generateButton_1 = document.createElement('button');
                         generateButton_1.className = 'btn btn-secondary ml-2 job-box-btn';
                         generateButton_1.innerText = 'ResuME';
-                        generateButton_1.style.backgroundColor = 'red';
-                        generateButton_1.style.color = 'white';
+                        generateButton_1.style.backgroundColor = 'yellow';
+                        generateButton_1.style.color = 'black';
                         generateButton_1.style.marginBottom = '10px';
                         generateButton_1.onclick = () => generateCoverLetter_1(
                             job.job_description,
@@ -375,7 +432,7 @@
                         analyzeButton.className = 'btn btn-secondary ml-2 job-box-btn';
                         analyzeButton.innerText = 'Salary';
                         analyzeButton.style.backgroundColor = 'green';
-                        analyzeButton.style.color = 'yellow';
+                        analyzeButton.style.color = 'white';
                         analyzeButton.style.marginBottom = '10px';
                         analyzeButton.onclick = () => {
                             // AJAX call to Flask backend with separate parameters for job title
@@ -399,40 +456,6 @@
                         applyButton.style.marginLeft = '10px';
                         jobBox.appendChild(applyButton);
 
-                        // Append the Save button
-                        const saveButton = document.createElement('button');
-                        saveButton.className = 'btn btn-secondary save-job-btn job-box-btn';
-                        saveButton.innerText = 'Save Job';
-                        saveButton.style.backgroundColor = 'yellow';
-                        saveButton.style.color = 'red';
-                        saveButton.style.marginLeft = '10px';  // Adds 10px of space to the left of the Save button
-                        saveButton.setAttribute('data-job-id', job.job_id);
-                        jobBox.appendChild(saveButton);
-
-                        // Attach the Save button click event handler
-                        saveButton.addEventListener('click', function (event) {
-                            event.stopPropagation();  // Prevents any parent event handlers from being executed
-
-                            var jobIdentifier = job.job_id;
-
-                            $.ajax({
-                                url: '/save-job',  // Backend route to save the job
-                                type: 'POST',
-                                data: {
-                                    'job_identifier': jobIdentifier
-                                },
-                                success: function (response) {
-                                    if (response.success) {
-                                        alert('Job saved successfully!');
-                                    } else {
-                                        alert('Failed to save the job. Please try again.');
-                                    }
-                                },
-                                error: function () {
-                                    alert('Hey there! This feature is a part of our MAX tier. Fancy an upgrade ?');
-                                }
-                            });
-                        });
 
                         // Append the job posted timestamp
                         const jobPostedTimestamp = document.createElement('p');
