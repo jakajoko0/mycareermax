@@ -3,7 +3,7 @@
 
 <head>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>CareerClick</title>
@@ -26,7 +26,7 @@
         }
 
         .job-box {
-            background-color: #fdffd5;
+            background-color: #d2e3ff;
             border: 1px solid #ccc;
             padding: 15px;
             margin: 10px;
@@ -333,10 +333,28 @@
                     jobs.forEach(job => {
                         const jobBox = document.createElement('div');
                         jobBox.className = 'job-box';
-                        jobBox.style.marginBottom = '100px';
+                        jobBox.style.marginBottom = '50px';
+                        jobBox.style.position = 'relative';
+                        jobBox.style.borderRadius = '10px'; // Adjust this value as needed
 
                         // Add the job identifier as a data attribute to the job box
                         jobBox.dataset.jobIdentifier = job.job_id;
+
+                        // Append the employer logo if it exists
+                        if (job.employer_logo) {
+                            const logoImg = document.createElement('img');
+                            logoImg.src = job.employer_logo;
+                            logoImg.alt = job.employer_name + ' logo';
+                            logoImg.style.width = '75px'; // Adjust this to your preferred size
+                            jobBox.appendChild(logoImg);
+                        }
+                        // Append the job posted timestamp
+                        const jobPostedTimestamp = document.createElement('p');
+                        const dateObj = new Date(job.job_posted_at_timestamp * 1000); // Convert to milliseconds
+                        jobPostedTimestamp.innerText = 'Posted At: ' + dateObj.toDateString();
+                        jobPostedTimestamp.style.fontSize = '12px';  // You can adjust '12px' to your preferred size
+                        jobBox.appendChild(jobPostedTimestamp);
+
 
                         // Create the "Save Job" heart-shaped button
                         const saveJobButton = document.createElement('i');
@@ -412,14 +430,35 @@
                         };
                         jobBox.appendChild(analyzeSymbol);
 
+                        // Append the Apply button
+                        const applyButton = document.createElement('a');
+                        applyButton.href = job.job_apply_link;
+                        applyButton.target = '_blank';
+                        applyButton.className = 'btn btn-primary job-box-btn';
+                        applyButton.innerText = 'Apply!';
+                        applyButton.style.marginBottom = '10px';
+                        applyButton.style.marginLeft = '8px';
+                        jobBox.appendChild(applyButton);
 
+
+                        // Append the job title
+                        const jobTitle = document.createElement('h4');
+                        jobTitle.innerText = (job.job_title || 'N/A');
+                        jobTitle.style.color = '#black';
+                        jobBox.appendChild(jobTitle);
+
+                        // Append the employer name
+                        const employerName = document.createElement('p');
+                        employerName.innerText = (job.employer_name || 'N/A');
+                        employerName.style.color = '#007BFF';
+                        jobBox.appendChild(employerName);
 
                         // Create the "Generate Cover Letter" button first
                         const generateButton = document.createElement('button');
                         generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
                         generateButton.innerText = 'CoverME';
-                        generateButton.style.backgroundColor = 'grey';
-                        generateButton.style.color = 'white';
+                        generateButton.style.backgroundColor = '#99ff99';
+                        generateButton.style.color = 'black';
                         generateButton.style.marginBottom = '10px';
                         generateButton.style.marginLeft = '20px';
                         generateButton.onclick = () => generateCoverLetter(
@@ -434,8 +473,8 @@
                         const generateButton_1 = document.createElement('button');
                         generateButton_1.className = 'btn btn-secondary ml-2 job-box-btn';
                         generateButton_1.innerText = 'ResuME';
-                        generateButton_1.style.backgroundColor = 'grey';
-                        generateButton_1.style.color = 'white';
+                        generateButton_1.style.backgroundColor = '#99ff99';
+                        generateButton_1.style.color = 'black';
                         generateButton_1.style.marginBottom = '10px';
                         generateButton_1.onclick = () => generateCoverLetter_1(
                             job.job_description,
@@ -445,63 +484,25 @@
                         );
                         jobBox.appendChild(generateButton_1);
 
+                        // Append the remote status
+                        const jobRemoteStatus = document.createElement('p');
+                        jobRemoteStatus.innerText = 'Remote: ' + (job.job_is_remote ? 'Yes' : 'No');
+                        jobBox.appendChild(jobRemoteStatus);
 
-                        // Append the Apply button
-                        const applyButton = document.createElement('a');
-                        applyButton.href = job.job_apply_link;
-                        applyButton.target = '_blank';
-                        applyButton.className = 'btn btn-primary job-box-btn';
-                        applyButton.innerText = 'Apply!';
-                        applyButton.style.marginBottom = '10px';
-                        applyButton.style.marginLeft = '8px';
-                        jobBox.appendChild(applyButton);
-
-
-                        // Append the job posted timestamp
-                        const jobPostedTimestamp = document.createElement('p');
-                        const dateObj = new Date(job.job_posted_at_timestamp * 1000); // Convert to milliseconds
-                        jobPostedTimestamp.innerText = 'Posted At: ' + dateObj.toDateString();
-                        jobBox.appendChild(jobPostedTimestamp);
-
-                        // Append the employer logo if it exists
-                        if (job.employer_logo) {
-                            const logoImg = document.createElement('img');
-                            logoImg.src = job.employer_logo;
-                            logoImg.alt = job.employer_name + ' logo';
-                            logoImg.style.width = '100px'; // Adjust this to your preferred size
-                            jobBox.appendChild(logoImg);
-                        }
-
-                        // Append the job title
-                        const jobTitle = document.createElement('h4');
-                        jobTitle.innerText = 'Title: ' + (job.job_title || 'N/A');
-                        jobBox.appendChild(jobTitle);
-
-                        // Append the employer name
-                        const employerName = document.createElement('p');
-                        employerName.innerText = 'Employer: ' + (job.employer_name || 'N/A');
-                        jobBox.appendChild(employerName);
-
+                        // Append the job employment type
+                        const jobEmploymentType = document.createElement('p');
+                        jobEmploymentType.innerText = 'Employment Type: ' + (job.job_employment_type || 'N/A');
+                        jobBox.appendChild(jobEmploymentType);
 
                         // Append the job description
                         const jobDescription = document.createElement('p');
                         jobDescription.innerText = 'Description: ' + (job.job_description || 'N/A');
                         jobBox.appendChild(jobDescription);
 
-                        // Append the remote status
-                        const jobRemoteStatus = document.createElement('p');
-                        jobRemoteStatus.innerText = 'Remote: ' + (job.job_is_remote ? 'Yes' : 'No');
-                        jobBox.appendChild(jobRemoteStatus);
-
                         // Append the job publisher
                         const jobPublisher = document.createElement('p');
                         jobPublisher.innerText = 'Publisher: ' + (job.job_publisher || 'N/A');
                         jobBox.appendChild(jobPublisher);
-
-                        // Append the job employment type
-                        const jobEmploymentType = document.createElement('p');
-                        jobEmploymentType.innerText = 'Employment Type: ' + (job.job_employment_type || 'N/A');
-                        jobBox.appendChild(jobEmploymentType);
 
                         // Append the apply link
                         const applyLink = document.createElement('a');
