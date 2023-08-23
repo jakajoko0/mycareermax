@@ -24,7 +24,7 @@
         }
 
         .job-box {
-            background-color: #ffffff;
+            background-color: #fdffd5;
             border: 1px solid #ccc;
             padding: 15px;
             margin: 10px;
@@ -51,7 +51,7 @@
 
         header {
             background-color: #ffffff;
-            color: rgb(0, 0, 0);
+            color: #007BFF;
             padding: 10px 0;
             text-align: center;
         }
@@ -67,18 +67,10 @@
             margin: 0 15px;
         }
 
-        .view-more-label {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 0.8em;
-            color: gray;
-        }
-
         /* Updated styles for green text */
         .navbar-light .green-text .navbar-brand,
         .navbar-light .green-text .navbar-nav .nav-link {
-            color: green;
+            color: #007BFF;
         }
 
         .navbar-light .green-text .navbar-toggler-icon {
@@ -89,7 +81,7 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="https://www.mycareermax.com">myCareerMax.com</a>
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #007BFF;">myCareerMax.com</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -121,7 +113,7 @@
 
 <body>
     <div class="d-flex justify-content-center align-items-center"><img class="img-fluid mb-3"
-            src="https://drive.google.com/uc?export=download&id=1pQtWu7UFTZEQ2hHEXcfljHa1aqfms5Jv" /></div>
+            src="https://drive.google.com/uc?export=download&id=1pUmsBRTfuTvssInii5oxqGzBWe1pwxCa" /></div>
     <div class="container mt-5">
         <!-- Job Search Section -->
         <div class="mb-4" id="job-search-section">
@@ -349,7 +341,7 @@
                         saveJobButton.className = 'fa fa-heart save-job-btn';
                         saveJobButton.dataset.jobId = job.job_id;
                         saveJobButton.style.cursor = 'pointer';
-                        saveJobButton.style.marginRight = '20px';  // Adjusted the margin property name
+                        saveJobButton.style.marginRight = '10px';  // Adjusted the margin property name
                         saveJobButton.style.fontSize = '24px';
 
                         saveJobButton.onclick = function () {
@@ -396,15 +388,38 @@
 
                         jobBox.appendChild(saveJobButton);
 
+                        const analyzeSymbol = document.createElement('a');
+                        analyzeSymbol.href = '#';  // Prevent default navigation
+                        analyzeSymbol.innerText = '$';
+                        analyzeSymbol.style.color = 'green';  // Give it the color green
+                        analyzeSymbol.style.fontSize = '30px';  // Adjust size as needed
+                        analyzeSymbol.style.marginLeft = '5px';  // Provide some margin for better spacing
+                        analyzeSymbol.style.marginRight = '10px';  // Provide some margin for better spacing
+                        analyzeSymbol.style.cursor = 'pointer';  // Change cursor to pointer to indicate clickability
+                        analyzeSymbol.style.fontWeight = 'bold';  // Make the symbol bold
+                        analyzeSymbol.onclick = (event) => {
+                            event.preventDefault();  // Prevent default navigation
+                            // AJAX call to Flask backend with separate parameters for job title
+                            $.post("/analyze-job", {
+                                job_title: job.job_title
+                            }, function (data) {
+                                // Display the result in the modal
+                                document.getElementById('analyzeResult').innerText = data.response;
+                                $('#analyzeModal').modal('show');
+                            });
+                        };
+                        jobBox.appendChild(analyzeSymbol);
+
 
 
                         // Create the "Generate Cover Letter" button first
                         const generateButton = document.createElement('button');
                         generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
                         generateButton.innerText = 'CoverME';
-                        generateButton.style.backgroundColor = 'yellow';
-                        generateButton.style.color = 'black';
+                        generateButton.style.backgroundColor = 'grey';
+                        generateButton.style.color = 'white';
                         generateButton.style.marginBottom = '10px';
+                        generateButton.style.marginLeft = '20px';
                         generateButton.onclick = () => generateCoverLetter(
                             job.job_description,
                             document.getElementById('resume-text').value,
@@ -417,8 +432,8 @@
                         const generateButton_1 = document.createElement('button');
                         generateButton_1.className = 'btn btn-secondary ml-2 job-box-btn';
                         generateButton_1.innerText = 'ResuME';
-                        generateButton_1.style.backgroundColor = 'yellow';
-                        generateButton_1.style.color = 'black';
+                        generateButton_1.style.backgroundColor = 'grey';
+                        generateButton_1.style.color = 'white';
                         generateButton_1.style.marginBottom = '10px';
                         generateButton_1.onclick = () => generateCoverLetter_1(
                             job.job_description,
@@ -428,23 +443,6 @@
                         );
                         jobBox.appendChild(generateButton_1);
 
-                        const analyzeButton = document.createElement('button');
-                        analyzeButton.className = 'btn btn-secondary ml-2 job-box-btn';
-                        analyzeButton.innerText = 'Salary';
-                        analyzeButton.style.backgroundColor = 'green';
-                        analyzeButton.style.color = 'white';
-                        analyzeButton.style.marginBottom = '10px';
-                        analyzeButton.onclick = () => {
-                            // AJAX call to Flask backend with separate parameters for job title
-                            $.post("/analyze-job", {
-                                job_title: job.job_title
-                            }, function (data) {
-                                // Display the result in the modal
-                                document.getElementById('analyzeResult').innerText = data.response;
-                                $('#analyzeModal').modal('show');
-                            });
-                        };
-                        jobBox.appendChild(analyzeButton);
 
                         // Append the Apply button
                         const applyButton = document.createElement('a');
@@ -453,7 +451,7 @@
                         applyButton.className = 'btn btn-primary job-box-btn';
                         applyButton.innerText = 'Apply!';
                         applyButton.style.marginBottom = '10px';
-                        applyButton.style.marginLeft = '10px';
+                        applyButton.style.marginLeft = '8px';
                         jobBox.appendChild(applyButton);
 
 

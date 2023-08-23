@@ -38,6 +38,22 @@ from flask import flash, get_flashed_messages
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
+
+def create_connection():
+    """Establish a connection to the Azure SQL database."""
+    server = os.getenv("DB_SERVER")
+    database = os.getenv("DB_NAME")
+    username = os.getenv("DB_USERNAME")  # Ensure this is the correct key from .env
+    password = os.getenv("DB_PASSWORD")  # Ensure this is the correct key from .env
+
+    connection_string = (
+        f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+        f"SERVER={server};DATABASE={database};"
+        f"UID={username};PWD={password}"
+    )
+    return pyodbc.connect(connection_string)
+
+
 # keys
 RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
@@ -49,6 +65,9 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 app.config["DEBUG"] = True
 app.config["PROPAGATE_EXCEPTIONS"] = True
+app.config[
+    "UPLOAD_FOLDER"
+] = "/path/to/upload/folder"  # set this to your desired upload folder
 
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
@@ -190,8 +209,6 @@ def login():
     return render_template("login.html", message=message)
 
 
-# ...
-
 db = SQLAlchemy()
 
 # Quote the username and password to handle special characters
@@ -331,7 +348,9 @@ def save_job():
 def get_saved_jobs():
     try:
         user_id = current_user.id
-        with conn.cursor() as cursor:
+        # Create a new connection for this route
+        local_conn = create_connection()
+        with local_conn.cursor() as cursor:
             cursor.execute("SELECT * FROM saved_jobs WHERE user_id = ?", (user_id,))
             saved_jobs = cursor.fetchall()
 
@@ -351,6 +370,7 @@ def get_saved_jobs():
             }
             saved_jobs_list.append(job_dict)
 
+        local_conn.close()  # Close the local connection
         return jsonify({"success": True, "saved_jobs": saved_jobs_list})
 
     except Exception as e:
@@ -377,23 +397,60 @@ def remove_saved_job():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@app.route("/upload_dashresume", methods=["POST"])
+@login_required
+def upload_dashresume():
+    if "resume" not in request.files:
+        return jsonify({"success": False, "error": "No file part"})
+    file = request.files["resume"]
+
+    if file.filename == "":
+        return jsonify({"success": False, "error": "No selected file"})
+
+    if file and file.filename.endswith(".docx"):
+        document = Document(io.BytesIO(file.read()))
+        resume_text = "\n".join([p.text for p in document.paragraphs if p.text])
+
+        try:
+            with conn.cursor() as cursor:
+                # Assuming you want to overwrite the old resume:
+                cursor.execute(
+                    "DELETE FROM user_resumes WHERE user_id = ?", (current_user.id,)
+                )
+                cursor.execute(
+                    "INSERT INTO user_resumes (user_id, resume_text, filename) VALUES (?, ?, ?)",
+                    (current_user.id, resume_text, file.filename),
+                )
+                conn.commit()
+        except Exception as e:
+            app.logger.error(f"Failed to insert resume into database: {e}")
+            return jsonify({"success": False, "error": "Failed to upload resume."})
+        return jsonify({"success": True, "filename": file.filename})
+    return jsonify({"success": False, "error": "Invalid file format"})
+
+
+@app.route("/get_latest_resume_name")
+@login_required
+def get_latest_resume_name():
+    print("Fetching latest resume name...")
+    try:
+        with conn.cursor() as cursor:
+            query = "SELECT TOP (1) filename FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+            cursor.execute(query, (current_user.id,))
+            result = cursor.fetchone()
+            if result:
+                return jsonify({"success": True, "filename": result[0]})
+            else:
+                return jsonify({"success": False, "error": "No resume found."})
+    except Exception as e:
+        app.logger.error(f"Failed to fetch resume name: {e}")
+        return jsonify({"success": False, "error": "Failed to fetch resume name."})
+
+
 @app.route("/test_connection")
 def test_connection():
     documents = UserDocuments.query.all()
     return jsonify([doc.id for doc in documents])
-
-
-@app.route("/delete_document/<int:doc_id>", methods=["DELETE"])
-def delete_document(doc_id):
-    document = UserDocuments.query.get(doc_id)
-
-    if not document:
-        return jsonify({"message": "Document not found!"}), 404
-
-    db.session.delete(document)
-    db.session.commit()
-
-    return jsonify({"message": "Document deleted successfully!"})
 
 
 @app.route("/download_document/<int:document_id>", methods=["GET"])
