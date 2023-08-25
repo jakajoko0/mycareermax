@@ -241,9 +241,14 @@ class UserDocuments(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     document_name = db.Column(db.String(255), nullable=False)
-    document_content = db.Column(db.String, nullable=False)
+    document_content = db.Column(
+        db.String, nullable=False
+    )  # Consider changing to db.Text or db.LargeBinary if the content can be large
     document_type = db.Column(db.String(50), nullable=False)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+    job_title = db.Column(db.String(255), nullable=True)  # Add job title
+    company_name = db.Column(db.String(255), nullable=True)  # Add company name
+    apply_link = db.Column(db.String(255), nullable=True)  # Add apply link
 
     user = db.relationship("User", backref=db.backref("documents", lazy=True))
 
@@ -251,17 +256,28 @@ class UserDocuments(db.Model):
 @app.route("/save_document", methods=["POST"])
 def save_document():
     try:
-        user_id = request.form.get("user_id")
-        doc_name = request.form.get("document_name")
-        doc_content = request.form.get("document_content")
-        doc_type = request.form.get("document_type")
+        # Get the request data from JSON (since we're sending JSON from the client-side)
+        data = request.json
+        user_id = data.get("user_id")
+        doc_name = data.get("document_name")
+        doc_content = data.get("document_content")
+        doc_type = data.get("document_type")
+        job_title = data.get("job_title")
+        company_name = data.get("company_name")
+        apply_link = data.get("apply_link")
 
+        # Create the new document object with all the details
         new_document = UserDocuments(
             user_id=user_id,
             document_name=doc_name,
             document_content=doc_content,
             document_type=doc_type,
+            job_title=job_title,  # Include job title
+            company_name=company_name,  # Include company name
+            apply_link=apply_link,  # Include apply link
         )
+
+        # Add and commit the new document
         db.session.add(new_document)
         db.session.commit()
         return jsonify(
@@ -281,7 +297,7 @@ def save_document():
         )
 
 
-@app.route("/get_user_documents", methods=["GET"])
+@app.route("/dashboard", methods=["GET"])
 @login_required
 def get_user_documents():
     user_id = current_user.id
@@ -294,11 +310,30 @@ def get_user_documents():
             "document_content": doc.document_content,
             "document_type": doc.document_type,
             "creation_date": doc.creation_date,
+            "job_title": doc.job_title,  # Include job title
+            "company_name": doc.company_name,  # Include company name
+            "apply_link": doc.apply_link,  # Include apply link
         }
         for doc in user_documents
     ]
 
-    return jsonify(documents_list)
+    return render_template("dashboard.html", documents=documents_list)
+
+
+@app.route("/delete_document/<int:document_id>", methods=["DELETE"])
+@login_required
+def delete_document(document_id):
+    try:
+        doc = UserDocuments.query.filter_by(id=document_id).first()
+        if not doc:
+            return jsonify({"success": False, "error": "Document not found"}), 404
+
+        db.session.delete(doc)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Document deleted successfully"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route("/save-job", methods=["POST"])

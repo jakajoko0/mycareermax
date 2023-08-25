@@ -215,7 +215,7 @@
             </script>
             <script>
 
-                function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName) {
+                function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName, applyLink) { // Add applyLink parameter
                     console.log("Job Description:", jobDescription);
                     console.log("Resume:", resume);
 
@@ -241,8 +241,14 @@
                             // Hide the loading overlay
                             document.getElementById('loading-overlay').style.display = 'none';
 
+                            // Store the job details in data attributes on the text box element
+                            var textBox = document.getElementById('cover-letter-text-1');
+                            textBox.value = data.cover_letter;
+                            textBox.setAttribute('data-job-title', jobTitle);
+                            textBox.setAttribute('data-company-name', companyName);
+                            textBox.setAttribute('data-apply-link', applyLink); // Store the apply link
+
                             document.getElementById('cover-letter-section-1').style.display = 'block';
-                            document.getElementById('cover-letter-text-1').value = data.cover_letter;
                         })
                         .catch(error => {
                             console.error("Error generating cover letter:", error);
@@ -252,11 +258,12 @@
                         });
                 }
 
-                // Generate a cover letter using the Flask route
-                function generateCoverLetter(jobDescription, resume, jobTitle, companyName) {
+
+
+                function generateCoverLetter(jobDescription, resume, jobTitle, companyName, applyLink) { // Add applyLink parameter
                     console.log("Generate Cover Letter button clicked.");
-                    console.log("Job Description:", jobDescription);  // Log the job description
-                    console.log("Resume:", resume);  // Log the resume text
+                    console.log("Job Description:", jobDescription);
+                    console.log("Resume:", resume);
 
                     // Show the loading overlay
                     document.getElementById('loading-overlay').style.display = 'block';
@@ -270,19 +277,24 @@
                         body: JSON.stringify({
                             resume: resume,
                             job_description: jobDescription,
-                            company_name: companyName, // Add company name field
-                            job_title: jobTitle // Add job title field
+                            company_name: companyName,
+                            job_title: jobTitle
                         })
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log("Cover Letter Response:", data);  // Log the response data
+                            console.log("Cover Letter Response:", data);
 
                             // Hide the loading overlay
                             document.getElementById('loading-overlay').style.display = 'none';
 
-                            // Display the generated cover letter
-                            document.getElementById('cover-letter-text').value = data.cover_letter;
+                            // Store the job details in data attributes on the text box element
+                            var textBox = document.getElementById('cover-letter-text');
+                            textBox.value = data.cover_letter;
+                            textBox.setAttribute('data-job-title', jobTitle);
+                            textBox.setAttribute('data-company-name', companyName);
+                            textBox.setAttribute('data-apply-link', applyLink); // Store the apply link
+
                             document.getElementById('cover-letter-section').style.display = 'block';
                         })
                         .catch(error => {
@@ -292,6 +304,7 @@
                             document.getElementById('loading-overlay').style.display = 'none';
                         });
                 }
+
 
 
                 // Fetch job listings based on user input
@@ -465,7 +478,8 @@
                             job.job_description,
                             document.getElementById('resume-text').value,
                             job.job_title,
-                            job.employer_name || "Unknown Company"
+                            job.employer_name || "Unknown Company",
+                            job.job_apply_link // Include the apply link
                         );
                         jobBox.appendChild(generateButton);
 
@@ -480,7 +494,8 @@
                             job.job_description,
                             document.getElementById('resume-text').value,
                             job.job_title,
-                            job.employer_name || "Unknown Company"
+                            job.employer_name || "Unknown Company",
+                            job.job_apply_link // Include the apply link
                         );
                         jobBox.appendChild(generateButton_1);
 
@@ -649,44 +664,74 @@
         </script>
         <script>
             function saveDocument() {
-                const documentContent = document.getElementById('cover-letter-text').value;
+                const textBox = document.getElementById('cover-letter-text');
+                const documentContent = textBox.value;
                 const documentName = "Generated Cover Letter";
                 const documentType = "Cover Letter";
+                const jobTitle = textBox.getAttribute('data-job-title');
+                const companyName = textBox.getAttribute('data-company-name');
+                const applyLink = textBox.getAttribute('data-apply-link');
 
-                // AJAX call to save the document content
-                $.post("/save_document", {
-                    user_id: userId,
-                    document_name: documentName,
-                    document_content: documentContent,
-                    document_type: documentType
-                }, function (data) {
-                    if (data.message === "Document saved successfully") {
-                        alert("Your Cover Letter Has Been Saved to Your Dashboard!");
-                    } else {
-                        alert("Error saving document. Please try again.");
-                    }
-                });
+                fetch("/save_document", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        document_name: documentName,
+                        document_content: documentContent,
+                        document_type: documentType,
+                        job_title: jobTitle,
+                        company_name: companyName,
+                        apply_link: applyLink
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === "Document saved successfully") {
+                            alert("Your Cover Letter Has Been Saved to Your Dashboard!");
+                        } else {
+                            alert("Error saving document. Please try again.");
+                        }
+                    });
             }
 
             function saveResume() {
-                const resumeContent = document.getElementById('cover-letter-text-1').value;
+                const textBox = document.getElementById('cover-letter-text-1');
+                const resumeContent = textBox.value;
                 const resumeName = "Generated Resume";
                 const documentType = "Resume";
+                const jobTitle = textBox.getAttribute('data-job-title');
+                const companyName = textBox.getAttribute('data-company-name');
+                const applyLink = textBox.getAttribute('data-apply-link');
 
-                // AJAX call to save the resume content
-                $.post("/save_document", {
-                    user_id: userId,
-                    document_name: resumeName,
-                    document_content: resumeContent,
-                    document_type: documentType
-                }, function (data) {
-                    if (data.message === "Document saved successfully") {
-                        alert("Your Resume Has Been Saved to Your Dashboard!");
-                    } else {
-                        alert("Error saving resume. Please try again.");
-                    }
-                });
+                fetch("/save_document", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        document_name: resumeName,
+                        document_content: resumeContent,
+                        document_type: documentType,
+                        job_title: jobTitle,
+                        company_name: companyName,
+                        apply_link: applyLink
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === "Document saved successfully") {
+                            alert("Your Resume Has Been Saved to Your Dashboard!");
+                        } else {
+                            alert("Error saving resume. Please try again.");
+                        }
+                    });
             }
+
+
         </script>
     </div>
 </body>
