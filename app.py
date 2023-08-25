@@ -795,7 +795,7 @@ def career_click():
 
     # Make the API call to OpenAI's GPT-3.5 model
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=messages,
     )
 
@@ -818,19 +818,23 @@ def resume_1():
     messages = [
         {
             "role": "system",
-            "content": "You are a helpful assistant that enhances resumes and tailors them to specific jobs.",
+            "content": "You are a helpful assistant who enhances resumes and tailors them for specific jobs",
         },
         {
             "role": "user",
-            "content": f"Enhance the following resume and tailor it to the following job. Resume: {resume}. Job description: {job_description}. Job title: {job_title},",
+            "content": f"Edit the following resume to enhance it for the job described below. The resume should be ATS optimized. Provide a summary of your ATS Enhanced Optimizations. Resume: {resume}. Job title: {job_title}. Job description: {job_description}",
         },
     ]
 
-    # Make the API call to OpenAI's GPT-3.5 model
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-    )
+    # Make the API call to OpenAI's GPT-4 model
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=messages,
+        )
+    except openai.error.InvalidRequestError as e:
+        print(e)  # Handle error accordingly
+        return jsonify({"error": str(e)})
 
     # Extract the generated cover letter from the response
     cover_letter = response.choices[0].message["content"].strip()

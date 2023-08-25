@@ -97,22 +97,25 @@
             class="responsive-logo">
     </div>
 
+    <div class="container mt-5 text-white">
+        <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
+            <input type="file" name="resume" accept=".docx" required>
+            <button type="submit" class="btn btn-success">Upload Resume</button>
+        </form>
+        <div id="uploaded-resume-name" style="margin-top: 20px;"></div>
+    </div>
+
     <!-- Main Content -->
-    <div class="container mt-5" style="color: white;">
+    <div class="container mt-5 mb-5" style="color: white;">
         <h2>My Saved Jobs</h2>
         <div id="saved-jobs-container">
             <!-- Saved jobs will be dynamically added here -->
         </div>
     </div>
 
-    <div class="container mt-5" style="color: white;">
-        <h2>Resume</h2>
-        <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
-            <input type="file" name="resume" accept=".docx" required>
-            <button type="submit" class="btn btn-success">Upload</button>
-        </form>
-        <div id="uploaded-resume-name" style="margin-top: 20px;"></div>
-    </div>
+
+
+
     <!-- jQuery, Bootstrap JS and Popper.js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -264,18 +267,20 @@
     <!-- Saved Documents Section -->
 
     <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
+        <h2 style="color: #007BFF;">My Docs</h2> <!-- Changed color here -->
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Apply Link</th>
-                        <th>Document Name</th>
+                        <th>Document</th>
                         <th>Job Title</th>
                         <th>Company Name</th>
+                        <th>Interview Prep</th> <!-- Added this new header -->
                         <th>Download DOCX</th>
                         <th>Download PDF</th>
-                        <th>Creation Date</th>
                         <th>Delete</th>
+                        <th>Creation Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -285,13 +290,14 @@
                         <td>{{ doc.document_type }}</td>
                         <td>{{ doc.job_title }}</td>
                         <td>{{ doc.company_name }}</td>
+                        <td><a href="/interview-prep" target="_blank">IntervueME</a></td> <!-- Added this new cell -->
                         <td><a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">Download
                                 DOCX</a></td>
                         <td><a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">Download
                                 PDF</a>
                         </td>
-                        <td>{{ doc.creation_date }}</td>
                         <td><button onclick="deleteDocument({{ doc.id }})" class="btn btn-danger">Delete</button></td>
+                        <td>{{ doc.creation_date }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -316,7 +322,6 @@
             }
         }
     </script>
-
 </body>
 
 </html>
