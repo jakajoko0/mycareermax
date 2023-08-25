@@ -763,7 +763,7 @@ def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=1"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
