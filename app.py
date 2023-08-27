@@ -252,6 +252,23 @@ class UserDocuments(db.Model):
 
     user = db.relationship("User", backref=db.backref("documents", lazy=True))
 
+@app.route("/get-username")
+@login_required
+def get_username():
+    try:
+        with conn.cursor() as cursor:
+            query = "SELECT username FROM users WHERE id = ?"
+            cursor.execute(query, (current_user.id,))
+            result = cursor.fetchone()
+            if result:
+                username = result[0]
+                return jsonify({"success": True, "username": username})
+            else:
+                return jsonify({"success": False, "error": "User not found."})
+    except Exception as e:
+        app.logger.error(f"Failed to fetch username: {e}")
+        return jsonify({"success": False, "error": "Failed to fetch username."})
+
 
 @app.route("/save_document", methods=["POST"])
 def save_document():
@@ -469,7 +486,7 @@ def upload_dashresume():
 def get_latest_resume_name():
     print("Fetching latest resume name...")
     try:
-        with conn.cursor() as cursor:
+        with create_connection().cursor() as cursor:  # Create a new connection
             query = "SELECT TOP (1) filename FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
             cursor.execute(query, (current_user.id,))
             result = cursor.fetchone()
@@ -480,6 +497,7 @@ def get_latest_resume_name():
     except Exception as e:
         app.logger.error(f"Failed to fetch resume name: {e}")
         return jsonify({"success": False, "error": "Failed to fetch resume name."})
+
 
 
 @app.route("/test_connection")

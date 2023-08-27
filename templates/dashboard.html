@@ -9,7 +9,6 @@
     <title>myDashboard - myCareerMax</title>
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
     <style>
         .logo-container {
@@ -56,272 +55,317 @@
     </style>
     <style>
         body {
-            background-color: #007BFF;
+            background-image: linear-gradient(120deg, #adadad, #007BFF);
+            background-size: cover;
+            background-attachment: fixed;
         }
     </style>
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light green-text">
-        <a class="navbar-brand" href="https://www.mycareermax.com">myCareerMax.com</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard">myDashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/careerclick">AI Job Search</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cover-letter-generator">CoverCraft</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/resume-enhancer">ResumeTuner</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/interview-prep">IntervueME</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="logo-container">
-        <img src="https://drive.google.com/uc?export=download&id=1d70_CTAYnJxkfCKRSdiu4FIn_yN2EBN_" alt="Logo"
-            class="responsive-logo">
-    </div>
+    <!-- Your existing body content here -->
 
-    <div class="container mt-5 text-white">
-        <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
-            <input type="file" name="resume" accept=".docx" required>
-            <button type="submit" class="btn btn-success">Upload Resume</button>
-        </form>
-        <div id="uploaded-resume-name" style="margin-top: 20px;"></div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container mt-5 mb-5" style="color: white;">
-        <h2>My Saved Jobs</h2>
-        <div id="saved-jobs-container">
-            <!-- Saved jobs will be dynamically added here -->
-        </div>
-    </div>
-
-
-
-
-    <!-- jQuery, Bootstrap JS and Popper.js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <script>
+    <!-- Your existing scripts -->
+
+    <script defer>
+        // Your existing JavaScript code
+
         $(document).ready(function () {
-
-            // Handling resume upload via jQuery
-            $("#uploadButtonOrForm").on("submit", function () {
-                let formData = new FormData(this);
-
-                $.ajax({
-                    url: '/upload_dashresume',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.success) {
-                            // Display the uploaded resume name
-                            $('#uploaded-resume-name').text('Uploaded Resume: ' + response.filename);
-                        } else {
-                            console.error('Error uploading resume:', response.error);
-                        }
-                    }
-                });
-
-                return false;  // To prevent the form from actually submitting and refreshing the page
-            });
-
-            // Fetch the latest uploaded resume name for the user
-            $.get("/get_latest_resume_name", function (response) {
+            console.log("Fetching username...");
+            $.get("/get-username", function (response) {
+                console.log("Username response:", response);
                 if (response.success) {
-                    // Display the resume name
-                    $('#uploaded-resume-name').text('Current Resume: ' + response.filename);
+                    const usernamePlaceholder = document.getElementById("username-placeholder");
+                    usernamePlaceholder.textContent = "Hello, " + response.username;
                 } else {
-                    console.error('Error fetching resume name:', response.error);
+                    console.error('Error fetching username:', response.error);
                 }
             });
 
-            // Fetch and display saved jobs
-            fetch("/get-saved-jobs")
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const savedJobsContainer = document.getElementById("saved-jobs-container");
-                        data.saved_jobs.forEach(job => {
-                            const jobCard = document.createElement("div");
-                            jobCard.className = "card mb-3";
-                            jobCard.style.width = "300px";
-
-                            const cardBody = document.createElement("div");
-                            cardBody.className = "card-body";
-                            cardBody.style.height = "250px";
-                            cardBody.style.overflowY = "auto";
-
-                            // Append the employer logo if it exists
-                            if (job.employer_logo) {
-                                const logoImg = document.createElement('img');
-                                logoImg.src = job.employer_logo;
-                                logoImg.alt = job.company_name + ' logo';
-                                logoImg.style.width = '100px';
-                                cardBody.appendChild(logoImg);
-                            }
-
-                            const applyLink = document.createElement("a");
-                            applyLink.href = job.job_link;
-                            applyLink.target = "_blank";
-                            applyLink.className = "btn btn-primary mr-2";
-                            applyLink.textContent = "Apply Here";
-
-                            const jobTitle = document.createElement("h5");
-                            jobTitle.className = "card-title";
-                            jobTitle.style.color = "blue";
-                            jobTitle.textContent = job.job_title;
-
-                            const companyName = document.createElement("h6");
-                            companyName.className = "card-text";
-                            companyName.style.color = "green";
-                            companyName.textContent = job.company_name;
-
-                            const jobDescription = document.createElement("p");
-                            jobDescription.className = "card-text";
-                            jobDescription.style.color = "blue";
-                            jobDescription.textContent = job.job_description;
-
-                            const removeButton = document.createElement("button");
-                            removeButton.className = "btn btn-danger";
-                            removeButton.textContent = "Remove";
-
-                            removeButton.onclick = function () {
-                                const jobId = job.id;
-
-                                $.ajax({
-                                    url: "/remove-saved-job",
-                                    type: "POST",
-                                    contentType: "application/json",
-                                    data: JSON.stringify({ job_id: jobId }),
-                                    success: function (response) {
-                                        if (response.success) {
-                                            console.log("Job removed successfully!");
-                                            jobCard.remove();
-                                        } else {
-                                            console.error("Failed to remove job:", response.error);
-                                        }
-                                    },
-                                    error: function (xhr, status, error) {
-                                        console.error("Failed to remove job:", error);
-                                    }
-                                });
-                            };
-
-
-                            // Append buttons to cardBody
-                            cardBody.appendChild(jobTitle);
-                            cardBody.appendChild(companyName);
-                            cardBody.appendChild(applyLink);
-                            cardBody.appendChild(removeButton);
-                            cardBody.appendChild(jobDescription);
-                            jobCard.appendChild(cardBody);
-
-                            savedJobsContainer.appendChild(jobCard);
-                        });
-                    } else {
-                        console.error("Failed to fetch saved jobs:", data.error);
-                    }
-                });
-
+            // Rest of your existing JavaScript code...
         });
     </script>
 
-    <script defer>
-        // Ensure jQuery is loaded
-        if (typeof $ !== 'undefined') {
-            $(document).ready(function () {
-                // Fetch the user's documents and populate the list
-                $.get("/get_user_documents", function (data) {
-                    data.forEach(function (doc) {
-                        $("#saved-documents-list").append(`<li class="list-group-item"><a href="/download_document/${doc.id}?format=docx">${doc.document_name} - DOCX</a> | <a href="/download_document/${doc.id}?format=pdf">${doc.document_name} - PDF</a></li>`);
-                    });
-                });
-            });
-        } else {
-            console.error("jQuery is not loaded.");
-        }
-    </script>
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #007BFF;">myCareerMax.com</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard" style="color: #007BFF;">myDashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/careerclick" style="color: #007BFF;">AI Job Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/resume-enhancer" style="color: #007BFF;">ATS Resume</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
+                    </li>
+                    <!-- Add the dropdown for the username -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+                            <span id="username-placeholder">Hello, User</span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
+                            <a class="dropdown-item" href="#" style="color: #007BFF;">Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-    <!-- Saved Documents Section -->
 
-    <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
-        <h2 style="color: #007BFF;">My Docs</h2> <!-- Changed color here -->
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Apply Link</th>
-                        <th>Document</th>
-                        <th>Job Title</th>
-                        <th>Company Name</th>
-                        <th>Interview Prep</th> <!-- Added this new header -->
-                        <th>Download DOCX</th>
-                        <th>Download PDF</th>
-                        <th>Delete</th>
-                        <th>Creation Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for doc in documents %}
-                    <tr>
-                        <td><a href="{{ doc.apply_link }}" target="_blank">Apply</a></td>
-                        <td>{{ doc.document_type }}</td>
-                        <td>{{ doc.job_title }}</td>
-                        <td>{{ doc.company_name }}</td>
-                        <td><a href="/interview-prep" target="_blank">IntervueME</a></td> <!-- Added this new cell -->
-                        <td><a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">Download
-                                DOCX</a></td>
-                        <td><a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">Download
-                                PDF</a>
-                        </td>
-                        <td><button onclick="deleteDocument({{ doc.id }})" class="btn btn-danger">Delete</button></td>
-                        <td>{{ doc.creation_date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+        <div class="logo-container">
+            <img src="https://drive.google.com/uc?export=download&id=1d70_CTAYnJxkfCKRSdiu4FIn_yN2EBN_" alt="Logo"
+                class="responsive-logo">
         </div>
-    </div>
-    <script>
-        function deleteDocument(documentId) {
-            if (confirm("Are you sure you want to delete this document?")) {
-                $.ajax({
-                    url: '/delete_document/' + documentId,
-                    type: 'DELETE',
-                    success: function (response) {
-                        if (response.success) {
-                            alert('Document deleted successfully!');
-                            location.reload(); // Reload the page to update the table
-                        } else {
-                            alert('Error deleting document. Please try again.');
+
+        <div class="container mt-5 text-white">
+            <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
+                <input type="file" name="resume" accept=".docx" required>
+                <button type="submit" class="btn btn-success">Upload Resume</button>
+            </form>
+            <div id="uploaded-resume-name" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mt-5 mb-5" style="color: white;">
+            <h2>My Saved Jobs</h2>
+            <div id="saved-jobs-container">
+                <!-- Saved jobs will be dynamically added here -->
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+
+                // Handling resume upload via jQuery
+                $("#uploadButtonOrForm").on("submit", function () {
+                    let formData = new FormData(this);
+
+                    $.ajax({
+                        url: '/upload_dashresume',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success) {
+                                // Display the uploaded resume name
+                                $('#uploaded-resume-name').text('Uploaded Resume: ' + response.filename);
+                            } else {
+                                console.error('Error uploading resume:', response.error);
+                            }
                         }
+                    });
+
+                    return false;  // To prevent the form from actually submitting and refreshing the page
+                });
+
+                // Fetch the latest uploaded resume name for the user
+                $.get("/get_latest_resume_name", function (response) {
+                    if (response.success) {
+                        // Display the resume name
+                        $('#uploaded-resume-name').text('Current Resume: ' + response.filename);
+                    } else {
+                        console.error('Error fetching resume name:', response.error);
                     }
                 });
+
+                // Fetch and display saved jobs
+                fetch("/get-saved-jobs")
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const savedJobsContainer = document.getElementById("saved-jobs-container");
+                            data.saved_jobs.forEach(job => {
+                                const jobCard = document.createElement("div");
+                                jobCard.className = "card mb-3";
+                                jobCard.style.width = "300px";
+
+                                const cardBody = document.createElement("div");
+                                cardBody.className = "card-body";
+                                cardBody.style.height = "250px";
+                                cardBody.style.overflowY = "auto";
+
+                                // Append the employer logo if it exists
+                                if (job.employer_logo) {
+                                    const logoImg = document.createElement('img');
+                                    logoImg.src = job.employer_logo;
+                                    logoImg.alt = job.company_name + ' logo';
+                                    logoImg.style.width = '100px';
+                                    cardBody.appendChild(logoImg);
+                                }
+
+                                const applyLink = document.createElement("a");
+                                applyLink.href = job.job_link;
+                                applyLink.target = "_blank";
+                                applyLink.className = "btn btn-primary mr-2";
+                                applyLink.textContent = "Apply Here";
+
+                                const jobTitle = document.createElement("h5");
+                                jobTitle.className = "card-title";
+                                jobTitle.style.color = "blue";
+                                jobTitle.textContent = job.job_title;
+
+                                const companyName = document.createElement("h6");
+                                companyName.className = "card-text";
+                                companyName.style.color = "green";
+                                companyName.textContent = job.company_name;
+
+                                const jobDescription = document.createElement("p");
+                                jobDescription.className = "card-text";
+                                jobDescription.style.color = "blue";
+                                jobDescription.textContent = job.job_description;
+
+                                const removeButton = document.createElement("button");
+                                removeButton.className = "btn btn-danger";
+                                removeButton.textContent = "Remove";
+
+                                removeButton.onclick = function () {
+                                    const jobId = job.id;
+
+                                    $.ajax({
+                                        url: "/remove-saved-job",
+                                        type: "POST",
+                                        contentType: "application/json",
+                                        data: JSON.stringify({ job_id: jobId }),
+                                        success: function (response) {
+                                            if (response.success) {
+                                                console.log("Job removed successfully!");
+                                                jobCard.remove();
+                                            } else {
+                                                console.error("Failed to remove job:", response.error);
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error("Failed to remove job:", error);
+                                        }
+                                    });
+                                };
+
+
+                                // Append buttons to cardBody
+                                cardBody.appendChild(jobTitle);
+                                cardBody.appendChild(companyName);
+                                cardBody.appendChild(applyLink);
+                                cardBody.appendChild(removeButton);
+                                cardBody.appendChild(jobDescription);
+                                jobCard.appendChild(cardBody);
+
+                                savedJobsContainer.appendChild(jobCard);
+                            });
+                        } else {
+                            console.error("Failed to fetch saved jobs:", data.error);
+                        }
+                    });
+
+            });
+        </script>
+
+        <script defer>
+            // Ensure jQuery is loaded
+            if (typeof $ !== 'undefined') {
+                $(document).ready(function () {
+                    // Fetch the user's documents and populate the list
+                    $.get("/get_user_documents", function (data) {
+                        data.forEach(function (doc) {
+                            $("#saved-documents-list").append(`<li class="list-group-item"><a href="/download_document/${doc.id}?format=docx">${doc.document_name} - DOCX</a> | <a href="/download_document/${doc.id}?format=pdf">${doc.document_name} - PDF</a></li>`);
+                        });
+                    });
+                });
+            } else {
+                console.error("jQuery is not loaded.");
             }
-        }
-    </script>
+        </script>
+
+        <!-- Saved Documents Section -->
+
+        <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #007BFF;">My Docs</h2> <!-- Changed color here -->
+            <div id="my-docs" class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Apply Link</th>
+                            <th>Document</th>
+                            <th>Job Title</th>
+                            <th>Company Name</th>
+                            <th>Interview Prep</th> <!-- Added this new header -->
+                            <th>Download DOCX</th>
+                            <th>Download PDF</th>
+                            <th>Delete</th>
+                            <th>Creation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documents %}
+                        <tr>
+                            <td><a href="{{ doc.apply_link }}" target="_blank">Apply</a></td>
+                            <td>{{ doc.document_type }}</td>
+                            <td>{{ doc.job_title }}</td>
+                            <td>{{ doc.company_name }}</td>
+                            <td><a href="/interview-prep" target="_blank">IntervueME</a></td>
+                            <!-- Added this new cell -->
+                            <td><a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">Download
+                                    DOCX</a></td>
+                            <td><a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">Download
+                                    PDF</a>
+                            </td>
+                            <td><button onclick="deleteDocument({{ doc.id }})" class="btn btn-danger">Delete</button>
+                            </td>
+                            <td>{{ doc.creation_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function deleteDocument(documentId) {
+                if (confirm("Are you sure you want to delete this document?")) {
+                    $.ajax({
+                        url: '/delete_document/' + documentId,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.success) {
+                                alert('Document deleted successfully!');
+                                location.reload(); // Reload the page to update the table
+                            } else {
+                                alert('Error deleting document. Please try again.');
+                            }
+                        }
+                    });
+                }
+            }
+        </script>
+        <!-- Your existing HTML content -->
+
+        <!-- Add these script tags right before the closing </body> tag -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </body>
+
+</html>
+
 </body>
 
 </html>

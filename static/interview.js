@@ -13,6 +13,8 @@ $("#interview-form").on("submit", function (event) {
   if (file) {
     formData.append("resume", file); // Only append the file if one is selected
   }
+  // Show the loading spinner
+  $("#loading-spinner").show();
 
   $("input[type='submit']").val("Loading...").prop("disabled", true);
 
@@ -23,6 +25,8 @@ $("#interview-form").on("submit", function (event) {
     processData: false,
     contentType: false,
     success: function (response) {
+      // Show the loading spinner
+      $("#loading-spinner").hide();
       console.log("Response received"); // Add this line
       // Hide the form fields
       $("#interview-form").hide();
@@ -53,6 +57,8 @@ $("#interview-form").on("submit", function (event) {
         .prop("disabled", false);
     },
     error: function (xhr, textStatus, error) {
+      $("#loading-spinner").hide(); // <-- Add this line
+
       alert("An error occurred. Please try again.");
       $("input[type='submit']")
         .val("Simulate Interview")

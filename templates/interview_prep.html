@@ -4,24 +4,30 @@
 
 <head>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
-     crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <title>InterviewPRO</title>
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- Links to the Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com" rel="preconnect" />
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
   <div id="loading-spinner" style="display: none;">
     <div class="spinner"></div>
   </div>
   <style>
+    #question-display {
+      font-family: 'Roboto Slab', serif;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f7f7f7;
     }
 
     header {
@@ -50,9 +56,7 @@
     textarea,
     input[type="text"] {
       border: 1px solid #5b87ff;
-      /* Green border */
       border-radius: 5px;
-      /* Rounded border */
       width: 100%;
     }
 
@@ -62,7 +66,7 @@
 
     /* Gradient Background */
     body {
-      background-image: linear-gradient(120deg, #ffffff, #ffffff);
+      background-image: linear-gradient(120deg, #adadad, #007BFF);
       background-size: cover;
       background-attachment: fixed;
     }
@@ -177,10 +181,8 @@
       height: auto;
     }
 
-    .green-text,
-    .green-text .nav-link,
-    .green-text .navbar-brand {
-      color: green !important;
+    .custom-label {
+      font-family: 'Roboto Slab', serif;
     }
   </style>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -188,9 +190,29 @@
 </head>
 
 <body>
+
+
+  <script defer>
+    // Your existing JavaScript code
+
+    $(document).ready(function () {
+      console.log("Fetching username...");
+      $.get("/get-username", function (response) {
+        console.log("Username response:", response);
+        if (response.success) {
+          const usernamePlaceholder = document.getElementById("username-placeholder");
+          usernamePlaceholder.textContent = "Hello, " + response.username;
+        } else {
+          console.error('Error fetching username:', response.error);
+        }
+      });
+
+      // Rest of your existing JavaScript code...
+    });
+  </script>
   <div class="container-fluid">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light green-text">
-      <a class="navbar-brand" href="https://www.mycareermax.com">myCareerMax.com</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #007BFF;">myCareerMax.com</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -198,44 +220,56 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/dashboard">myDashboard</a>
+            <a class="nav-link" href="/dashboard" style="color: #007BFF;">myDashboard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/careerclick">AI Job Search</a>
+            <a class="nav-link" href="/careerclick" style="color: #007BFF;">AI Job Search</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/cover-letter-generator">CoverCraft</a>
+            <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/resume-enhancer">ResumeTuner</a>
+            <a class="nav-link" href="/resume-enhancer" style="color: #007BFF;">ATS Resume</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/interview-prep">IntervueME</a>
+            <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
+          <!-- Add the dropdown for the username -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+              <span id="username-placeholder">Hello, User</span>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
+              <a class="dropdown-item" href="#" style="color: #007BFF;">Settings</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
+            </div>
           </li>
         </ul>
       </div>
     </nav>
+
+
     <div style="text-align:center;">
       <img alt="Your Logo" src="https://drive.google.com/uc?export=download&id=1mLGoQd5J0gTz1_cEpdgItm1ZsKuvDEyT"
         style="max-width:100%;" />
     </div>
     <form enctype="multipart/form-data" id="interview-form">
-      <label for="job_title">Job Title:</label><br />
+      <label class="custom-label" for="job_title">Job Title:</label><br />
       <input id="job_title" name="job_title" type="text" /><br />
       <div> </div>
       <div> </div>
-      <label for="job_description">Job Description:</label><br />
+      <label class="custom-label" for="job_description">Job Description:</label><br />
       <textarea id="job_description" name="job_description"></textarea><br />
       <div> </div>
       <div> </div>
-      <label for="job_requirements">Job Requirements:</label><br />
+      <label class="custom-label" for="job_requirements">Job Requirements:</label><br />
       <textarea id="job_requirements" name="job_requirements"></textarea><br />
       <div> </div>
       <div> </div>
-      <label for="industry">Industry:</label><br />
+      <label class="custom-label" for="industry">Industry:</label><br />
       <input id="industry" name="industry" type="text" /><br />
       <div> </div>
       <div> </div>
@@ -246,7 +280,9 @@
       <label for="typed_resume">Or enter it manually here:</label><br />
       <textarea id="typed_resume" name="typed_resume"></textarea><br />
       <div> </div>
-      <input type="submit" value="Simulate Interview" />
+      <button type="submit"
+        style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px;">Simulate
+        Interview</button>
     </form>
     <div>
       <p> </p>
@@ -259,13 +295,17 @@
     <div id="interview-container">
       <div id="question-display"></div>
       <p> </p>
-      <textarea id="user-answer" style="display: none"></textarea>
+      <textarea id="user-answer" rows="10" cols="50" style="display: none; border-color: green;"></textarea>
       <div>
         <p> </p>
       </div>
-      <button id="submit-answer" style="display: none">Submit Answer</button>
-      <button id="previous-button" style="display: none">Previous</button>
-      <button id="next-button" style="display: none">Next</button>
+      <button id="submit-answer"
+        style="background-color: #007BFF; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Submit
+        Answer</button>
+      <button id="previous-button"
+        style="background-color: gray; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Previous</button>
+      <button id="next-button"
+        style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px; display: none;">Next</button>
     </div>
     <!-- JavaScript code -->
     <script src="/static/interview.js"></script>
