@@ -143,38 +143,39 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #007BFF;">myDashboard</a>
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerclick" style="color: #007BFF;">AI Job Search</a>
+                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
+                    <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
                 </li>
                 <!-- Dropdown Menu for AI Resume Tools -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
                         AI Resume Tools
                     </a>
                     <div class="dropdown-menu" aria-labelledby="resumeDropdown">
-                        <a class="dropdown-item" href="/resume-enhancer" style="color: #007BFF;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
                     </div>
                 </li>
                 <!-- End of Dropdown -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
+                    <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
                 </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
-                        <span id="username-placeholder">Hello, User</span>
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        <span id="username-placeholder">Hello, Neo</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #ff0000;">Logout</a>
                     </div>
                 </li>
             </ul>
@@ -190,8 +191,10 @@
 </body>
 
 <body>
-    <div class="d-flex justify-content-center align-items-center"><img class="img-fluid mb-3"
-            src="https://drive.google.com/uc?export=download&id=1pUmsBRTfuTvssInii5oxqGzBWe1pwxCa" /></div>
+    <div style="text-align:center;">
+        <img src="{{ url_for('static', filename='images/blue-mycareermax.png') }}" alt="Your Logo"
+            style="max-width:100%;" />
+    </div>
     <div class="container mt-5">
         <!-- Job Search Section -->
         <div class="mb-4" id="job-search-section">
@@ -281,7 +284,7 @@
                         onclick="downloadResume_1()">Download</button>
                     <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">Copy to
                         Clipboard</button>
-                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">Save to Dashboard</button>
+                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">Send to myDashboard</button>
                 </div>
             </div>
              
@@ -295,7 +298,7 @@
                 <div class="mt-2">
                     <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
                     <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button><button
-                        class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">Save to Dashboard</button>
+                        class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">Send to myDashboard</button>
                 </div>
             </div>
             <!-- Job Listings Container -->
@@ -496,7 +499,7 @@
                                         if (response.success) {
                                             console.log("Job saved successfully!");
                                         } else {
-                                            console.error("Failed to save job:", response.error);
+                                            alert("You must be logged in to Save Jobs to myDashboard.");
                                         }
                                     },
                                     error: function (xhr, status, error) {
@@ -664,7 +667,7 @@
                     const coverLetterTextarea = document.getElementById('cover-letter-text');
                     coverLetterTextarea.select();
                     document.execCommand('copy');
-                    alert('Cover letter copied to clipboard!');
+                    alert('AI Cover letter copied to clipboard!');
                 }
 
                 // Function to download the resuME
@@ -683,7 +686,7 @@
                     const copyText = document.getElementById('cover-letter-text-1');
                     copyText.select();
                     document.execCommand("copy");
-                    alert("resuME copied to clipboard!");
+                    alert("Optimized Resume copied to clipboard!");
                 }
 
                 // Event listener for file upload
@@ -789,7 +792,7 @@
                         if (data.message === "Document saved successfully") {
                             alert("Your Cover Letter Has Been Saved to Your Dashboard!");
                         } else {
-                            alert("Error saving document. Please try again.");
+                            alert("You must be logged in to access myDashboard.");
                         }
                     });
             }
@@ -823,7 +826,7 @@
                         if (data.message === "Document saved successfully") {
                             alert("Your Resume Has Been Saved to Your Dashboard!");
                         } else {
-                            alert("Error saving resume. Please try again.");
+                            alert("You must be logged in to access myDashboard.");
                         }
                     });
             }

@@ -123,16 +123,28 @@ conn_str = (
 )
 conn = pyodbc.connect(conn_str)
 
-
 @app.before_request
 def require_login():
     allowed_routes = [
         "login",
         "register",
+        "careerclick",
+        "fetch-job-listings",
+        "analyze-job",
+        "analyze-answer",
+        "analyze-resume",
+        "upload-docx",
+        "generate-cover-letter",
+        "simulate-interview",
+        "resume-enhancer",
+        "interview-prep",
+        "career_click",
+        "resume.1",
     ]  # List of routes that don't require authentication
 
-    if not current_user.is_authenticated and request.endpoint not in allowed_routes:
-        return redirect(url_for("login"))
+    #if not current_user.is_authenticated and request.endpoint not in allowed_routes:
+        #return redirect(url_for("login"))
+
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
@@ -580,7 +592,7 @@ def background_image():
 
 @app.route("/")
 def home():
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("careerclick"))
 
 
 @app.route("/cover-letter-generator")
@@ -603,7 +615,7 @@ def interview_prep():
 def analyze_resume():
     # Extract the content from the request
     resume_content = request.form.get("resume")
-    job_title = request.form.get("jobTitle")  
+    job_title = request.form.get("jobTitle")
     job_description = request.form.get("jobDescription")
     # Construct the messages for the OpenAI API
     messages = [

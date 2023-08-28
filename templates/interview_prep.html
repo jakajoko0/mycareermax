@@ -232,38 +232,39 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/dashboard" style="color: #007BFF;">myDashboard</a>
+            <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/careerclick" style="color: #007BFF;">AI Job Search</a>
+            <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
+            <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
           </li>
           <!-- Dropdown Menu for AI Resume Tools -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+              aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
               AI Resume Tools
             </a>
             <div class="dropdown-menu" aria-labelledby="resumeDropdown">
-              <a class="dropdown-item" href="/resume-enhancer" style="color: #007BFF;">Resume Scanner</a>
+              <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
             </div>
           </li>
           <!-- End of Dropdown -->
           <li class="nav-item">
-            <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
+            <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
           </li>
           <!-- Existing dropdown for the username -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
-              <span id="username-placeholder">Hello, User</span>
+              aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+              <span id="username-placeholder">Hello, Neo</span>
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
+              <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
+              <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+              <a class="dropdown-item" href="/logout" style="color: #ff0000;">Logout</a>
             </div>
           </li>
         </ul>
@@ -273,8 +274,7 @@
 
 
     <div style="text-align:center;">
-      <img alt="Your Logo" src="https://drive.google.com/uc?export=download&id=1mLGoQd5J0gTz1_cEpdgItm1ZsKuvDEyT"
-        style="max-width:100%;" />
+      <img src="{{ url_for('static', filename='images/intervueme.png') }}" alt="Your Logo" style="max-width:100%;" />
     </div>
     <form enctype="multipart/form-data" id="interview-form">
       <label class="custom-label" for="job_title">Job Title:</label><br />
