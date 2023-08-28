@@ -3,29 +3,23 @@
 <html>
 
 <head>
+  <title>IntervueME | myCareerMax</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
     crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta content="width=device-width, initial-scale=1" name="viewport" />
-  <title>InterviewPRO</title>
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- Links to the Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@500&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com" rel="preconnect" />
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
   <div id="loading-spinner" style="display: none;">
     <div class="spinner"></div>
   </div>
   <style>
-    #question-display {
-      font-family: 'Roboto Slab', serif;
-    }
-
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Prompt', sans-serif;
       margin: 0;
       padding: 0;
     }
@@ -53,12 +47,7 @@
       text-decoration: none;
     }
 
-    textarea,
-    input[type="text"] {
-      border: 1px solid #5b87ff;
-      border-radius: 5px;
-      width: 100%;
-    }
+
 
     form {
       margin-top: 100px;
@@ -182,7 +171,30 @@
     }
 
     .custom-label {
-      font-family: 'Roboto Slab', serif;
+      font-family: 'Prompt', sans-serif;
+    }
+
+    #interview-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #job_title,
+    #job_description,
+    #job_requirements,
+    #industry,
+    #resume,
+    #typed_resume {
+      width: 90%;
+      max-width: 500px;
+      border-radius: 8px;
+      border: 2px solid #007BFF;
+    }
+
+    /* Remove the border from the resume field */
+    #resume {
+      border: none;
     }
   </style>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -212,7 +224,7 @@
   </script>
   <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #007BFF;">myCareerMax.com</a>
+      <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -228,13 +240,21 @@
           <li class="nav-item">
             <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/resume-enhancer" style="color: #007BFF;">ATS Resume</a>
+          <!-- Dropdown Menu for AI Resume Tools -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+              AI Resume Tools
+            </a>
+            <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+              <a class="dropdown-item" href="/resume-enhancer" style="color: #007BFF;">Resume Scanner</a>
+            </div>
           </li>
+          <!-- End of Dropdown -->
           <li class="nav-item">
             <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
           </li>
-          <!-- Add the dropdown for the username -->
+          <!-- Existing dropdown for the username -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
@@ -242,7 +262,6 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
-              <a class="dropdown-item" href="#" style="color: #007BFF;">Settings</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
             </div>
@@ -250,6 +269,7 @@
         </ul>
       </div>
     </nav>
+
 
 
     <div style="text-align:center;">
@@ -262,11 +282,11 @@
       <div> </div>
       <div> </div>
       <label class="custom-label" for="job_description">Job Description:</label><br />
-      <textarea id="job_description" name="job_description"></textarea><br />
+      <textarea id="job_description" name="job_description" rows="4"></textarea>
       <div> </div>
       <div> </div>
       <label class="custom-label" for="job_requirements">Job Requirements:</label><br />
-      <textarea id="job_requirements" name="job_requirements"></textarea><br />
+      <textarea id="job_requirements" name="job_requirements" rows="4"></textarea>
       <div> </div>
       <div> </div>
       <label class="custom-label" for="industry">Industry:</label><br />
@@ -278,11 +298,13 @@
       <input id="resume" name="resume" type="file" /><br />
       <div> </div>
       <label for="typed_resume">Or enter it manually here:</label><br />
-      <textarea id="typed_resume" name="typed_resume"></textarea><br />
+      <textarea id="typed_resume" name="typed_resume" rows="6"></textarea>
       <div> </div>
-      <button type="submit"
-        style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px;">Simulate
-        Interview</button>
+      <div style="text-align: center;">
+        <button style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px;">Simulate
+          Interview</button>
+      </div>
+
     </form>
     <div>
       <p> </p>

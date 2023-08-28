@@ -2,11 +2,14 @@
 <html lang="en">
 
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
         crossorigin="anonymous"></script>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>myDashboard - myCareerMax</title>
+    <title>myDashboard | myCareerMax</title>
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -52,9 +55,9 @@
             white-space: normal;
             /* Make sure the content wraps within the card */
         }
-    </style>
-    <style>
+
         body {
+            font-family: 'Prompt', sans-serif;
             background-image: linear-gradient(120deg, #adadad, #007BFF);
             background-size: cover;
             background-attachment: fixed;
@@ -91,7 +94,7 @@
     <body>
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #007BFF;">myCareerMax.com</a>
+            <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -107,13 +110,21 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/resume-enhancer" style="color: #007BFF;">ATS Resume</a>
+                    <!-- Dropdown Menu for AI Resume Tools -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+                            AI Resume Tools
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+                            <a class="dropdown-item" href="/resume-enhancer" style="color: #007BFF;">Resume Scanner</a>
+                        </div>
                     </li>
+                    <!-- End of Dropdown -->
                     <li class="nav-item">
                         <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
                     </li>
-                    <!-- Add the dropdown for the username -->
+                    <!-- Existing dropdown for the username -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
@@ -121,7 +132,6 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
-                            <a class="dropdown-item" href="#" style="color: #007BFF;">Settings</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
                         </div>
@@ -129,6 +139,7 @@
                 </ul>
             </div>
         </nav>
+
 
 
 

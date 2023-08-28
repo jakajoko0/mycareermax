@@ -252,6 +252,7 @@ class UserDocuments(db.Model):
 
     user = db.relationship("User", backref=db.backref("documents", lazy=True))
 
+
 @app.route("/get-username")
 @login_required
 def get_username():
@@ -499,7 +500,6 @@ def get_latest_resume_name():
         return jsonify({"success": False, "error": "Failed to fetch resume name."})
 
 
-
 @app.route("/test_connection")
 def test_connection():
     documents = UserDocuments.query.all()
@@ -603,16 +603,17 @@ def interview_prep():
 def analyze_resume():
     # Extract the content from the request
     resume_content = request.form.get("resume")
-
+    job_title = request.form.get("jobTitle")  
+    job_description = request.form.get("jobDescription")
     # Construct the messages for the OpenAI API
     messages = [
         {
             "role": "system",
-            "content": "You are a helpful assistant that reviews and provides feedback on resumes.",
+            "content": "You are an expert on resume ATS systems",
         },
         {
             "role": "user",
-            "content": f"Review and rate the following resume on a scale from 1 (lowest) to 5 (highest). Give your reasoning in a detailed analysis with tips and suggestions for improvement. Make it no more than 250 words: {resume_content}",
+            "content": f"Please review the following resume and job description and give it an ATS score. The rating system is 1-100. 100 means it's 100% ATS friendly. Provide detailed reasoning and steps to improve the score. Job Title: {job_title},  Job Description: {job_description} Resume:{resume_content} ",
         },
     ]
 
@@ -790,7 +791,7 @@ def fetch_job_listings():
         return jsonify(data)
 
 
-# COVERME PRO - coverME OPENAI API CALLS
+# AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS
 @app.route("/career_click", methods=["POST"])
 def career_click():
     # Extract the resume, job description, company name, and job title from the request
@@ -824,10 +825,12 @@ def career_click():
     return jsonify({"cover_letter": cover_letter})
 
 
-# COVERME PRO - resuME OPENAI API CALLS
+# AI JOB SEARCH - ATS OPTIMIZER - OPENAI API CALLS
+
+
 @app.route("/resume.1", methods=["POST"])
 def resume_1():
-    # Extract the resume, job description, company name, and job title from the request
+    # Extract the resume, job description, and job title from the request
     resume = request.json.get("resume")
     job_description = request.json.get("job_description")
     job_title = request.json.get("job_title")
@@ -836,11 +839,11 @@ def resume_1():
     messages = [
         {
             "role": "system",
-            "content": "You are a helpful assistant who enhances resumes and tailors them for specific jobs",
+            "content": "You are an expert at extracting keywords from job descriptions and optimizing resumes for ATS systems.",
         },
         {
             "role": "user",
-            "content": f"Edit the following resume to enhance it for the job described below. The resume should be ATS optimized. Provide a summary of your ATS Enhanced Optimizations. Resume: {resume}. Job title: {job_title}. Job description: {job_description}",
+            "content": f"Extract 10 keywords from the following job description and incoporate them into the resume provided. Format the resume to ATS standards by using dashes instead of bullet points. Acceptable Date Format MM/YYYY. As in, 03/2023. Resume: {resume}. Job description: {job_description}",
         },
     ]
 
@@ -849,9 +852,14 @@ def resume_1():
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=messages,
+            temperature=0.7,
+            max_tokens=2000,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
         )
     except openai.error.InvalidRequestError as e:
-        print(e)  # Handle error accordingly
+        print(e)
         return jsonify({"error": str(e)})
 
     # Extract the generated cover letter from the response
@@ -861,7 +869,7 @@ def resume_1():
     return jsonify({"cover_letter": cover_letter})
 
 
-# COVERME PRO - $alary OPENAI API CALLS
+# AI JOB SEARCH - SALARY - OPENAI API CALLS
 @app.route("/analyze-job", methods=["POST"])
 def analyze_job():
     job_title = request.form.get("job_title")
@@ -880,7 +888,6 @@ def analyze_job():
             },
         ],
         temperature=1,
-        max_tokens=256,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,

@@ -3,12 +3,12 @@
 <html dir="ltr" lang="en">
 
 <head>
-    <title>CoverMe | myCareerMax</title>
+    <title>Resume Scanner | myCareerMax</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
         crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=Expletus+Sans&amp;display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
     <meta charset="utf-8" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -18,30 +18,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <style>
+        .intro-box {
+            background-color: #e7e7e7;
+            /* Light grey background */
+            border: 1px solid #007BFF;
+            /* Grey border */
+            border-radius: 12px;
+            /* Rounded corners */
+            padding: 16px;
+            /* Padding */
+            width: 100%;
+            /* Full width */
+            box-sizing: border-box;
+            /* Make sure padding and width stay in place */
+            margin-bottom: 16px;
+            /* Bottom margin */
+            color: #007BFF;
+            /* Dark grey text */
+
+        }
+
+        @media (max-width: 768px) {
+            .intro-box {
+                font-size: 14px;
+                /* Smaller text on mobile */
+            }
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Prompt', sans-serif;
             margin: 0;
             padding: 0;
         }
-    
+
         .navbar {
             background-image: linear-gradient(120deg, #ffffff, #4a83ff);
             background-size: cover;
             background-attachment: fixed;
         }
-    
-    
+
+
         nav {
             display: flex;
             justify-content: center;
             list-style: none;
             padding: 0;
         }
-    
+
         nav li {
             margin: 0 15px;
         }
-    
+
         nav a {
             color: rgb(0, 0, 0);
             text-decoration: none;
@@ -100,7 +127,7 @@
         });
     </script>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #007BFF;">myCareerMax.com</a>
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -116,13 +143,21 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/resume-enhancer" style="color: #007BFF;">ATS Resume</a>
+                <!-- Dropdown Menu for AI Resume Tools -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+                        AI Resume Tools
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #007BFF;">Resume Scanner</a>
+                    </div>
                 </li>
+                <!-- End of Dropdown -->
                 <li class="nav-item">
                     <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
                 </li>
-                <!-- Add the dropdown for the username -->
+                <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
@@ -130,7 +165,6 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
-                        <a class="dropdown-item" href="#" style="color: #007BFF;">Settings</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
                     </div>
@@ -139,12 +173,43 @@
         </div>
     </nav>
 
+
     <header>
         <div style="text-align:center;">
-            <img alt="Your Logo" src="https://drive.google.com/uc?export=download&id=1GRzRR29O2fGVniMvpayyOiBuF_u9TdHT"
+            <img alt="Your Logo" src="https://drive.google.com/uc?export=download&id=1zjkVj-niAQy62Ft4hKWYEFBtGtGyAiKF"
                 style="max-width:100%;" />
         </div>
     </header>
+    <div class="intro-box">
+        <strong>Score Your Resume's ATS-Friendliness with Precision</strong><br>
+        Navigating the job market? Your first challenge is to get past the Applicant Tracking Systems (ATS) that
+        recruiters
+        use to screen resumes. Our state-of-the-art Resume Analyzer Tool is designed to give you the edge you
+        need.<br><br>
+
+        <strong>How Does It Work?</strong><br>
+        <strong>1. Upload Your Resume:</strong> Simply upload your resume in .docx format.<br>
+        <strong>2. Provide Job Title (optional):</strong> Paste the job title for the position you're applying for.<br>
+        <strong>3. Provide Job Description:</strong> Enter the job description for the position you're applying for.<br>
+        <strong>4. Scan:</strong> Click the 'Scan' button and let our tool do the magic.<br><br>
+
+        <strong>What Do You Get?</strong><br>
+        <strong>ATS-Friendliness Score:</strong> Your resume will be scored on a 1-100 scale based on how well it
+        matches
+        with the provided job description and ATS algorithms.<br>
+
+        <strong>Insightful Reasoning:</strong> Understand why your resume scored the way it did. Our tool provides a
+        comprehensive analysis of key areas, including keyword matching, formatting, and more.<br>
+
+        <strong>Tailored Tips:</strong> Receive personalized tips and suggestions on how to improve your resume's ATS
+        score,
+        from optimizing keywords to enhancing the layout.<br><br>
+
+        <strong>Why Use Our Tool?</strong><br>
+        <strong>Data-Driven:</strong> Our algorithms are based on extensive research and are designed to mimic the most
+        commonly used ATS systems.<br>
+    </div>
+
     <div class="d-none" id="loading-spinner"
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="spinner-border text-primary" role="status">
@@ -156,7 +221,6 @@
         <p> </p>
         <!-- FORM FIELDS -->
         <div class="container-fluid">
-            <!-- File upload section -->
             <form enctype="multipart/form-data" id="resume-upload-form">
                 <div class="mt-3">
                     <label for="resume-upload">Upload your resume (.docx format):</label>
@@ -164,11 +228,21 @@
                     <!-- Manual text entry section -->
                     <div><label for="resume">Or manually paste/type your resume:</label></div>
                     <!-- Set the rows attribute to match the default size in the cover_letter_generator.html file -->
-                    <textarea class="form-control" id="resume" rows="10"></textarea>
+                    <textarea class="form-control" id="resume" rows="5"></textarea>
+                </div>
+                <div class="mt-3">
+                    <label for="job-title">Job Title:</label>
+                    <textarea class="form-control" id="job-title" rows="2"></textarea>
+                </div>
+
+                <!-- Job Description input -->
+                <div class="mt-3">
+                    <label for="job-description">Job Description:</label>
+                    <textarea class="form-control" id="job-description" rows="10"></textarea>
                 </div>
                 <div class="mt-3">
                     <div class="mt-3 button-container">
-                        <button class="btn btn-primary" id="btn-coverme">Tune My Resume</button>
+                        <button class="btn btn-primary" id="btn-coverme">Scan</button>
                     </div>
                     <!-- Button section -->
                     <div class="mt-3 button-container">
@@ -198,11 +272,15 @@
                     // Show the loading spinner
                     $("#loading-spinner").removeClass("d-none");
 
+                    // Fetching values from the existing and new fields
                     var resume = $("#resume").val();
+                    var jobTitle = $("#job-title").val();  // Fetch value from the new "Job Title" field
+                    var jobDescription = $("#job-description").val();  // Fetch value from the new "Job Description" field
 
                     $.post("/analyze-resume", {
                         resume: resume,
-
+                        jobTitle: jobTitle,  // Include the new "Job Title" field
+                        jobDescription: jobDescription  // Include the new "Job Description" field
                     }, function (data) {
                         // Display the server's response (the generated cover letter) in the output text area
                         $("#output-text").val(data.feedback).show();
@@ -215,6 +293,7 @@
                     });
                 });
             });
+
 
 
 

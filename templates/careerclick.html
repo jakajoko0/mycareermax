@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>CareerClick</title>
+    <title>AI Job Search | myCareerMax</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
@@ -20,13 +20,45 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
+
     <style>
+        .pro-tip-box {
+            background-color: #e7e7e7;
+            /* Light grey background */
+            border: 1px solid #007BFF;
+            /* Grey border */
+            border-radius: 12px;
+            /* Rounded corners */
+            padding: 16px;
+            /* Padding */
+            width: 100%;
+            /* Full width */
+            box-sizing: border-box;
+            /* Make sure padding and width stay in place */
+            margin-bottom: 16px;
+            /* Bottom margin */
+            color: #007BFF;
+            /* Dark grey text */
+
+        }
+
+        @media (max-width: 768px) {
+            .pro-tip-box {
+                font-size: 14px;
+                /* Smaller text on mobile */
+            }
+        }
+
         body {
             background-color: #ffffff;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Prompt', sans-serif;
             margin: 0;
             padding: 0;
         }
@@ -103,7 +135,7 @@
     </script>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #e6e6e6;">myCareerMax.com</a>
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -119,13 +151,21 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/cover-letter-generator" style="color: #007BFF;">AI Cover Letter</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/resume-enhancer" style="color: #007BFF;">ATS Resume</a>
+                <!-- Dropdown Menu for AI Resume Tools -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
+                        AI Resume Tools
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #007BFF;">Resume Scanner</a>
+                    </div>
                 </li>
+                <!-- End of Dropdown -->
                 <li class="nav-item">
                     <a class="nav-link" href="/interview-prep" style="color: #007BFF;">Interview Prep</a>
                 </li>
-                <!-- Add the dropdown for the username -->
+                <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #007BFF;">
@@ -133,7 +173,6 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/dashboard#my-docs" style="color: #007BFF;">My AI Docs</a>
-                        <a class="dropdown-item" href="#" style="color: #007BFF;">Settings</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout" style="color: #007BFF;">Logout</a>
                     </div>
@@ -141,6 +180,7 @@
             </ul>
         </div>
     </nav>
+
 
     <script>
         console.log("jQuery version:", $().jquery);
@@ -217,9 +257,23 @@
                     finished.
                 </div>
             </div>
+            <div class="pro-tip-box">
+                Pro-tip: ATS systems prefer minimal formatting, plain text, and standard date formats. Use dashes (-)
+                instead of
+                uncommon bullet points to be safe and include as many keywords as possible. Our ATS Optimizer handles
+                all of this
+                for you. Check it out by clicking the ATS Optimizer 🚀 button within any job posting or try it out for
+                any
+                job posting
+                <a href="/resume-enhancer" style="color: rgb(0, 174, 41);">HERE!</a>
+            </div>
+
+
             <!-- Generated Resume Display -->
             <div class="cover-letter-section" id="cover-letter-section-1" style="display: none;">
-                <h3>Your ATS Enhanced Resume</h3>
+                <h3
+                    style="text-align: center !important; color: #007BFF !important; font-family: 'Crimson Text', serif !important;">
+                    Optimized Resume</h3>
                 <textarea class="form-control" id="cover-letter-text-1" readonly="" rows="10"></textarea>
                 <!-- New buttons added here -->
                 <div class="mt-2">
@@ -234,7 +288,9 @@
 
             <!-- Generated Cover Letter Display -->
             <div class="mb-4" id="cover-letter-section" style="display: none;">
-                <h3>AI Generated Cover Letter</h3>
+                <h3
+                    style="text-align: center !important; color: #007BFF !important; font-family: 'Crimson Text', serif !important;">
+                    AI Generated Cover Letter</h3>
                 <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
                 <div class="mt-2">
                     <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
