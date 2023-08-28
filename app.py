@@ -212,7 +212,7 @@ def login():
             user_obj = User.query.filter_by(id=user_record.id).first()
             if user_obj:
                 login_user(user_obj, remember=remember_me)
-                return redirect(url_for("careerclick"))
+                return redirect(url_for("dashboard"))
             else:
                 message = "User not found"
         else:
@@ -592,7 +592,7 @@ def background_image():
 
 @app.route("/")
 def home():
-    return redirect(url_for("careerclick"))
+    return redirect(url_for("login"))
 
 
 @app.route("/cover-letter-generator")

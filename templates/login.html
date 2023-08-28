@@ -51,7 +51,7 @@
         </div>
         {% endif %}
         {% endwith %}
-
+        <!-- Existing login form -->
         <form action="/login" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
@@ -61,10 +61,16 @@
                 <label for="password">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-bottom: 10px;">Login</button>
         </form>
+
+        <!-- New separate form for Guest Login -->
+        <form action="/careerclick" method="get">
+            <button type="submit" class="btn btn-secondary btn-block">Guest Login</button>
+        </form>
+
+
         <div class="text-center mt-3">
-            <a href="/careerclick" class="btn btn-link">Guest Login</a><br>
             <a href="/forgot-password" class="btn btn-link">Forgot Password?</a><br>
             <a href="/register" class="btn btn-link">Don't have an account? Register here</a>
         </div>
