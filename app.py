@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 from flask import Response, stream_with_context
 import pdfkit
-
 load_dotenv()
 import logging
 from docx import Document
