@@ -171,7 +171,12 @@ def forgot_password():
         # Create email message
         msg = Message('Password Reset Request', sender='password_reset@mycareermax.com', recipients=[email])
         link = url_for('reset_token', token=token, _external=True)
-        msg.body = f'Your link is {link}'
+        
+        msg.body = (f'Please use this link to reset your password: {link}\n\n'
+                    '---\n'
+                    'Note: This inbox is not monitored. Please do not reply to this email. '
+                    'If you have any questions or need further assistance, please contact us at '
+                    'stephen@mycareermax.com')
         
         # Send email
         mail.send(msg)
@@ -179,6 +184,7 @@ def forgot_password():
         return 'Email has been sent!'
     
     return render_template('forgot_password.html')
+
 
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_token(token):
