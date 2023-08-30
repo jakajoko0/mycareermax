@@ -9,6 +9,7 @@ docker ps
 docker ps -a
 
 docker stop [container_id]
+docker stop $(docker ps -aq)    #stops all containers
 docker rm [CONTAINER_ID_OR_NAME]
 docker rm -f [CONTAINER_ID_OR_NAME]
 docker container prune   # clean up all stopped containers
