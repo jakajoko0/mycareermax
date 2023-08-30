@@ -22,4 +22,27 @@ docker build --no-cache -t skalamera/mycareermax-webapp:latest .
 
 $ docker run --env-file .env -p 8080:5000 skalamera/mycareermax-webapp:latest
 
-test commit
+
+
+1. Merge the Changes
+This will create a new commit in your local branch that merges changes from the remote branch.
+    git config pull.rebase false  # Set merge as the default for this repository
+    git pull origin main  # Pull and merge changes
+
+2. Rebase the Changes
+This moves or combines a sequence of commits to a new base commit. Essentially, it's a way to integrate changes from one branch into another.
+    git config pull.rebase true  # Set rebase as the default for this repository
+    git pull origin main  # Pull and rebase changes
+
+
+3. Fast-Forward Only
+This will only update your branch if it can be "fast-forwarded" to the remote branch, meaning your local branch is strictly behind the remote and has no new changes.
+    git config pull.ff only  # Set fast-forward only as the default for this repository
+    git pull origin main  # Pull and fast-forward changes if possible
+
+4. Specify the Method Each Time
+If you don't want to set a default, you can specify the method each time you pull:
+    git pull --rebase origin main  # For rebase
+    git pull --no-rebase origin main  # For merge
+    git pull --ff-only origin main  # For fast-forward only
+
