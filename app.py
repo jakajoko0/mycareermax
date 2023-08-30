@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from flask import Response, stream_with_context
 import pdfkit
 load_dotenv()
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 import logging
 from docx import Document
 import io
@@ -67,9 +69,20 @@ app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config[
     "UPLOAD_FOLDER"
 ] = "/path/to/upload/folder"  # set this to your desired upload folder
-
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
+
+# Configure Flask-Mail
+app.config["MAIL_SERVER"] = "smtp.office365.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USERNAME"] = "password_reset@mycareermax.com"
+app.config["MAIL_PASSWORD"] = "&Skally02&"
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
+mail = Mail(app)
+
+s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
 
 if os.name == "nt":  # Windows
     path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
@@ -122,6 +135,7 @@ conn_str = (
 )
 conn = pyodbc.connect(conn_str)
 
+
 @app.before_request
 def require_login():
     allowed_routes = [
@@ -141,16 +155,59 @@ def require_login():
         "resume.1",
     ]  # List of routes that don't require authentication
 
-    #if not current_user.is_authenticated and request.endpoint not in allowed_routes:
-        #return redirect(url_for("login"))
+    # if not current_user.is_authenticated and request.endpoint not in allowed_routes:
+    # return redirect(url_for("login"))
 
 
-
-@app.route("/forgot-password", methods=["GET", "POST"])
+@app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    # Placeholder for password reset functionality
-    # For now, it will just render a message
-    return "Password reset functionality will be added here"
+    if request.method == 'POST':
+        email = request.form['email']
+        
+        # Generate token
+        token = s.dumps(email, salt='email-confirm')
+        
+        # Create email message
+        msg = Message('Password Reset Request', sender='password_reset@mycareermax.com', recipients=[email])
+        link = url_for('reset_token', token=token, _external=True)
+        
+        msg.body = (f'Please use this link to reset your password: {link}\n\n'
+                    '---\n'
+                    'Note: This inbox is not monitored. Please do not reply to this email. '
+                    'If you have any questions or need further assistance, please contact us at '
+                    'stephen@mycareermax.com')
+        
+        # Send email
+        mail.send(msg)
+        
+        return 'Email has been sent!'
+    
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=3600)
+    except SignatureExpired:
+        return 'The token is expired!'
+    
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        
+        # Hash the new password
+        hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Update the password in the database
+        with pyodbc.connect(conn_str) as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET password = ? WHERE email = ?", (hashed_password, email))
+            conn.commit()
+        
+        login_url = url_for('login')
+        return f'Password Reset Successfully! <a href="{login_url}">Login</a>'
+        
+    return render_template('reset_token.html')
 
 
 @app.route("/register", methods=["GET", "POST"])

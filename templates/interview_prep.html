@@ -61,7 +61,7 @@
     }
 
     .question-box.current-question {
-      background-color: #eef;
+      background-color: rgb(166, 166, 166);
     }
 
     body {
@@ -186,8 +186,7 @@
     #industry,
     #resume,
     #typed_resume {
-      width: 90%;
-      max-width: 500px;
+      width: 100%;
       border-radius: 8px;
       border: 2px solid #007BFF;
     }
@@ -195,6 +194,27 @@
     /* Remove the border from the resume field */
     #resume {
       border: none;
+    }
+
+    #interview-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    #question-display {
+      font-family: 'Prompt', sans-serif;
+      margin-bottom: 50px;
+    }
+
+    /* Add this CSS class for the parent div */
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      /* Optional: Add space between buttons */
     }
   </style>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -316,24 +336,27 @@
       <p> </p>
     </div>
     <div id="interview-container">
-      <div id="question-display"></div>
-      <p> </p>
-      <textarea id="user-answer" rows="10" cols="50" style="display: none; border-color: green;"></textarea>
+      <div id="question-display">
+      </div>
+      <textarea id="user-answer" rows="10" cols="50" style="display: none; border-color: green; flex: 1 1 auto;">
+</textarea>
       <div>
         <p> </p>
-      </div>
-      <button id="submit-answer"
-        style="background-color: #007BFF; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Submit
-        Answer</button>
-      <button id="previous-button"
-        style="background-color: gray; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Previous</button>
-      <button id="next-button"
-        style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px; display: none;">Next</button>
-    </div>
-    <!-- JavaScript code -->
-    <script src="/static/interview.js"></script>
+        <div class="button-container">
+          <button id="submit-answer"
+            style="background-color: #007BFF; margin-right: 5px; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Submit
+            Answer</button>
+          <button id="previous-button"
+            style="background-color: gray; margin-right: 5px; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Previous</button>
+          <button id="next-button"
+            style="background-color: #4bf87a; margin-right: 5px; color: black; border-radius: 12px; padding: 10px 20px; display: none;">Next</button>
+        </div>
 
-  </div>
+
+        <!-- JavaScript code -->
+        <script src="/static/interview.js"></script>
+
+      </div>
 </body>
 
 </html>
