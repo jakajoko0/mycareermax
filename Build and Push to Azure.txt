@@ -18,3 +18,8 @@ docker rm -f [CONTAINER_ID_OR_NAME]
 docker container prune   # clean up all stopped containers
 docker rm $(docker ps -aq) -f  # remove ALL containers
 docker build --no-cache -t skalamera/mycareermax-webapp:latest .
+
+
+$ docker run --env-file .env -p 8080:5000 skalamera/mycareermax-webapp:latest
+
+test commit
