@@ -1,3 +1,8 @@
+quiet merge
+git commit --no-gpg-sign --quiet
+
+
+
 docker login
 
 docker build -t skalamera/mycareermax-webapp:latest .
