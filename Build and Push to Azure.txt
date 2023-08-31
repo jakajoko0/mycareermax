@@ -1,4 +1,4 @@
-quiet merge
+quiet commit
 git commit --no-gpg-sign --quiet
 
 
