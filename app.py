@@ -607,7 +607,6 @@ def download_document(document_id):
     if download_format == "docx":
         # Create a new Document
         document = Document()
-        document.add_heading(doc.document_name, 0)
         document.add_paragraph(doc.document_content)
 
         # Stream the .docx file back to the user
