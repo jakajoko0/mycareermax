@@ -788,8 +788,8 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.message === "Document saved successfully") {
-                            alert("Your Cover Letter Has Been Saved to Your Dashboard!");
+                        if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
+                            alert("Cover Letter saved successfully! You may view and download your Saved Documents from your Dashboard");
                         } else {
                             alert("You must be logged in to access myDashboard.");
                         }
@@ -822,8 +822,8 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.message === "Document saved successfully") {
-                            alert("Your Resume Has Been Saved to Your Dashboard!");
+                        if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
+                            alert("Resume saved successfully! You may view and download your Saved Documents from your Dashboard");
                         } else {
                             alert("You must be logged in to access myDashboard.");
                         }

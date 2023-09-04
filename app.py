@@ -158,7 +158,7 @@ def require_login():
         "resume.1",
         "node-app",
         "resume-builder",
-        "resume_builder",
+        "ai-builder",
     ]
     # if not current_user.is_authenticated and request.endpoint not in allowed_routes:
     # return redirect(url_for("login"))
@@ -663,12 +663,10 @@ def careerclick():
     return render_template("careerclick.html", user_id=user_id)
 
 
-from flask_login import current_user
-
-
 @app.route("/ai-builder")
 def ai_builder():
-    return render_template("ai_builder.html", user_id=current_user.id)
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("ai_builder.html", user_id=user_id)
 
 
 @app.route("/")
