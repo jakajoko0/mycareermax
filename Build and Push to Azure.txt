@@ -5,10 +5,16 @@ git commit --no-gpg-sign --quiet
 
 docker login
 
+cd C:\Users\skala\Projects\open-resume-main
+cd C:\Users\skala\Projects\mycareermax
 docker build -t skalamera/mycareermax-webapp:latest .
+docker build -t skalamera/mynodeapp:latest .
+
+docker build --no-cache -t skalamera/mynodeapp:latest .
 docker build --no-cache -t skalamera/mycareermax-webapp:latest .
 
-docker push skalamera/mycareermax-webapp:latest 
+docker push skalamera/mycareermax-webapp:latest
+docker push skalamera/mynodeapp:latest
 
 docker ps
 docker ps -a

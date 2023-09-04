@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder | myCareerMax</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #ffffff, #6b9aff);
+            /* Correct property for gradient */
+        }
+
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            position: fixed;
+            z-index: 9999;
+            overflow: show;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            border-color: blue;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            /* Light grey */
+            border-left-color: blue;
+            /* Blue */
+            border-radius: 50%;
+            /* Rounded */
+            animation: spin 0.75s linear infinite;
+            /* Spin animation */
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .navbar {
+            background-image: linear-gradient(120deg, #6b9aff, #f1f1f1);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+
+        nav {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+
+        nav li {
+            margin: 0 15px;
+        }
+
+        nav a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+        }
+
+        .custom-form-background {
+            background: linear-gradient(120deg, #ffffff, #6b9aff);
+            padding: 100px;
+            border-radius: 10px;
+        }
+
+        /* Media query for small screens */
+        @media (max-width: 768px) {
+            .custom-form-background {
+                padding: 15px;
+                /* Adjust this value based on your preference */
+            }
+        }
+    </style>
+
+    <script>
+
+        function copyToClipboard() {
+            const textArea = document.getElementById("apiResponseTextArea");
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand("copy");
+            alert("Copied to clipboard!");
+        }
+
+
+        function showSpinner() {
+            const spinner = document.getElementById("spinner");
+            spinner.style.display = "block";
+        }
+
+        function hideSpinner() {
+            const spinner = document.getElementById("spinner");
+            spinner.style.display = "none";
+        }
+
+
+
+        let workExperienceCount = 1;
+
+        function addWorkExperience() {
+            workExperienceCount++;
+            const container = document.getElementById("workExperienceContainer");
+            const newFields = document.createElement('div');
+            newFields.innerHTML = `
+                <div class="mb-3">
+                    <label>Job Title:</label>
+                    <input type="text" class="form-control" name="job_title${workExperienceCount}">
+                </div>
+                <div class="mb-3">
+                    <label>Company:</label>
+                    <input type="text" class="form-control" name="company${workExperienceCount}">
+                </div>
+                <div class="mb-3">
+                    <label>Date:</label>
+                    <input type="text" class="form-control" name="date${workExperienceCount}">
+                </div>
+                <div class="mb-3">
+                    <label>Responsibilities:</label>
+                    <textarea class="form-control" name="responsibilities${workExperienceCount}" rows="4"></textarea>
+                </div>`;
+            container.appendChild(newFields);
+        }
+
+        function removeWorkExperience() {
+            if (workExperienceCount > 1) {
+                const container = document.getElementById("workExperienceContainer");
+                container.removeChild(container.lastChild);
+                workExperienceCount--;
+            }
+        }
+
+        let educationCount = 1;
+
+        function addEducation() {
+            educationCount++;
+            const container = document.getElementById("educationContainer");
+            const newFields = document.createElement('div');
+            newFields.id = `educationSet${educationCount}`;
+            newFields.innerHTML = `
+        <div class="mb-3">
+            <label>School Name:</label>
+            <input type="text" class="form-control" name="school${educationCount}">
+        </div>
+        <div class="mb-3">
+            <label>City:</label>
+            <input type="text" class="form-control" name="city${educationCount}">
+        </div>
+        <div class="mb-3">
+            <label>Degree:</label>
+            <input type="text" class="form-control" name="degree${educationCount}">
+        </div>
+        <div class="mb-3">
+            <label>Major:</label>
+            <input type="text" class="form-control" name="major${educationCount}">
+        </div>
+        <div class="mb-3">
+            <label>Dates Attended:</label>
+            <input type="text" class="form-control" name="dates${educationCount}">
+        </div>`;
+            container.appendChild(newFields);
+            const addButton = document.getElementById("addEducationButton");
+            const removeButton = document.getElementById("removeEducationButton");
+            container.appendChild(addButton);
+            container.appendChild(removeButton);
+        }
+
+        function removeEducation() {
+            if (educationCount > 1) {
+                const container = document.getElementById(`educationSet${educationCount}`);
+                container.remove();
+                educationCount--;
+            }
+        }
+
+        // COLLECT SECTION FIELD DATA //
+
+
+
+        function collectDataAndSubmitForm(type) {
+            // Show the spinner when the button is clicked
+            showSpinner();
+
+            // Initialize an array to hold work experience data
+            const workExperienceData = [];
+            for (let i = 1; i <= workExperienceCount; i++) {
+                const jobTitle = document.getElementsByName(`job_title${i}`)[0].value;
+                const company = document.getElementsByName(`company${i}`)[0].value;
+                const date = document.getElementsByName(`date${i}`)[0].value;
+                const responsibilities = document.getElementsByName(`responsibilities${i}`)[0].value;
+                workExperienceData.push({ jobTitle, company, date, responsibilities });
+            }
+
+            // Initialize an array to hold education data
+            const educationData = [];
+            for (let i = 1; i <= educationCount; i++) {
+                const school = document.getElementsByName(`school${i}`)[0].value;
+                const city = document.getElementsByName(`city${i}`)[0].value;
+                const degree = document.getElementsByName(`degree${i}`)[0].value;
+                const major = document.getElementsByName(`major${i}`)[0].value;
+                const dates = document.getElementsByName(`dates${i}`)[0].value;
+                educationData.push({ school, city, degree, major, dates });
+            }
+
+            // Collect personal information data
+            const personalInfoData = {
+                fullName: document.getElementsByName("full_name")[0].value,
+                email: document.getElementsByName("email")[0].value,
+                phone: document.getElementsByName("phone")[0].value,
+                cityState: document.getElementsByName("city_state")[0].value,
+                linkedin: document.getElementsByName("linkedin")[0].value,
+                website: document.getElementsByName("website")[0].value
+            };
+
+            // Collect summary, skills, and keywords
+            const summary = document.getElementsByName("summary")[0].value;
+            const skills = document.getElementsByName("skills")[0].value;
+            const keywords = document.getElementsByName("keywords")[0].value;
+
+            // Create the payload object
+            const payload = {
+                type: type,
+                personalinfo: personalInfoData,
+                summary,
+                skills,
+                keywords,
+                workexp: workExperienceData,
+                education: educationData
+            };
+
+            // Make the fetch request
+            fetch("/resume-builder", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }).then(response => response.json())
+                .then(data => {
+                    // Hide the spinner when data is received
+                    hideSpinner();
+
+                    // Display the resume or error message
+                    if (data.resume) {
+                        document.getElementById("apiResponseTextArea").value = data.resume;
+                        // Make the textarea and the download button visible
+                        document.getElementById("apiResponseTextArea").style.visibility = 'visible';
+                        document.getElementById("copyButton").style.visibility = "visible";
+                        document.getElementById("downloadButton").style.visibility = 'visible';
+                    } else {
+                        document.getElementById("apiResponse").innerHTML = `<p>Error: ${data.error}</p>`;
+                    }
+                }).catch(() => {
+                    // Hide the spinner if there is an error
+                    hideSpinner();
+                });
+        }
+
+        // Function to download data as .txt file
+        function downloadAsTxt() {
+            const textToSave = document.getElementById("apiResponseTextArea").value;
+            const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "resume.txt";
+            link.click();
+        }
+
+
+
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
+                </li>
+                <!-- Dropdown Menu for AI Resume Tools -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        AI Resume Tools
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">AI Resume Builder</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown -->
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #ff0000;">Logout</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Spinner -->
+    <div class="spinner-border text-primary" id="spinner" role="status" style="display: none;">
+        <span class="sr-only">Loading...</span>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center" style="margin-top: 30px;">Resume Builder</h1>
+
+        <!-- Collapsible Introductory Text -->
+        <div class="text-center"> <button class="btn btn-link" type="button" data-toggle="collapse"
+                data-target="#introText" aria-expanded="false" aria-controls="introText">
+                👉 Click here to learn how to use our New Resume Builder!
+            </button>
+
+            <div class="collapse text-center" id="introText">
+                <div class="card card-body text-left">
+                    <h3 class="text-center">Welcome to our New Resume Builder!</h3>
+                    <p>Navigating today's job market is challenging, but we're here to give you the edge you need. Our
+                        tool is
+                        designed not just to build your resume, but to optimize it for Applicant Tracking Systems (ATS).
+                        Here's
+                        how to
+                        get started:</p>
+
+                    <h4 class="text-center">How It Works</h4>
+                    <ol>
+                        <li><strong>Personal Information</strong>: Fill in your basic details like name, contact
+                            information,
+                            and online
+                            profiles.</li>
+                        <li><strong>Summary</strong>: Craft a compelling summary that encapsulates your career.</li>
+                        <li><strong>Work Experience</strong>: List your professional history including responsibilites.
+                            Start with your most recent/current position and work backwards.
+                        <li><strong>Education</strong>: Add your educational background, again starting with your most
+                            recent/current school and working backwards.
+                        </li>
+                        <li><strong>Skills</strong>: Detail your professional skills that make you the right fit for the
+                            job.
+                        </li>
+                        <li><strong>✨Keywords</strong>: This feature is only available when you use the AI-Enhanced
+                            option to build your resume. Input specific keywords that you wish to highlight and have
+                            them auto-integrated seamlessly throughout your resume.</li>
+                    </ol>
+
+                    <h4 class="text-center">Final Steps</h4>
+                    <ul>
+                        <li>Click <strong>Build Resume</strong> to generate an ATS-optimized resume with your provided
+                            details.</li>
+                        <li>Or, go a step further with our <strong>AI-Enhanced Resume Builder</strong> for a
+                            resume
+                            that's not
+                            just optimized but enhanced with AI-driven content.</li>
+                    </ul>
+
+                    <h4 class="text-center">Why Choose the AI-Enhanced Option?</h4>
+                    <ul>
+                        <li><strong>ATS-Friendly</strong>: Before your resume ever reaches human eyes, it's screened by
+                            AI systems. Level the playing field with our
+                            <strong>ChatGPT-4</strong>-driven tool, specifically engineered to understand ATS algorithms
+                            and elevate your
+                            resume's ranking. Here are just 2 examples of specific sentence structure and bullet
+                            point
+                            models that are used.
+
+                            <p><strong>Summary</strong> sentence structure: <strong>[Soft
+                                    Skill] +
+                                    [Most
+                                    Recent
+                                    Job Title]</strong> who is passionate about <strong>[Your Stance on the
+                                    Industry]</strong>
+                            </p>
+                            <p><strong>Work Experience</strong> bullet point model:
+                                <strong>[Action
+                                    Verb] +
+                                    [Cause] +
+                                    [Effect] + [Measurable Outcome]</strong>
+                            </p>
+
+                        </li>
+                        <li><strong>Enhanced Content</strong>: Benefit from these proven sentence structures that
+                            recruiters
+                            love, among many others.
+                        </li>
+                        <li><strong>Keyword Integration</strong>: Your provided keywords will be seamlessly woven into
+                            your
+                            resume,
+                            boosting its relevance.</li>
+                    </ul>
+                    <h4 class="text-center">Already have a resume and want to see your ATS-Friendliness score? Check out
+                        our Resume Scanner
+                        <a href="/resume-enhancer" class="text-info">HERE</a>
+                    </h4>
+                    <h4 class="text-center">Need a Cover Letter to go along with your newly enhanced resume? Let us take
+                        care of that for you. Click
+                        <a href="/cover-letter-generator" class="text-info"> HERE </a> to create your personalized,
+                        AI-generated, Cover Letter.
+                    </h4>
+
+                </div>
+            </div>
+        </div>
+
+        <form method="post" class="custom-form-background">
+            <!-- Personal Information -->
+            <div class="mb-3">
+                <label class="form-label"><strong>PERSONAL INFORMATION</strong></label>
+                <div class="row">
+                    <!-- Each of these divs will take up 6 columns on medium to large screens and 12 columns on small screens -->
+                    <div class="col-12 col-md-6 mb-3">
+                        <label>Full Name:</label>
+                        <input type="text" class="form-control" name="full_name">
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label>Email:</label>
+                        <input type="text" class="form-control" name="email">
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label>Phone Number:</label>
+                        <input type="text" class="form-control" name="phone">
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label>City, State:</label>
+                        <input type="text" class="form-control" name="city_state">
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label>LinkedIn Profile:</label>
+                        <input type="text" class="form-control" name="linkedin">
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label>Website:</label>
+                        <input type="text" class="form-control" name="website">
+                    </div>
+                </div>
+            </div>
+            <!-- Summary -->
+            <div class="mb-3">
+                <label class="form-label"><strong>SUMMARY</strong></label>
+                <textarea name="summary" rows="4" class="form-control"></textarea>
+            </div>
+            <!-- Work Experience -->
+            <div class="mb-3">
+                <label class="form-label"><strong>WORK EXPERIENCE</strong></label>
+                <div id="workExperienceContainer">
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>Job Title:</label>
+                            <input type="text" class="form-control" name="job_title1">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>Company:</label>
+                            <input type="text" class="form-control" name="company1">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>Date:</label>
+                            <input type="text" class="form-control" name="date1">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label>Responsibilities:</label>
+                            <textarea class="form-control" name="responsibilities1" rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-success mb-3" style="color: white;" onclick="addWorkExperience()">➕
+                    Add
+                    Experience</button>
+                <button type="button" class="btn btn-danger mb-3" style="color: white;"
+                    onclick="removeWorkExperience()">➖
+                    Remove Experience</button>
+            </div>
+            <!-- Education -->
+            <div class="mb-3">
+                <label class="form-label"><strong>EDUCATION</strong></label>
+                <div id="educationContainer">
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>School Name:</label>
+                            <input type="text" class="form-control" name="school1">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>City:</label>
+                            <input type="text" class="form-control" name="city1">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>Degree:</label>
+                            <input type="text" class="form-control" name="degree1">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>Major:</label>
+                            <input type="text" class="form-control" name="major1">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label>Dates Attended:</label>
+                            <input type="text" class="form-control" name="dates1">
+                        </div>
+                    </div>
+                </div>
+                <button id="addEducationButton" type="button" class="btn btn-success mb-3" style="color: white;"
+                    onclick="addEducation()">➕ Add Education</button>
+                <button id="removeEducationButton" type="button" class="btn btn-danger mb-3" style="color: white;"
+                    onclick="removeEducation()">➖ Remove Education</button>
+            </div>
+            <!-- Skills -->
+            <div class="mb-3">
+                <label class="form-label"><strong>SKILLS</strong></label>
+                <textarea name="skills" rows="4" class="form-control"></textarea>
+            </div>
+            <!-- Keywords -->
+            <div class="mb-3">
+                <label class="form-label"><strong>KEYWORDS</strong></label>
+                <input type="text" name="keywords" class="form-control"
+                    placeholder="e.g., Incident Management, Customer Satisfaction">
+            </div>
+            <!-- Submit -->
+            <button type="button" class="btn btn-secondary mb-2" onclick="collectDataAndSubmitForm('generate')">Build
+                Resume</button>
+            <button type="button" class="btn btn-primary mb-2"
+                onclick="collectDataAndSubmitForm('rewrite')">✨AI-Enhanced Resume Builder✨</button>
+            <!-- New div to display API Response -->
+            <div id="apiResponse" style="margin-top: 30px;">
+                <textarea id="apiResponseTextArea" class="form-control" rows="50"
+                    style="visibility: hidden;"></textarea>
+            </div>
+            <!-- Buttons -->
+            <div style="margin-top: 15px;">
+                <!-- Download Button -->
+                <button type="button" class="btn btn-success mb-2" id="downloadButton" style="visibility: hidden;"
+                    onclick="downloadAsTxt()">⬇️ Download as .txt</button>
+                <!-- Copy to Clipboard Button -->
+                <button type="button" class="btn btn-info mb-2" id="copyButton" style="visibility: hidden;"
+                    onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            </div>
+
+
+        </form>
+    </div>
+    </form>
+    </div>
+    </form>
+    </div>
+</body>
+
+</html>

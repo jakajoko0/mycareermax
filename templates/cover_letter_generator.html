@@ -18,34 +18,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <style>
-        .intro-box {
-            background-color: #e7e7e7;
-            /* Light grey background */
-            border: 1px solid #007BFF;
-            /* Grey border */
-            border-radius: 12px;
-            /* Rounded corners */
-            padding: 16px;
-            /* Padding */
-            width: 100%;
-            /* Full width */
-            box-sizing: border-box;
-            /* Make sure padding and width stay in place */
-            margin-bottom: 16px;
-            /* Bottom margin */
-            color: #007BFF;
-            /* Dark grey text */
-            text-align: center;
-            /* Center the text */
-        }
-
-        @media (max-width: 768px) {
-            .intro-box {
-                font-size: 14px;
-                /* Smaller text on mobile */
-            }
-        }
-
         body {
             font-family: 'Prompt', sans-serif;
             /* Add this line */
@@ -126,6 +98,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="resumeDropdown">
                         <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">AI Resume Builder</a>
                     </div>
                 </li>
                 <!-- End of Dropdown -->
@@ -165,28 +138,52 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
+    <!-- START OF Collapsible Cover Letter Generator Intro -->
+    <div class="text-center">
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#coverLetterIntro"
+            aria-expanded="false" aria-controls="coverLetterIntro">
+            👉 Click here to learn about our AI-Powered Cover Letter Generator!
+        </button>
+
+        <div class="collapse" id="coverLetterIntro">
+            <div class="card card-body" style="max-width: 834px; margin: auto;">
+                <h3 class="text-center">Welcome to Your AI-Powered Cover Letter Generator!</h3>
+                <p class="text-left">Looking to make a memorable impression on your next job application? You're in the
+                    right place! Our state-of-the-art tool employs advanced Artificial Intelligence to create
+                    personalized,
+                    standout cover letters.</p>
+
+                <h4 class="text-center">How It Works</h4>
+                <div class="text-left">
+                    <p>It's simple and intuitive:</p>
+                    <ol>
+                        <li>Upload your resume.</li>
+                        <li>Enter the company name, job title, and job description for the role you're targeting.</li>
+                        <li>Optionally, highlight specific areas of your resume you'd like to focus on.</li>
+                    </ol>
+                    <p>In just a few moments, you'll have a cover letter finely tuned to your background and the job
+                        you're
+                        applying for.</p>
+                </div>
+
+                <h4 class="text-center">Why Use This Tool?</h4>
+                <div class="text-left">
+                    <ul>
+                        <li>Say goodbye to one-size-fits-all cover letters.</li>
+                        <li>Say hello to a personalized, impactful application.</li>
+                    </ul>
+                </div>
+
+                <p class="text-left">Start your journey to a standout job application now!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- END OF Collapsible Cover Letter Generator Intro -->
+
     <div class="center-content">
         <p> </p>
         <p> </p>
-        <div class="intro-box">
-            <h1>Welcome to Your AI-Powered Cover Letter Generator!</h1>
-            <p>
-                Are you looking to make a strong impression on your next job application? You've come to the right
-                place! Our
-                cutting-edge tool uses advanced Artificial Intelligence to craft personalized cover letters that stand
-                out.
-            </p>
-            <p>
-                Simply upload your resume, enter the company name, job title and description for the role you're
-                applying for, and let our AI do
-                the rest. You can even choose to focus on specific areas of your resume that you want to highlight.
-                In just a few moments, you'll receive a cover letter tailored to your background and the job you're
-                targeting.
-            </p>
-            <p>
-                Say goodbye to generic cover letters and hello to a personalized, impactful application.
-            </p>
-        </div>
         <!-- FORM FIELDS -->
         <div class="container-fluid">
             <!-- File upload section -->

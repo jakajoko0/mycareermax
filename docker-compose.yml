@@ -1,0 +1,10 @@
+version: "3"
+services:
+  flask-app:
+    image: skalamera/myflaskapp
+    ports:
+      - "5000:5000"
+  node-app:
+    image: skalamera/mynodeapp
+    ports:
+      - "3000:3000"

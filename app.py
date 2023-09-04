@@ -1,8 +1,10 @@
 # Import necessary libraries
 import os
+from resume_builder import resume_builder  # Import the resume_builder function
 from dotenv import load_dotenv
 from flask import Response, stream_with_context
 import pdfkit
+import threading
 
 load_dotenv()
 from flask_mail import Mail, Message
@@ -83,7 +85,7 @@ app.config["MAIL_USE_SSL"] = False
 mail = Mail(app)
 
 s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-
+node_process = None
 
 if os.name == "nt":  # Windows
     path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
@@ -154,10 +156,18 @@ def require_login():
         "interview-prep",
         "career_click",
         "resume.1",
-    ]  # List of routes that don't require authentication
-
+        "node-app",
+        "resume-builder",
+        "resume_builder",
+    ]
     # if not current_user.is_authenticated and request.endpoint not in allowed_routes:
     # return redirect(url_for("login"))
+
+
+# Add the imported function as a route
+app.add_url_rule(
+    "/resume-builder", "resume_builder", resume_builder, methods=["GET", "POST"]
+)
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
