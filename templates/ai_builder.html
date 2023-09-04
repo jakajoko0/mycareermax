@@ -104,6 +104,38 @@
 
     <script>
 
+        function saveDocument() {
+            const userId = document.getElementById("userId").value;
+            const documentName = 'Resume (Resume Builder)';
+            const documentContent = document.getElementById("apiResponseTextArea").value; // Directly read from textarea
+            const documentType = 'Resume (Resume Builder)';
+
+            fetch('/save_document', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    document_name: documentName,
+                    document_content: documentContent,
+                    document_type: documentType,
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('An error occurred: ' + error);
+                });
+        }
+
+
         function copyToClipboard() {
             const textArea = document.getElementById("apiResponseTextArea");
             textArea.select();
@@ -276,6 +308,7 @@
                         document.getElementById("apiResponseTextArea").style.visibility = 'visible';
                         document.getElementById("copyButton").style.visibility = "visible";
                         document.getElementById("downloadButton").style.visibility = 'visible';
+                        document.getElementById("saveToDashboardBtn").style.visibility = 'visible';
                     } else {
                         document.getElementById("apiResponse").innerHTML = `<p>Error: ${data.error}</p>`;
                     }
@@ -301,6 +334,7 @@
 </head>
 
 <body>
+    <input type="hidden" id="userId" value="{{ user_id }}">
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
@@ -324,7 +358,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="resumeDropdown">
                         <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
-                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">AI Resume Builder</a>
+                        <a class="dropdown-item" href="/ai-builder" style="color: #003c86;">AI Resume Builder</a>
                     </div>
                 </li>
                 <!-- End of Dropdown -->
@@ -583,6 +617,10 @@
                 <!-- Copy to Clipboard Button -->
                 <button type="button" class="btn btn-info mb-2" id="copyButton" style="visibility: hidden;"
                     onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                <!-- Save to Dashboard Button -->
+                <button type="button" class="btn btn-primary mb-2" id="saveToDashboardBtn" style="visibility: hidden;"
+                    onclick="saveDocument()">💾 Save to Dashboard</button>
+
             </div>
 
 

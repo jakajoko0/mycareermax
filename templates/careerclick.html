@@ -154,7 +154,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="resumeDropdown">
                         <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
-                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">AI Resume Builder</a>
+                        <a class="dropdown-item" href="/ai-builder" style="color: #003c86;">AI Resume Builder</a>
                     </div>
                 </li>
                 <!-- End of Dropdown -->
@@ -283,7 +283,7 @@
                         onclick="downloadResume_1()">Download</button>
                     <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">Copy to
                         Clipboard</button>
-                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">Send to myDashboard</button>
+                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">Save to Dashboard</button>
                 </div>
             </div>
              
@@ -765,8 +765,8 @@
             function saveDocument() {
                 const textBox = document.getElementById('cover-letter-text');
                 const documentContent = textBox.value;
-                const documentName = "Cover Letter";
-                const documentType = "Cover Letter";
+                const documentName = "Cover Letter (Job Search)";
+                const documentType = "Cover Letter (Job Search)";
                 const jobTitle = textBox.getAttribute('data-job-title');
                 const companyName = textBox.getAttribute('data-company-name');
                 const applyLink = textBox.getAttribute('data-apply-link');
@@ -799,8 +799,8 @@
             function saveResume() {
                 const textBox = document.getElementById('cover-letter-text-1');
                 const resumeContent = textBox.value;
-                const resumeName = "ATS Enhanced Resume";
-                const documentType = "ATS Enhanced Resume";
+                const resumeName = "ATS Enhanced Resume (Job Search)";
+                const documentType = "ATS Enhanced Resume (Job Search)";
                 const jobTitle = textBox.getAttribute('data-job-title');
                 const companyName = textBox.getAttribute('data-company-name');
                 const applyLink = textBox.getAttribute('data-apply-link');

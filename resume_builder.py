@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import openai
+import pyodbc  # Make sure to install this package
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -76,4 +77,3 @@ def resume_builder():
         except Exception as e:
             return jsonify({"error": "An error occurred during processing."}), 500
 
-    return render_template("resume-builder.html")
