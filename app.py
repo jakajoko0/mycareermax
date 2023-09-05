@@ -94,6 +94,9 @@ else:  # Linux/Docker
 
 config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
+pdf_options = {
+    "encoding": "UTF-8",
+}
 
 # Configure logging
 logging.basicConfig(
@@ -630,11 +633,23 @@ def download_document(document_id):
         )
 
     elif download_format == "pdf":
-        # Convert the document content to basic HTML
-        html_content = "<p>{}</p>".format(doc.document_content.replace("\n", "<br>"))
+        # Convert the document content to basic HTML with UTF-8 meta tag
+        html_content = """<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+        </head>
+        <body>
+        <p>{}</p>
+        </body>
+        </html>""".format(
+            doc.document_content.replace("\n", "<br>")
+        )
 
         # Convert the HTML to PDF using pdfkit
-        pdf_content = pdfkit.from_string(html_content, False, configuration=config)
+        pdf_content = pdfkit.from_string(
+            html_content, False, configuration=config, options=pdf_options
+        )
 
         # Stream the PDF back to the user
         response = Response(stream_with_context(io.BytesIO(pdf_content)))
@@ -1039,7 +1054,7 @@ def resume_builder():
                 """
 
             user_role_content += f"""
-            [Full Name (in capital letters)]\\n[email]\\n[phone number]\\n[city, state]\\n[linkedin profile]\\n[website]\\n\\nSUMMARY\\n\\n[Use this model: (Soft skill) (Most Recent Job Title) who is passionate about (your stance on the industry).\\n\\nWORK EXPERIENCE\\n\\n[Job Title] | [Company] | [Location]\\n[Date (MMYYY)]\\n[Responsibilities listed with bullet point (•) and using this model: (Action verb) + (Cause) + (Effect) + (Measurable Outcome).]\\n\\nEDUCATION\\n\\n[School Name], [City]\\n[Degree] in [Major] | [Dates Attended (MM/YYYY)]\\n\\nSKILLS\\n\\n[Use bullet points (•) for each skill]
+            [Full Name (in capital letters)]\\n[email]\\n[phone number]\\n[city, state]\\n[linkedin profile]\\n[website]\\n\\nSUMMARY\\n\\n[Use this model: (Soft skill) (Most Recent Job Title) who is passionate about (your stance on the industry).\\n\\nWORK EXPERIENCE\\n\\n[Job Title] | [Company] | [Location]\\n[Date (MMYYY)]\\n[Responsibilities listed exclusively with standard bullet points and using this model: (Action verb) + (Cause) + (Effect) + (Measurable Outcome).]\\n\\nEDUCATION\\n\\n[School Name], [City]\\n[Degree] in [Major] | [Dates Attended (MM/YYYY)]\\n\\nSKILLS\\n\\n[Use bullet points (•) for each skill]
 
             PERSONAL INFORMATION: {personalinfo}
             SUMMARY: {summary}
