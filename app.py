@@ -597,6 +597,12 @@ def test_connection():
     return jsonify([doc.id for doc in documents])
 
 
+from flask import Flask, request, send_file, Response, stream_with_context
+from docx import Document
+import io
+import pdfkit
+
+
 @app.route("/download_document/<int:document_id>", methods=["GET"])
 def download_document(document_id):
     # Fetch the document from the database
@@ -625,9 +631,7 @@ def download_document(document_id):
 
     elif download_format == "pdf":
         # Convert the document content to basic HTML
-        html_content = "<h1>{}</h1><p>{}</p>".format(
-            doc.document_name, doc.document_content.replace("\n", "<br>")
-        )
+        html_content = "<p>{}</p>".format(doc.document_content.replace("\n", "<br>"))
 
         # Convert the HTML to PDF using pdfkit
         pdf_content = pdfkit.from_string(html_content, False, configuration=config)
@@ -676,7 +680,8 @@ def home():
 
 @app.route("/cover-letter-generator")
 def cover_letter_generator():
-    return render_template("cover_letter_generator.html")
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("cover_letter_generator.html", user_id=user_id)
 
 
 @app.route("/resume-enhancer")
@@ -767,7 +772,7 @@ def generate_cover_letter():
         },
         {
             "role": "user",
-            "content": f"Generate a cover letter for the following job. Resume: {resume_content}. Job description: {job_description}. Job title: {job_title}. Company name: {company_name}. Focus areas: {focus_areas}",
+            "content": f"Generate a cover letter for the following job. The format should be as follows: [Full Name]\n[Email Address]\n[Phone Number]\n[Date Placeholder]\n\n[RE: Job Title,]\n\n[Dear Hiring Manager]\n[Body of Cover Letter]\n\n[Sincerely,]\n[Full Name]. Special Instructions: Do not bold any text. Resume: {resume_content}. Job description: {job_description}. Job title: {job_title}. Company name: {company_name}. Focus areas: {focus_areas}",
         },
     ]
 
