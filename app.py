@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Response, stream_with_context
 import pdfkit
 import threading
+import re
 
 load_dotenv()
 from flask_mail import Mail, Message
@@ -1207,6 +1208,84 @@ def resume_builder():
 
         except Exception as e:
             return jsonify({"error": "An error occurred during processing."}), 500
+
+
+@app.route("/get-ranked-jobs", methods=["GET"])
+@login_required
+def get_ranked_jobs():
+    try:
+        user_id = current_user.id
+        local_conn = create_connection()
+
+        # Fetch saved jobs
+        with local_conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM saved_jobs WHERE user_id = ?", (user_id,))
+            saved_jobs = cursor.fetchall()
+
+        # Fetch latest resume
+        with local_conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC",
+                (user_id,),
+            )
+            row = cursor.fetchone()
+            resume = row[0] if row else None
+
+        if not resume:
+            return jsonify({"success": False, "error": "No resume found."}), 500
+
+        # Analyze and sort
+        ranked_jobs = []
+        for job in saved_jobs:
+            job_description = job.job_description
+            score = analyze_job_fit(job_description, resume, job.job_title)
+            job_dict = {
+                "id": job.id,
+                "job_id": job.job_id,
+                "job_title": job.job_title,
+                "company_name": job.company_name,
+                "job_link": job.job_link,
+                "score": score,
+            }
+            ranked_jobs.append(job_dict)
+
+        ranked_jobs.sort(key=lambda x: x["score"], reverse=True)
+
+        local_conn.close()
+        return jsonify({"success": True, "ranked_jobs": ranked_jobs})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+def analyze_job_fit(job_description, resume, job_title):
+    messages = [
+        {
+            "role": "system",
+            "content": "You are an expert at matching resumes to job descriptions.",
+        },
+        {
+            "role": "user",
+            "content": f"Rate the compatibility between this job description and resume on a scale of 1-100. Provide only your rating in your response. Example Response: 85. job title: {job_title}, job description: {job_description}, resume: {resume}",
+        },
+    ]
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=0.4,
+    )
+    score_text = response.choices[0].message["content"].strip()
+    score = extract_score_from_text(score_text)
+    return score
+
+
+def extract_score_from_text(text):
+    try:
+        # Assuming the text contains only the numerical score
+        return int(text)
+    except ValueError:
+        # If conversion fails, return a default value
+        return 0
 
 
 if __name__ == "__main__":
