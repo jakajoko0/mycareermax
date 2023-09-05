@@ -265,7 +265,7 @@
                 instead of
                 uncommon bullet points to be safe and include as many keywords as possible. Our ATS Optimizer handles
                 all of this
-                for you. Check it out by clicking the ATS Optimizer 🚀 button within any job posting or try out our
+                for you. Check it out by clicking the ✨ATS Optimizer button within any job posting or try out our
                 Resume Scanner if you just want to know how ATS friendly your resume is by clicking
                 <a href="/resume-enhancer" style="color: rgb(0, 174, 41);">HERE!</a>
             </div>
@@ -279,11 +279,12 @@
                 <textarea class="form-control" id="cover-letter-text-1" readonly="" rows="10"></textarea>
                 <!-- New buttons added here -->
                 <div class="mt-2">
-                    <button class="btn btn-primary mt-2" id="download-resume-1"
-                        onclick="downloadResume_1()">Download</button>
-                    <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">Copy to
-                        Clipboard</button>
-                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">Save to Dashboard</button>
+                    <button class="btn btn-primary mt-2" id="download-resume-1" onclick="downloadResume_1()">⬇️ Download
+                        (.TXT)</button>
+                    <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">📋 Copy
+                        to Clipboard</button>
+                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">💾 Save to Dashboard (.DOCX &
+                        .PDF)</button>
                 </div>
             </div>
              
@@ -295,9 +296,10 @@
                     AI Generated Cover Letter</h3>
                 <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
                 <div class="mt-2">
-                    <button class="btn btn-success" onclick="downloadCoverLetter()">Download</button>
-                    <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button><button
-                        class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">Send to myDashboard</button>
+                    <button class="btn btn-success" onclick="downloadCoverLetter()">⬇️ Download (.TXT)</button>
+                    <button class="btn btn-info" onclick="copyToClipboard()">📋 Copy to Clipboard</button><button
+                        class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">💾 Save to Dashboard (.DOCX &
+                        .PDF)</button>
                 </div>
             </div>
             <!-- Job Listings Container -->
@@ -563,7 +565,7 @@
                         // Create the "Generate Cover Letter" button first
                         const generateButton = document.createElement('button');
                         generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
-                        generateButton.innerText = 'AI Cover Letter 📄'; // Added paper and pencil emojis here
+                        generateButton.innerText = '✨AI Cover Letter'; // Added paper and pencil emojis here
                         generateButton.style.backgroundColor = '#99ff99';
                         generateButton.style.color = 'black';
                         generateButton.style.marginBottom = '10px';
@@ -581,7 +583,7 @@
                         // Create the "Generate Cover Letter (Resume.1)" button
                         const generateButton_1 = document.createElement('button');
                         generateButton_1.className = 'btn btn-secondary ml-2 job-box-btn';
-                        generateButton_1.innerText = 'ATS Optimizer 🚀'; // Added rocket ship emoji here
+                        generateButton_1.innerText = '✨ATS Optimizer'; // Added rocket ship emoji here
                         generateButton_1.style.backgroundColor = '#99ff99';
                         generateButton_1.style.color = 'black';
                         generateButton_1.style.marginBottom = '10px';

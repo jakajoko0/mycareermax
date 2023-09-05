@@ -905,13 +905,41 @@ def fetch_job_listings():
 # AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS
 @app.route("/career_click", methods=["POST"])
 def career_click():
-    # Extract the resume, job description, company name, and job title from the request
-    resume = request.json.get("resume")
+    logging.info("Inside /career_click route")  # Debugging
+
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
+
+        try:
+            with create_connection().cursor() as cursor:  # Create a new connection
+                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+                logging.info(f"Executing SQL Query: {query}")  # Debugging
+                cursor.execute(query, user_id)
+                row = cursor.fetchone()
+
+                if row:
+                    logging.info("Resume found in database")  # Debugging
+                    resume = row[0]
+                else:
+                    logging.info(
+                        "No resume found in database, using request content"
+                    )  # Debugging
+                    resume = request.json.get("resume")
+
+        except Exception as e:
+            logging.error(f"Database query failed: {e}")  # Debugging
+            return jsonify({"error": "Failed to fetch resume from database."})
+
+    else:
+        logging.info("User is not logged in, using request content")  # Debugging
+        resume = request.json.get("resume")
+
     job_description = request.json.get("job_description")
     company_name = request.json.get("company_name")
     job_title = request.json.get("job_title")
 
-    # Construct the conversation history as an array of messages
+    # Construct the conversation history
     messages = [
         {
             "role": "system",
@@ -923,16 +951,17 @@ def career_click():
         },
     ]
 
-    # Make the API call to OpenAI's GPT-3.5 model
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=messages,
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=messages,
+        )
+    except openai.error.InvalidRequestError as e:
+        logging.error(e)
+        return jsonify({"error": str(e)})
 
-    # Extract the generated cover letter from the response
     cover_letter = response.choices[0].message["content"].strip()
 
-    # Return the generated cover letter as a JSON response
     return jsonify({"cover_letter": cover_letter})
 
 
@@ -941,12 +970,39 @@ def career_click():
 
 @app.route("/resume.1", methods=["POST"])
 def resume_1():
-    # Extract the resume, job description, and job title from the request
-    resume = request.json.get("resume")
+    logging.info("Inside /resume.1 route")  # Debugging
+
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
+
+        try:
+            with create_connection().cursor() as cursor:  # Create a new connection
+                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+                logging.info(f"Executing SQL Query: {query}")  # Debugging
+                cursor.execute(query, user_id)
+                row = cursor.fetchone()
+
+                if row:
+                    logging.info("Resume found in database")  # Debugging
+                    resume = row[0]
+                else:
+                    logging.info(
+                        "No resume found in database, using request content"
+                    )  # Debugging
+                    resume = request.json.get("resume")
+
+        except Exception as e:
+            logging.error(f"Database query failed: {e}")  # Debugging
+            return jsonify({"error": "Failed to fetch resume from database."})
+    else:
+        logging.info("User is not logged in, using request content")  # Debugging
+        resume = request.json.get("resume")
+
     job_description = request.json.get("job_description")
     job_title = request.json.get("job_title")
 
-    # Construct the conversation history as an array of messages
+    # Construct the conversation history
     messages = [
         {
             "role": "system",
@@ -954,11 +1010,10 @@ def resume_1():
         },
         {
             "role": "user",
-            "content": f"Extract 10 keywords from the following job description and incoporate them into the resume provided. Format the resume to ATS standards by using dashes instead of bullet points. Acceptable Date Format MM/YYYY. As in, 03/2023. Resume: {resume}. Job description: {job_description}",
+            "content": f"Extract 10 keywords from the following job description and incorporate them into the resume provided. Format the resume to ATS standards by using dashes instead of bullet points. Acceptable Date Format MM/YYYY. As in, 03/2023. Resume: {resume}. Job description: {job_description}",
         },
     ]
 
-    # Make the API call to OpenAI's GPT-4 model
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -970,13 +1025,11 @@ def resume_1():
             presence_penalty=0,
         )
     except openai.error.InvalidRequestError as e:
-        print(e)
+        logging.error(e)
         return jsonify({"error": str(e)})
 
-    # Extract the generated cover letter from the response
     cover_letter = response.choices[0].message["content"].strip()
 
-    # Return the generated cover letter as a JSON response
     return jsonify({"cover_letter": cover_letter})
 
 
