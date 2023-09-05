@@ -69,6 +69,10 @@
             overflow-x: auto;
             background-color: #ffffff;
             /* Making the background white */
+            border-radius: 12px;
+            /* Adding rounded corners */
+            overflow: hidden;
+            /* Ensuring the content respects the rounded corners */
         }
 
         table {
@@ -179,22 +183,21 @@
             <img src="{{ url_for('static', filename='images/white-mycareermax.png') }}" alt="Your Logo"
                 style="max-width:100%;" />
         </div>
-
-        <!-- Adding a title for the leaderboard -->
-        <h2 style="text-align:center; color: #000;">Job Compatibility Ranking</h2>
-
-        <div id="leaderboard-container">
-            <!-- The leaderboard table will be inserted here -->
-        </div>
-
+        <!-- Save Resume -->
         <div class="container mt-5 text-white">
             <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
                 <input type="file" name="resume" accept=".docx" required>
                 <button type="submit" class="btn btn-success">💾 Save Resume</button>
             </form>
-            <div id="uploaded-resume-name" style="margin-top: 20px;"></div>
+            <div id="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
         </div>
+        <!-- Adding a title for the leaderboard -->
+        <h2 style="text-align:center; color: #000; margin-top: 40px;">✨Job Compatibility Ranking</h2>
 
+
+        <div id="leaderboard-container">
+            <!-- The leaderboard table will be inserted here -->
+        </div>
         <!-- Main Content -->
         <div class="container mt-5 mb-5" style="color: white;">
             <h2>My Saved Jobs</h2>

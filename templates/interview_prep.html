@@ -299,6 +299,26 @@
       <img src="{{ url_for('static', filename='images/intervueme.png') }}" alt="Your Logo" style="max-width:100%;" />
     </div>
     <form enctype="multipart/form-data" id="interview-form">
+      <style>
+        /* Add this to hide the textarea by default */
+        #typed_resume {
+          display: none;
+        }
+      </style>
+      <div style="text-align: center;">
+        <label for="resume">Upload Your Resume:</label><br />
+        <div style="display: inline-block;">
+          <input id="resume" name="resume" type="file" />
+        </div>
+      </div>
+      <div> </div>
+      <label for="typed_resume">Or</label>
+      <button type="button" class="btn btn-success mb-3" id="toggle_textarea">Manually Add Resume</button>
+      <!-- Button to toggle visibility -->
+      <br />
+      <textarea id="typed_resume" name="typed_resume" rows="6"></textarea>
+      <!-- Remaining form fields -->
+      <div> </div>
       <label class="custom-label" for="job_title">Job Title:</label><br />
       <input id="job_title" name="job_title" type="text" /><br />
       <div> </div>
@@ -314,19 +334,21 @@
       <label class="custom-label" for="industry">Industry:</label><br />
       <input id="industry" name="industry" type="text" /><br />
       <div> </div>
-      <div> </div>
-      <label for="resume">Upload Your Resume:</label><br />
-      <div> </div>
-      <input id="resume" name="resume" type="file" /><br />
-      <div> </div>
-      <label for="typed_resume">Or enter it manually here:</label><br />
-      <textarea id="typed_resume" name="typed_resume" rows="6"></textarea>
-      <div> </div>
       <div style="text-align: center;">
         <button style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px;">✨Simulate
           Interview✨</button>
       </div>
-
+      <script>
+        // Add this script to toggle textarea visibility
+        document.getElementById("toggle_textarea").addEventListener("click", function () {
+          var textarea = document.getElementById("typed_resume");
+          if (textarea.style.display === "none" || textarea.style.display === "") {
+            textarea.style.display = "block";
+          } else {
+            textarea.style.display = "none";
+          }
+        });
+      </script>
     </form>
     <div>
       <p> </p>
