@@ -378,17 +378,13 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.message) {
-                                alert(data.message);
+                            if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
+                                alert("Cover Letter saved successfully! You may view and download your Saved Cover Letter's from your Dashboard");
                             } else {
-                                alert('Error: ' + data.error);
+                                alert("You must be logged in to access your Dashboard.");
                             }
                         })
-                        .catch(error => {
-                            alert('An error occurred: ' + error);
-                        });
-                } else {
-                    alert("One or more elements are missing!");
+
                 }
             }
 
