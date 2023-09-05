@@ -63,13 +63,17 @@
             background-attachment: fixed;
         }
 
-        /* New styles for leaderboard container */
+        /* Updated styles for leaderboard container */
         #leaderboard-container {
             width: 100%;
             overflow-x: auto;
             background-color: #ffffff;
             /* Making the background white */
-                    }
+            border-radius: 12px;
+            /* Adding rounded corners */
+            overflow: hidden;
+            /* Ensuring the content respects the rounded corners */
+        }
 
         table {
             width: 100%;
@@ -190,10 +194,10 @@
         <!-- Adding a title for the leaderboard -->
         <h2 style="text-align:center; color: #000; margin-top: 40px;">✨Job Compatibility Ranking</h2>
 
-
-        <div id="leaderboard-container">
+        <div id="leaderboard-container" style="overflow-x: auto;">
             <!-- The leaderboard table will be inserted here -->
         </div>
+
         <!-- Main Content -->
         <div class="container mt-5 mb-5" style="color: white;">
             <h2>My Saved Jobs</h2>
