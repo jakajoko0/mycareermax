@@ -155,7 +155,7 @@
         <div class="container mt-5 text-white">
             <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
                 <input type="file" name="resume" accept=".docx" required>
-                <button type="submit" class="btn btn-success">Upload Resume</button>
+                <button type="submit" class="btn btn-success">💾 Save Resume</button>
             </form>
             <div id="uploaded-resume-name" style="margin-top: 20px;"></div>
         </div>
@@ -184,7 +184,7 @@
                         success: function (response) {
                             if (response.success) {
                                 // Display the uploaded resume name
-                                $('#uploaded-resume-name').text('Uploaded Resume: ' + response.filename);
+                                $('#uploaded-resume-name').text('Saved Resume: ' + response.filename);
                             } else {
                                 console.error('Error uploading resume:', response.error);
                             }

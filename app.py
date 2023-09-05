@@ -712,11 +712,38 @@ def interview_prep():
 # RESUMETUNER OPENAI API CALLS
 @app.route("/analyze-resume", methods=["POST"])
 def analyze_resume():
-    # Extract the content from the request
-    resume_content = request.form.get("resume")
+    logging.info("Inside /analyze-resume route")  # Debugging
+
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
+
+        try:
+            with create_connection().cursor() as cursor:  # Create a new connection
+                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+                logging.info(f"Executing SQL Query: {query}")  # Debugging
+                cursor.execute(query, user_id)
+                row = cursor.fetchone()
+
+                if row:
+                    logging.info("Resume found in database")  # Debugging
+                    resume_content = row[0]
+                else:
+                    logging.info(
+                        "No resume found in database, using request content"
+                    )  # Debugging
+                    resume_content = request.form.get("resume")
+
+        except Exception as e:
+            logging.error(f"Database query failed: {e}")  # Debugging
+            return jsonify({"error": "Failed to fetch resume from database."})
+    else:
+        logging.info("User is not logged in, using request content")  # Debugging
+        resume_content = request.form.get("resume")
+
     job_title = request.form.get("jobTitle")
     job_description = request.form.get("jobDescription")
-    # Construct the messages for the OpenAI API
+
     messages = [
         {
             "role": "system",
@@ -724,17 +751,14 @@ def analyze_resume():
         },
         {
             "role": "user",
-            "content": f"Please review the following resume and job description and give it an ATS score. The rating system is 1-100. 100 means it's 100% ATS friendly. Provide detailed reasoning and steps to improve the score. Job Title: {job_title},  Job Description: {job_description} Resume:{resume_content} ",
+            "content": f"Please review the following resume and job description and give it an ATS score. The rating system is 1-100. 100 means it's 100% ATS friendly. Provide detailed reasoning and steps to improve the score. Job Title: {job_title},  Job Description: {job_description} Resume:{resume_content}",
         },
     ]
 
-    # Send the messages to the OpenAI API
     response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
 
-    # Extract the model's reply from the response
     feedback = response["choices"][0]["message"]["content"].strip()
 
-    # Return the feedback to the front end
     return jsonify({"feedback": feedback})
 
 
@@ -772,14 +796,40 @@ def upload_docx():
 # COVERME OPENAI API CALLS
 @app.route("/generate-cover-letter", methods=["POST"])
 def generate_cover_letter():
-    # Extract the content from the request
-    resume_content = request.form.get("resume")
+    logging.info("Inside /generate-cover-letter route")  # Debugging
+
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
+
+        try:
+            with create_connection().cursor() as cursor:  # Create a new connection
+                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+                logging.info(f"Executing SQL Query: {query}")  # Debugging
+                cursor.execute(query, user_id)
+                row = cursor.fetchone()
+
+                if row:
+                    logging.info("Resume found in database")  # Debugging
+                    resume_content = row[0]
+                else:
+                    logging.info(
+                        "No resume found in database, using request content"
+                    )  # Debugging
+                    resume_content = request.form.get("resume")
+
+        except Exception as e:
+            logging.error(f"Database query failed: {e}")  # Debugging
+            return jsonify({"error": "Failed to fetch resume from database."})
+    else:
+        logging.info("User is not logged in, using request content")  # Debugging
+        resume_content = request.form.get("resume")
+
     job_description = request.form.get("job_description")
     job_title = request.form.get("job_title")
     company_name = request.form.get("company_name")
     focus_areas = request.form.get("focus_areas")
 
-    # Construct the messages for the OpenAI API
     messages = [
         {
             "role": "system",
@@ -791,51 +841,77 @@ def generate_cover_letter():
         },
     ]
 
-    # Send the messages to the OpenAI API
     response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
 
-    # Extract the model's reply from the response
     cover_letter = response["choices"][0]["message"]["content"].strip()
 
-    # Return the cover letter to the front end
     return jsonify({"cover_letter": cover_letter})
 
 
 # INTERVIEW SIMULATOR OPENAI API CALLS
 @app.route("/simulate-interview", methods=["POST"])
 def simulate_interview():
+    logging.info("Inside /simulate-interview route")  # Debugging
+
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
+
+        try:
+            with create_connection().cursor() as cursor:  # Create a new connection
+                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+                logging.info(f"Executing SQL Query: {query}")  # Debugging
+                cursor.execute(query, user_id)
+                row = cursor.fetchone()
+
+                if row:
+                    logging.info("Resume found in database")  # Debugging
+                    resume = row[0]
+                else:
+                    logging.info(
+                        "No resume found in database, checking for uploaded or typed resume."
+                    )  # Debugging
+                    resume = None  # Initialize as None
+
+        except Exception as e:
+            logging.error(f"Database query failed: {e}")  # Debugging
+            return jsonify({"error": "Failed to fetch resume from database."})
+
+    else:
+        logging.info(
+            "User is not logged in, checking for uploaded or typed resume."
+        )  # Debugging
+        resume = None  # Initialize as None
+
     try:
-        # Extract form data
         job_title = request.form.get("job_title")
         job_description = request.form.get("job_description")
         job_requirements = request.form.get("job_requirements")
         industry = request.form.get("industry")
 
-        # If the resume was uploaded as a file
-        if "resume" in request.files:
-            file = request.files["resume"]
-            if file.filename.endswith(".docx"):
-                # Process the uploaded DOCX file and extract the text content
-                document = Document(file)
-                # Extract text content from the document
-                resume = "\n".join(paragraph.text for paragraph in document.paragraphs)
+        if resume is None:
+            if "resume" in request.files:
+                file = request.files["resume"]
+                if file.filename.endswith(".docx"):
+                    document = Document(file)
+                    resume = "\n".join(
+                        paragraph.text for paragraph in document.paragraphs
+                    )
+                else:
+                    return (
+                        jsonify(
+                            {
+                                "error": "Invalid file format. Only .docx files are allowed."
+                            }
+                        ),
+                        400,
+                    )
             else:
-                return (
-                    jsonify(
-                        {"error": "Invalid file format. Only .docx files are allowed."}
-                    ),
-                    400,
-                )
-        else:
-            # If the resume was typed
-            resume = request.form.get("typed_resume")
+                resume = request.form.get("typed_resume")
 
-        # Define the system message for the AI
         system_message = f"You are a helpful assistant that generates personalized interview questions.You do not number your list of questions"
-        # Define the user message for the AI
         user_message = f"The candidate is applying for a role as a {job_title} in the {industry} industry. The job description is as follows: {job_description}. The job requirements are: {job_requirements}. The candidate's resume is as follows: {resume}. Respond only with a list of 10 questions in bullet point format (no numbers)"
 
-        # Use these messages to generate interview questions
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -844,13 +920,12 @@ def simulate_interview():
             ],
         )
 
-        # Extract the interview questions from the response
         interview_questions = response["choices"][0]["message"]["content"].split("\n")
 
-        # Return the questions as a JSON response
         return jsonify({"interview_questions": interview_questions})
+
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logging.error(f"An error occurred: {e}")  # Debugging
         return jsonify({"error": str(e)}), 500
 
 
@@ -1006,11 +1081,11 @@ def resume_1():
     messages = [
         {
             "role": "system",
-            "content": "You are an expert at extracting keywords from job descriptions and optimizing resumes for ATS systems.",
+            "content": "You are an AI developed by OpenAI to write professional, ATS-optimized resumes.",
         },
         {
             "role": "user",
-            "content": f"Extract 10 keywords from the following job description and incorporate them into the resume provided. Format the resume to ATS standards by using dashes instead of bullet points. Acceptable Date Format MM/YYYY. As in, 03/2023. Resume: {resume}. Job description: {job_description}",
+            "content": f"Tailor the provided Resume for the given Job description. Use Key Words extracted from the Job Description, rephrase, add, and remove bullet points where necessary. The Resume should be optimized for ATS system compatibility. Please use the following Resume format and add additional sections if necessary: [Full Name (in capital letters)]\\n[email]\\n[phone number]\\n[city, state]\\n[linkedin profile]\\n[website]\\n\\nSUMMARY\\n\\n[Use this model: (Soft skill) (Most Recent Job Title) who is passionate about (your stance on the industry).\\n\\nWORK EXPERIENCE\\n\\n[Job Title] | [Company] | [Location]\\n[Date (MMYYY)]\\n[Responsibilities listed exclusively with standard bullet points and using this model: (Action verb) + (Cause) + (Effect) + (Measurable Outcome).]\\n\\nEDUCATION\\n\\n[School Name], [City]\\n[Degree] in [Major] | [Dates Attended (MM/YYYY)]\\n\\nSKILLS\\n\\n[Use bullet points (•) for each skill] Resume: {resume}. Job description: {job_description}",
         },
     ]
 
@@ -1018,7 +1093,7 @@ def resume_1():
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=messages,
-            temperature=0.7,
+            temperature=1.0,
             max_tokens=2000,
             top_p=1,
             frequency_penalty=0,
