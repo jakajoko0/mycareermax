@@ -419,7 +419,11 @@
 
                             // Populate the leaderboard
                             rankedJobs.forEach((job, index) => {
-                                leaderboardHtml += `<tr><td>${index + 1}</td><td>${job.score}</td><td>${job.job_title}</td><td>${job.company_name}</td><td><a href="${job.job_link}" target="_blank" class="btn btn-primary">Apply</a></td></tr>`;
+                                let green = Math.floor((job.score / 100) * 255);
+                                let red = Math.floor(255 - (job.score / 100) * 255);
+                                let bgColor = `rgb(${red}, ${green}, 0)`;
+
+                                leaderboardHtml += `<tr style="background-color:${bgColor};"><td>${index + 1}</td><td>${job.score}</td><td>${job.job_title}</td><td>${job.company_name}</td><td><a href="${job.job_link}" target="_blank" class="btn btn-primary">Apply</a></td></tr>`;
                             });
 
                             leaderboardHtml += '</tbody></table>';
@@ -440,6 +444,8 @@
             $(document).ready(function () {
                 fetchRankedJobs();
             });
+
+
 
 
 
