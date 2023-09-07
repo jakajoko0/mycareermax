@@ -187,7 +187,7 @@
         <!-- My Resume Button to Trigger Modal -->
         <div class="text-center">
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resumeModal">
-                My Resume
+                Manage My Resume
             </button>
             <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
         </div>
@@ -276,17 +276,22 @@
                 });
 
 
-                // Add this to trigger resume deletion
-                $("#delete-resume-button").click(function () {
-                    $.post("/delete_resume", function (response) {
-                        if (response.success) {
-                            // Clear the displayed resume name
-                            $('#uploaded-resume-name').text('Current Resume: None');
-                        } else {
-                            console.error('Error deleting resume:', response.error);
+                // Handling resume deletion via jQuery
+                $("#delete-resume-button").on("click", function () {
+                    $.ajax({
+                        url: '/delete_resume',  // Using your actual deletion URL
+                        type: 'POST',
+                        success: function (response) {
+                            if (response.success) {
+                                // Remove the displayed resume name in all elements with the class 'uploaded-resume-name'
+                                $('.uploaded-resume-name').text('No saved resume.');
+                            } else {
+                                console.error('Error deleting resume:', response.error);
+                            }
                         }
                     });
                 });
+
 
                 // Fetch and display saved jobs
                 fetch("/get-saved-jobs")
