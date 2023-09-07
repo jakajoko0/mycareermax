@@ -67,8 +67,7 @@ $("#interview-form").on("submit", function (event) {
   });
 });
 
-// ... Remainder of the file ...
-
+// Code for handling answer submission
 $("#submit-answer").on("click", function () {
   // Show the loading spinner
   $("#loading-spinner").show();
@@ -79,7 +78,7 @@ $("#submit-answer").on("click", function () {
   // Get the user's answer
   var userAnswer = $("#user-answer").val();
 
-  // Send an AJAX request to the server with the current question and the user's answer
+  // AJAX call to analyze the answer
   $.ajax({
     url: "/analyze-answer",
     data: JSON.stringify({ question: currentQuestion, answer: userAnswer }),
@@ -88,61 +87,54 @@ $("#submit-answer").on("click", function () {
     success: function (response) {
       // Hide the loading spinner
       $("#loading-spinner").hide();
-
-      // Display the feedback to the user
-      alert(response.feedback); // Replace this with the appropriate action
+      // Insert the feedback into the modal's body
+      $("#modal-body-content").html(response.feedback);
+      // Show the modal
+      $("#feedbackModal").modal("show");
     },
     error: function (xhr, textStatus, error) {
       // Hide the loading spinner
       $("#loading-spinner").hide();
-
-      alert("An error occurred. Please try again.");
-    },
+      // Display an error message in the modal
+      $("#modal-body-content").html("An error occurred. Please try again.");
+      // Show the modal
+      $("#feedbackModal").modal("show");
+    }
   });
-});
+});  // This closing bracket and parenthesis were added to close the click event handler
 
-// When the Next button is clicked...
+// Code for handling the Next button
 $("#next-button").on("click", function () {
-  // Get the index of the current question
   var index = window.questions.indexOf(
     $("#question-display")
       .text()
       .substring($("#question-display").text().indexOf(" ") + 1)
   );
-
-  // If this isn't the last question, increment the index and display the next question
   if (index < window.questions.length - 1) {
     $("#question-display").text(index + 2 + ". " + window.questions[index + 1]);
   }
-
-  // Clear the user's answer
   $("#user-answer").val("");
 });
 
-// When the Previous button is clicked...
+// Code for handling the Previous button
 $("#previous-button").on("click", function () {
-  // Get the index of the current question
   var index = window.questions.indexOf(
     $("#question-display")
       .text()
       .substring($("#question-display").text().indexOf(" ") + 1)
   );
-
-  // If this isn't the first question, decrement the index and display the previous question
   if (index > 0) {
     $("#question-display").text(index + ". " + window.questions[index - 1]);
   }
-
-  // Clear the user's answer
   $("#user-answer").val("");
 });
 
+// Code for handling resume upload
 $("#resume").on("change", function () {
   var file = this.files[0];
   if (file) {
     var formData = new FormData();
     formData.append("file", file); // Use 'file' instead of 'resume'
-
     $.ajax({
       url: "/upload-docx", // Use '/upload-docx' instead of '/upload-resume'
       data: formData,
@@ -150,12 +142,11 @@ $("#resume").on("change", function () {
       processData: false,
       contentType: false,
       success: function (response) {
-        // Set the content of the typed_resume textarea to the response from the server
         $("#typed_resume").val(response.content); // Use 'response.content' instead of 'response.resume_content'
       },
       error: function (xhr, textStatus, error) {
         alert("An error occurred. Please try again.");
-      },
+      }
     });
   }
 });

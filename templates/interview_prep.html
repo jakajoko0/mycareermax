@@ -216,170 +216,210 @@
       justify-content: space-between;
       /* Optional: Add space between buttons */
     }
+
+    <style>
+
+    /* Your existing CSS and new button-container class */
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Full Version of jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <!-- Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+
+  <!-- Bootstrap JS -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </head>
 
 <body>
+  <!-- Your body content here -->
+</body>
 
 
-  <script defer>
-    // Your existing JavaScript code
+<script defer>
+  // Your existing JavaScript code
 
-    $(document).ready(function () {
-      console.log("Fetching username...");
-      $.get("/get-username", function (response) {
-        console.log("Username response:", response);
-        if (response.success) {
-          const usernamePlaceholder = document.getElementById("username-placeholder");
-          usernamePlaceholder.textContent = "Hello, " + response.username;
+  $(document).ready(function () {
+    console.log("Fetching username...");
+    $.get("/get-username", function (response) {
+      console.log("Username response:", response);
+      if (response.success) {
+        const usernamePlaceholder = document.getElementById("username-placeholder");
+        usernamePlaceholder.textContent = "Hello, " + response.username;
+      } else {
+        console.error('Error fetching username:', response.error);
+      }
+    });
+
+    // Rest of your existing JavaScript code...
+  });
+</script>
+<div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+    <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
+        </li>
+        <!-- Dropdown Menu for AI Resume Tools -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+            AI Resume Tools
+          </a>
+          <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+            <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+            <a class="dropdown-item" href="/ai-builder" style="color: #003c86;">AI Resume Builder</a>
+          </div>
+        </li>
+        <!-- End of Dropdown -->
+        <li class="nav-item">
+          <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+        </li>
+        <!-- Existing dropdown for the username -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+            <span id="username-placeholder">Login Here</span>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+            <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+            <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+          </div>
+        </li>
+        <!-- End of Dropdown for username -->
+      </ul>
+    </div>
+  </nav>
+
+
+
+  <div style="text-align:center;">
+    <img src="{{ url_for('static', filename='images/intervueme.png') }}" alt="Your Logo" style="max-width:100%;" />
+  </div>
+  <form enctype="multipart/form-data" id="interview-form">
+    <style>
+      /* Add this to hide the textarea by default */
+      #typed_resume {
+        display: none;
+      }
+    </style>
+    <div style="text-align: center;">
+      <label for="resume">Upload Your Resume:</label><br />
+      <div style="display: inline-block;">
+        <input id="resume" name="resume" type="file" />
+      </div>
+    </div>
+    <div> </div>
+    <label for="typed_resume">Or</label>
+    <button type="button" class="btn btn-success mb-3" id="toggle_textarea">Manually Add Resume</button>
+    <!-- Button to toggle visibility -->
+    <br />
+    <textarea id="typed_resume" name="typed_resume" rows="6"></textarea>
+    <!-- Remaining form fields -->
+    <div> </div>
+    <label class="custom-label" for="job_title">Job Title:</label><br />
+    <input id="job_title" name="job_title" type="text" /><br />
+    <div> </div>
+    <div> </div>
+    <label class="custom-label" for="job_description">Job Description:</label><br />
+    <textarea id="job_description" name="job_description" rows="4"></textarea>
+    <div> </div>
+    <div> </div>
+    <label class="custom-label" for="job_requirements">Job Requirements:</label><br />
+    <textarea id="job_requirements" name="job_requirements" rows="4"></textarea>
+    <div> </div>
+    <div> </div>
+    <label class="custom-label" for="industry">Industry:</label><br />
+    <input id="industry" name="industry" type="text" /><br />
+    <div> </div>
+    <div style="text-align: center;">
+      <button style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px;">✨Simulate
+        Interview✨</button>
+    </div>
+    <script>
+      // Add this script to toggle textarea visibility
+      document.getElementById("toggle_textarea").addEventListener("click", function () {
+        var textarea = document.getElementById("typed_resume");
+        if (textarea.style.display === "none" || textarea.style.display === "") {
+          textarea.style.display = "block";
         } else {
-          console.error('Error fetching username:', response.error);
+          textarea.style.display = "none";
         }
       });
-
-      // Rest of your existing JavaScript code...
-    });
-  </script>
-  <div class="container-fluid">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
-          </li>
-          <!-- Dropdown Menu for AI Resume Tools -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
-              AI Resume Tools
-            </a>
-            <div class="dropdown-menu" aria-labelledby="resumeDropdown">
-              <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
-              <a class="dropdown-item" href="/ai-builder" style="color: #003c86;">AI Resume Builder</a>
-            </div>
-          </li>
-          <!-- End of Dropdown -->
-          <li class="nav-item">
-            <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
-          </li>
-          <!-- Existing dropdown for the username -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
-              <span id="username-placeholder">Login Here</span>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
-              <a class="dropdown-item" href="/logout" style="color: #ff0000;">Logout</a>
-            </div>
-          </li>
-          <!-- End of Dropdown for username -->
-        </ul>
-      </div>
-    </nav>
-
-
-
-    <div style="text-align:center;">
-      <img src="{{ url_for('static', filename='images/intervueme.png') }}" alt="Your Logo" style="max-width:100%;" />
+    </script>
+  </form>
+  <div>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+  </div>
+  <div id="interview-container">
+    <div id="question-display">
     </div>
-    <form enctype="multipart/form-data" id="interview-form">
-      <style>
-        /* Add this to hide the textarea by default */
-        #typed_resume {
-          display: none;
-        }
-      </style>
-      <div style="text-align: center;">
-        <label for="resume">Upload Your Resume:</label><br />
-        <div style="display: inline-block;">
-          <input id="resume" name="resume" type="file" />
-        </div>
-      </div>
-      <div> </div>
-      <label for="typed_resume">Or</label>
-      <button type="button" class="btn btn-success mb-3" id="toggle_textarea">Manually Add Resume</button>
-      <!-- Button to toggle visibility -->
-      <br />
-      <textarea id="typed_resume" name="typed_resume" rows="6"></textarea>
-      <!-- Remaining form fields -->
-      <div> </div>
-      <label class="custom-label" for="job_title">Job Title:</label><br />
-      <input id="job_title" name="job_title" type="text" /><br />
-      <div> </div>
-      <div> </div>
-      <label class="custom-label" for="job_description">Job Description:</label><br />
-      <textarea id="job_description" name="job_description" rows="4"></textarea>
-      <div> </div>
-      <div> </div>
-      <label class="custom-label" for="job_requirements">Job Requirements:</label><br />
-      <textarea id="job_requirements" name="job_requirements" rows="4"></textarea>
-      <div> </div>
-      <div> </div>
-      <label class="custom-label" for="industry">Industry:</label><br />
-      <input id="industry" name="industry" type="text" /><br />
-      <div> </div>
-      <div style="text-align: center;">
-        <button style="background-color: #4bf87a; color: black; border-radius: 12px; padding: 10px 20px;">✨Simulate
-          Interview✨</button>
-      </div>
-      <script>
-        // Add this script to toggle textarea visibility
-        document.getElementById("toggle_textarea").addEventListener("click", function () {
-          var textarea = document.getElementById("typed_resume");
-          if (textarea.style.display === "none" || textarea.style.display === "") {
-            textarea.style.display = "block";
-          } else {
-            textarea.style.display = "none";
-          }
-        });
-      </script>
-    </form>
+    <textarea id="user-answer" rows="10" cols="50" style="display: none; border-color: green; flex: 1 1 auto;">
+</textarea>
     <div>
       <p> </p>
-      <p> </p>
-      <p> </p>
-      <p> </p>
-      <p> </p>
-      <p> </p>
-    </div>
-    <div id="interview-container">
-      <div id="question-display">
+      <div class="button-container">
+        <button id="submit-answer"
+          style="background-color: #007BFF; margin-right: 5px; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Submit
+          Answer</button>
+        <button id="previous-button"
+          style="background-color: gray; margin-right: 5px; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Previous</button>
+        <button id="next-button"
+          style="background-color: #4bf87a; margin-right: 5px; color: black; border-radius: 12px; padding: 10px 20px; display: none;">Next</button>
       </div>
-      <textarea id="user-answer" rows="10" cols="50" style="display: none; border-color: green; flex: 1 1 auto;">
-</textarea>
-      <div>
-        <p> </p>
-        <div class="button-container">
-          <button id="submit-answer"
-            style="background-color: #007BFF; margin-right: 5px; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Submit
-            Answer</button>
-          <button id="previous-button"
-            style="background-color: gray; margin-right: 5px; color: white; border-radius: 12px; padding: 10px 20px; display: none;">Previous</button>
-          <button id="next-button"
-            style="background-color: #4bf87a; margin-right: 5px; color: black; border-radius: 12px; padding: 10px 20px; display: none;">Next</button>
+      <!-- Insert the Bootstrap modal HTML here -->
+      <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+              <!-- Feedback will be inserted here -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
         </div>
-
-
-        <!-- JavaScript code -->
-        <script src="/static/interview.js"></script>
-
       </div>
-</body>
+
+      <!-- JavaScript code -->
+      <script src="/static/interview.js"></script>
+
+    </div>
+    </body>
 
 </html>

@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delete Account</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -23,9 +32,73 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
+                </li>
+                <!-- Dropdown Menu for AI Resume Tools -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        AI Resume Tools
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="resumeDropdown">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/ai-builder" style="color: #003c86;">AI Resume
+                            Builder</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
 
     <div class="container register-container">
         <h2>Delete Your Account</h2>
+
+        <!-- Disclaimer Text -->
+        <div class="alert alert-warning" role="alert">
+            <strong>Disclaimer:</strong> By clicking the "Delete Account" button below, you are requesting the permanent
+            deletion of your account and all data associated with it. This action is irreversible.
+            <br><br>
+            Please be aware that all your user data, including any documents tied to this account, will be completely
+            removed from our system. We will not retain any of your data post-deletion, in compliance with privacy
+            regulations.
+            <br><br>
+            If you have any questions or concerns about this process, please contact our support team before proceeding.
+        </div>
+
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="alert alert-info">
@@ -33,6 +106,7 @@
         </div>
         {% endif %}
         {% endwith %}
+
         <form action="/delete_account" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
@@ -42,6 +116,37 @@
         </form>
     </div>
 
+    <!-- Deletion Confirmation Modal -->
+    <div class="modal fade" id="deletionModal" tabindex="-1" aria-labelledby="deletionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletionModalLabel">Account Deleted</h5>
+                </div>
+                <div class="modal-body">
+                    Your account has been successfully deleted.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="confirm-deletion">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('delete-account-button').addEventListener('click', function (e) {
+            e.preventDefault();  // Prevent the default form submission
+            // Your deletion logic here, perhaps a call to your server to delete the account
+
+            // Show the modal after successful deletion
+            $('#deletionModal').modal('show');
+        });
+
+        // Redirect to mycareermax.com after confirming deletion
+        document.getElementById('confirm-deletion').addEventListener('click', function () {
+            window.location.href = "https://www.mycareermax.com";
+        });
+    </script>
 </body>
 
 </html>
