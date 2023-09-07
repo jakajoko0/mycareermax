@@ -143,32 +143,6 @@ conn_str = (
 conn = pyodbc.connect(conn_str)
 
 
-@app.before_request
-def require_login():
-    allowed_routes = [
-        "login",
-        "register",
-        "careerclick",
-        "fetch-job-listings",
-        "analyze-job",
-        "analyze-answer",
-        "analyze-resume",
-        "upload-docx",
-        "generate-cover-letter",
-        "simulate-interview",
-        "resume-enhancer",
-        "interview-prep",
-        "career_click",
-        "resume.1",
-        "node-app",
-        "resume-builder",
-        "ai-builder",
-        "delete_account",
-    ]
-    # if not current_user.is_authenticated and request.endpoint not in allowed_routes:
-    # return redirect(url_for("login"))
-
-
 def delete_user_and_associated_data(username):
     """Delete a user and their associated data from the Azure SQL database."""
     # Create database connection
@@ -337,13 +311,10 @@ def login():
 
         # Decode the hashed password from the database before comparing
         if user_record and bcrypt.checkpw(password_to_check, user_record.password):
-            # Fetch the user object using SQLAlchemy
-            user_obj = User.query.filter_by(id=user_record.id).first()
-            if user_obj:
-                login_user(user_obj, remember=remember_me)
-                return redirect(url_for("dashboard"))
-            else:
-                message = "User not found"
+            # Create a user object without using SQLAlchemy
+            user_obj = LoginUser(user_record.id)
+            login_user(user_obj, remember=remember_me)
+            return redirect(url_for("dashboard"))
         else:
             message = "Invalid credentials"
 
