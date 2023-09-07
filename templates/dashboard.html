@@ -183,14 +183,46 @@
             <img src="{{ url_for('static', filename='images/white-mycareermax.png') }}" alt="Your Logo"
                 style="max-width:100%;" />
         </div>
-        <!-- Save Resume -->
-        <div class="container mt-5 text-white">
-            <form id="uploadButtonOrForm" action="/upload_dashresume" method="post" enctype="multipart/form-data">
-                <input type="file" name="resume" accept=".docx" required>
-                <button type="submit" class="btn btn-success">💾 Save Resume</button>
-            </form>
-            <div id="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
+
+        <!-- My Resume Button to Trigger Modal -->
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resumeModal">
+                My Resume
+            </button>
+            <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
         </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="resumeModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="resumeModalLabel">My Resume</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Save Resume -->
+                        <div class="container text-black">
+                            <form id="uploadButtonOrForm" action="/upload_dashresume" method="post"
+                                enctype="multipart/form-data">
+                                <input type="file" name="resume" accept=".docx" required>
+                                <button type="submit" class="btn btn-success">💾 Save Resume</button>
+                            </form>
+                            <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
+                            <button id="delete-resume-button" class="btn btn-danger">🗑️ Delete Resume</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Adding a title for the leaderboard -->
         <h2 style="text-align:center; color: #000; margin-top: 40px;">✨Job Compatibility Ranking</h2>
 
@@ -221,8 +253,8 @@
                         contentType: false,
                         success: function (response) {
                             if (response.success) {
-                                // Display the uploaded resume name
-                                $('#uploaded-resume-name').text('Saved Resume: ' + response.filename);
+                                // Display the uploaded resume name in all elements with the class 'uploaded-resume-name'
+                                $('.uploaded-resume-name').text('Saved Resume: ' + response.filename);
                             } else {
                                 console.error('Error uploading resume:', response.error);
                             }
@@ -232,14 +264,28 @@
                     return false;  // To prevent the form from actually submitting and refreshing the page
                 });
 
+
                 // Fetch the latest uploaded resume name for the user
                 $.get("/get_latest_resume_name", function (response) {
                     if (response.success) {
-                        // Display the resume name
-                        $('#uploaded-resume-name').text('Current Resume: ' + response.filename);
+                        // Display the resume name in all elements with the class 'uploaded-resume-name'
+                        $('.uploaded-resume-name').text('Current Resume: ' + response.filename);
                     } else {
                         console.error('Error fetching resume name:', response.error);
                     }
+                });
+
+
+                // Add this to trigger resume deletion
+                $("#delete-resume-button").click(function () {
+                    $.post("/delete_resume", function (response) {
+                        if (response.success) {
+                            // Clear the displayed resume name
+                            $('#uploaded-resume-name').text('Current Resume: None');
+                        } else {
+                            console.error('Error deleting resume:', response.error);
+                        }
+                    });
                 });
 
                 // Fetch and display saved jobs

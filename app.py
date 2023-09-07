@@ -79,8 +79,8 @@ app.config["SESSION_COOKIE_SECURE"] = True
 # Configure Flask-Mail
 app.config["MAIL_SERVER"] = "smtp.office365.com"
 app.config["MAIL_PORT"] = 587
-app.config["MAIL_USERNAME"] = "password_reset@mycareermax.com"
-app.config["MAIL_PASSWORD"] = "&Skally02&"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USE_SSL"] = False
 mail = Mail(app)
@@ -163,15 +163,64 @@ def require_login():
         "node-app",
         "resume-builder",
         "ai-builder",
+        "delete_account",
     ]
     # if not current_user.is_authenticated and request.endpoint not in allowed_routes:
     # return redirect(url_for("login"))
 
 
-# Add the imported function as a route
-# app.add_url_rule(
-# "/resume-builder", "resume_builder", resume_builder, methods=["GET", "POST"]
-# )
+def delete_user_and_associated_data(username):
+    """Delete a user and their associated data from the Azure SQL database."""
+    # Create database connection
+    conn = create_connection()
+
+    # Create a cursor object
+    cursor = conn.cursor()
+
+    try:
+        # Get user_id for the username
+        cursor.execute("SELECT id FROM dbo.users WHERE username = ?", username)
+        user_id = cursor.fetchone()
+        if user_id is None:
+            print("Username not found.")
+            return
+
+        user_id = user_id[0]
+
+        # SQL queries to delete associated records
+        delete_documents_query = "DELETE FROM dbo.UserDocuments WHERE user_id = ?"
+        delete_resumes_query = "DELETE FROM dbo.user_resumes WHERE user_id = ?"
+        delete_saved_jobs_query = "DELETE FROM dbo.saved_jobs WHERE user_id = ?"
+
+        # SQL query to delete user
+        delete_user_query = "DELETE FROM dbo.users WHERE id = ?"
+
+        # Execute the queries to delete associated records
+        cursor.execute(delete_documents_query, user_id)
+        cursor.execute(delete_resumes_query, user_id)
+        cursor.execute(delete_saved_jobs_query, user_id)
+
+        # Execute the query to delete the user
+        cursor.execute(delete_user_query, user_id)
+
+        # Commit the transaction
+        conn.commit()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        conn.rollback()
+    finally:
+        # Close the connection
+        conn.close()
+
+
+@app.route("/delete_account", methods=["GET", "POST"])
+def delete_account():
+    if request.method == "POST":
+        username = request.form["username"]
+        delete_user_and_associated_data(username)
+        flash("Account successfully deleted.")
+        return redirect(url_for("delete_account"))
+    return render_template("delete_account.html")
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
@@ -593,6 +642,23 @@ def get_latest_resume_name():
     except Exception as e:
         app.logger.error(f"Failed to fetch resume name: {e}")
         return jsonify({"success": False, "error": "Failed to fetch resume name."})
+
+        # DELETE RESUME FROM DASHBOARD
+
+
+@app.route("/delete_resume", methods=["POST"])
+@login_required
+def delete_resume():
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM user_resumes WHERE user_id = ?", (current_user.id,)
+            )
+            conn.commit()
+            return jsonify({"success": True})
+    except Exception as e:
+        app.logger.error(f"Failed to delete resume: {e}")
+        return jsonify({"success": False, "error": "Failed to delete resume."})
 
 
 @app.route("/test_connection")
