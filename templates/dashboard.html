@@ -2,6 +2,11 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
@@ -12,6 +17,21 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+
+        .satisfy-font {
+            font-family: 'Satisfy', cursive;
+            color: #ffffff;
+            /* Set the text color to white */
+        }
+
+
         .logo-container {
             text-align: center;
             margin-top: 20px;
@@ -251,7 +271,7 @@
         <!-- My Resume Button to Trigger Modal -->
         <div class="text-center">
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resumeModal">
-                Manage My Resume
+                📄 Manage My Resume
             </button>
             <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
         </div>
@@ -286,9 +306,90 @@
                 </div>
             </div>
         </div>
+        <!-- Tooltip Info Modal -->
+        <div class="modal fade" id="tooltipInfoModal" tabindex="-1" aria-labelledby="tooltipInfoModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tooltipInfoModalLabel">Top Candidate Board</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Introducing the Top Candidate Feature -->
+                        <h2>🌟 Introducing the Top Candidate Feature! 🌟</h2>
+                        <p>Imagine you could know, without a shadow of a doubt, which job openings you stand the best
+                            chance at landing.
+                            That's exactly what our revolutionary Top Candidate Feature offers you.</p>
+
+                        <h3>What It Does</h3>
+                        <p>The Top Candidate Feature is like having your own personal career adviser available 24/7.
+                            Utilizing the latest AI
+                            technology—powered by OpenAI's ChatGPT-4—we meticulously evaluate your resume and background
+                            to match you with
+                            job opportunities that align with your skills, experience, and aspirations.</p>
+
+                        <h3>📊 How It Works</h3>
+                        <ul>
+                            <li>Deep Analysis: ChatGPT-4 reads through your uploaded resume to understand your
+                                professional background and
+                                competencies.</li>
+                            <li>Tailored Matches: It then scans all the job descriptions you've saved to your dashboard,
+                                comparing them
+                                against your resume.</li>
+                            <li>Insightful Rankings: Finally, all saved jobs are rated and ranked, giving you a
+                                crystal-clear insight, into
+                                which jobs you'd be a top candidate for!</li>
+                        </ul>
+
+                        <h3>📝 Get Started in Two Simple Steps</h3>
+                        <ol>
+                            <li>Upload Your Resume: Don't miss out on tailoring your job search. Let us understand what
+                                makes you unique! Don't have
+                                a resume? No worries—use our <a href="/ai-builder">Resume Builder Tool</a> to create a
+                                polished resume in minutes.
+                            </li>
+                            <li>Save At Least One Job: Start by saving job listings you're interested in, so we can do
+                                the matchmaking.</li>
+                        </ol>
+                        <p><i>Note: If you don't complete these steps, the Top Candidate board will remain blank. We
+                                need both ingredients
+                                to cook up your success recipe!</i></p>
+
+                        <h3>🥇 Why Use the Top Candidate Feature?</h3>
+                        <ul>
+                            <li>Save Time: No more endless scrolling through job listings. We bring your best matches
+                                right to your
+                                fingertips.</li>
+                            <li>Boost Confidence: Knowing you're a top candidate will give you the extra push you need
+                                to apply and ace that
+                                interview.</li>
+                            <li>Maximize Opportunities: Make sure you're not overlooking jobs that are a great fit for
+                                your skill set.</li>
+                        </ul>
+                        <p>Ready to take your job search to the next level? Don't miss out on this chance to be the top
+                            candidate you're
+                            meant to be! 🚀</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Adding a title for the leaderboard -->
-        <h2 style="text-align:center; color: #000; margin-top: 40px;">✨Job Compatibility Ranking</h2>
+        <h2 class="satisfy-font" style="text-align:center; margin-top: 40px;"><span class="material-symbols-outlined"
+                style="margin-right: 10px; cursor: pointer;" data-toggle="modal"
+                data-target="#tooltipInfoModal">tooltip</span>Top Candidate <a href="/dashboard"><span
+                    class="material-symbols-outlined">refresh</span></a></h2>
+
+
+
 
         <div id="leaderboard-container" style="overflow-x: auto;">
             <!-- The leaderboard table will be inserted here -->
@@ -533,7 +634,7 @@
                     success: function (response) {
                         if (response.success) {
                             let rankedJobs = response.ranked_jobs;
-                            let leaderboardHtml = '<table class="leaderboard"><thead><tr><th>Rank</th><th>Score</th><th>Job Title</th><th>Company Name</th><th>Job Link</th></tr></thead><tbody>';
+                            let leaderboardHtml = '<table class="leaderboard"><thead><tr><th>Rank</th><th>Score (%)</th><th>Job Title</th><th>Company Name</th><th>Job Link</th></tr></thead><tbody>';
 
                             // Populate the leaderboard
                             rankedJobs.forEach((job, index) => {

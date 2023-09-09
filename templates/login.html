@@ -2,6 +2,11 @@
 <html lang="en">
 
 <head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305706078196748"
+        crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Duployan:wght@700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
@@ -26,32 +31,40 @@
         }
 
         .logo {
-            max-width: 80%;
-            height: auto;
+            display: block;
+            margin: auto;
+            margin-top: 20px;
+            /* New margin at the top */
+            width: 175px;
+            height: 125px;
+        }
+
+        .login-text-color {
+            color: black;
+            /* New color for "Login" text */
+            font-family: 'Noto Sans Duployan', sans-serif;
+        }
+
+        .custom-header-text {
+            font-family: 'Noto Sans Duployan', sans-serif;
+            color: #007bff;
+            font-size: 36px;
             margin-bottom: 15px;
         }
     </style>
-
-
-
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-71KL2GKNB6"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-71KL2GKNB6');
-</script>
 
 <body>
 
     <div class="container login-container">
         <div class="login-header">
-            <img src="https://drive.google.com/uc?export=download&id=1oOIQslm6Ze0RW5AeN9uBC8GjXffIu2Rf" alt="Logo"
-                class="logo">
-            <h2>Login</h2>
+            <!-- SVG image -->
+            <img src="/static/images/bluetransdoc.svg" alt="Logo" class="logo">
+            <!-- "myCareerMax" text -->
+            <h3 class="custom-header-text">myCareerMax</h3>
+            <hr>
+            <!-- "Login" text -->
+            <h2 class="login-text-color">Login</h2>
         </div>
 
         {% with messages = get_flashed_messages() %}
@@ -71,14 +84,13 @@
                 <label for="password">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary btn-block" style="margin-bottom: 10px;">Login</button>
+            <button type="submit" class="btn btn-primary btn-block mb-2">Login</button>
         </form>
 
         <!-- New separate form for Guest Login -->
         <form action="/careerclick" method="get">
             <button type="submit" class="btn btn-secondary btn-block">Guest Login</button>
         </form>
-
 
         <div class="text-center mt-3">
             <a href="/forgot-password" class="btn btn-link">Forgot Password?</a><br>

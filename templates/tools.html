@@ -17,10 +17,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-
-
-
-
     <style>
         /* Custom Styles */
         .image-button {
@@ -69,6 +65,16 @@
             min-height: 100vh;
             margin: 0;
             background: linear-gradient(to bottom, #ffffff, #e8e8e8);
+        }
+
+        .spacing-class {
+            margin-bottom: 20px;
+            font-size: 24px;
+            /* Adjust the size as needed */
+        }
+
+        .noto-font {
+            font-family: 'Noto Sans Mono', monospace;
         }
     </style>
 </head>
@@ -119,26 +125,31 @@
     <div class="container mt-5 text-center">
         <!-- Logo or Title Image -->
         <div class="mb-5">
-            <img src="{{ url_for('static', filename='images/create.png') }}" alt="Your Logo" class="logo-size">
+            <img src="{{ url_for('static', filename='images/create1.png') }}" alt="Your Logo" class="logo-size">
         </div>
 
         <!-- Button Container with Background -->
         <div class="button-background py-5">
-            <!-- Image Buttons -->
+            <div class="spacing-class noto-font">What would you like to create today?</div>
+            &nbsp;
+            &nbsp;
+            <!-- Bootstrap Buttons -->
             <div class="row">
                 <div class="col-12 col-md-6 button-container">
-                    <a href="/cover-letter-generator" class="image-button">
-                        <img src="{{ url_for('static', filename='images/coverletterbutton.png') }}"
-                            alt="Cover Letter Generator">
+                    <!-- Cover Letter Button -->
+                    <a href="/cover-letter-generator" class="btn btn-primary btn-lg">
+                        ✨Cover Letter
                     </a>
                 </div>
                 <div class="col-12 col-md-6 button-container">
-                    <a href="/ai-builder" class="image-button">
-                        <img src="{{ url_for('static', filename='images/resumebutton.png') }}" alt="Resume Enhancer">
+                    <!-- Resume Button -->
+                    <a href="/ai-builder" class="btn btn-primary btn-lg">
+                        ✨Resume
                     </a>
                 </div>
             </div>
         </div>
+
     </div>
 </body>
 
