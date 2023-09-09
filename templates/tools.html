@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+
+
+
+    <style>
+        /* Custom Styles */
+        .image-button {
+            width: 200px;
+            height: 100px;
+            display: inline-block;
+            box-shadow: 5px 5px 10px #888888;
+            border-radius: 10px;
+            /* Add rounded corners to the div */
+            overflow: hidden;
+            /* Clip content to rounded corners */
+            transition: box-shadow 0.3s ease;
+        }
+
+        .image-button:hover {
+            box-shadow: 2px 2px 5px #888888;
+        }
+
+        .image-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 3px solid #88a4ff;
+            border-radius: 10px;
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .button-background {
+            background: linear-gradient(to bottom, #ffffff, #6394ff);
+            border-radius: 20px;
+            /* Add this line to round the corners */
+
+        }
+
+
+        .logo-size {
+            width: 300px;
+            height: 150px;
+        }
+
+        html,
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom, #ffffff, #e8e8e8);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                </li>
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5 text-center">
+        <!-- Logo or Title Image -->
+        <div class="mb-5">
+            <img src="{{ url_for('static', filename='images/create.png') }}" alt="Your Logo" class="logo-size">
+        </div>
+
+        <!-- Button Container with Background -->
+        <div class="button-background py-5">
+            <!-- Image Buttons -->
+            <div class="row">
+                <div class="col-12 col-md-6 button-container">
+                    <a href="/cover-letter-generator" class="image-button">
+                        <img src="{{ url_for('static', filename='images/coverletterbutton.png') }}"
+                            alt="Cover Letter Generator">
+                    </a>
+                </div>
+                <div class="col-12 col-md-6 button-container">
+                    <a href="/ai-builder" class="image-button">
+                        <img src="{{ url_for('static', filename='images/resumebutton.png') }}" alt="Resume Enhancer">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

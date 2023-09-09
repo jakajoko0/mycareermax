@@ -747,6 +747,11 @@ def interview_prep():
     return render_template("interview_prep.html")
 
 
+@app.route("/tools")
+def tools():
+    return render_template("tools.html")
+
+
 # RESUMETUNER OPENAI API CALLS
 @app.route("/analyze-resume", methods=["POST"])
 def analyze_resume():

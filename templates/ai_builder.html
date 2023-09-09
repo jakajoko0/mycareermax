@@ -22,6 +22,9 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Quill -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 
 
@@ -31,14 +34,14 @@
             font-family: 'Prompt', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(120deg, #ffffff, #6b9aff);
+            background: linear-gradient(120deg, #ffffff, #ffffff);
             /* Correct property for gradient */
         }
 
 
         .spinner-border {
-            width: 3rem;
-            height: 3rem;
+            width: 5rem;
+            height: 5rem;
             position: fixed;
             z-index: 9999;
             overflow: show;
@@ -103,45 +106,6 @@
     </style>
 
     <script>
-
-        function saveDocument() {
-            const userId = document.getElementById("userId").value;
-            const documentName = 'Resume (Resume Builder)';
-            const documentContent = document.getElementById("apiResponseTextArea").value; // Directly read from textarea
-            const documentType = 'Resume (Resume Builder)';
-
-            fetch('/save_document', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: userId,
-                    document_name: documentName,
-                    document_content: documentContent,
-                    document_type: documentType,
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
-                        alert("Resume saved successfully! You may view and download your Saved Resume's from your Dashboard");
-                    } else {
-                        alert("You must be logged in to access your Dashboard.");
-                    }
-                })
-        }
-
-
-        function copyToClipboard() {
-            const textArea = document.getElementById("apiResponseTextArea");
-            textArea.select();
-            textArea.setSelectionRange(0, 99999); // For mobile devices
-            document.execCommand("copy");
-            alert("Copied to clipboard!");
-        }
-
-
         function showSpinner() {
             const spinner = document.getElementById("spinner");
             spinner.style.display = "block";
@@ -286,6 +250,13 @@
                 education: educationData
             };
 
+            // Initialize the Quill editor if not already done
+            if (window.quill === undefined) {
+                window.quill = new Quill('#quillEditor', {
+                    theme: 'snow'
+                });
+            }
+
             // Make the fetch request
             fetch("/resume-builder", {
                 method: "POST",
@@ -300,9 +271,11 @@
 
                     // Display the resume or error message
                     if (data.resume) {
-                        document.getElementById("apiResponseTextArea").value = data.resume;
-                        // Make the textarea and the download button visible
-                        document.getElementById("apiResponseTextArea").style.visibility = 'visible';
+                        // Update this line to set the content of the Quill editor
+                        quill.setContents([{ insert: data.resume }]);
+
+                        // Make the Quill editor and the buttons visible
+                        document.getElementById("quillEditor").style.visibility = 'visible';
                         document.getElementById("copyButton").style.visibility = "visible";
                         document.getElementById("downloadButton").style.visibility = 'visible';
                         document.getElementById("saveToDashboardBtn").style.visibility = 'visible';
@@ -315,15 +288,77 @@
                 });
         }
 
-        // Function to download data as .txt file
         function downloadAsTxt() {
-            const textToSave = document.getElementById("apiResponseTextArea").value;
-            const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement("a");
-            link.href = window.URL.createObjectURL(blob);
-            link.download = "resume.txt";
-            link.click();
+            // Make sure to initialize quill beforehand or check its existence
+            if (typeof quill !== 'undefined') {
+                const textToSave = quill.getText();  // Using Quill's API to get text
+                const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
+                const link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "resume.txt";
+                link.click();
+            } else {
+                console.error("Quill editor is not initialized.");
+            }
         }
+
+        function saveDocument() {
+            const userId = document.getElementById("userId").value;
+            const documentName = 'Resume (Resume Builder)';
+            const documentType = 'Resume (Resume Builder)';
+
+            // Initialize documentContent based on the available source (Quill editor or a regular textarea)
+            let documentContent;
+            if (typeof quill !== 'undefined') {
+                documentContent = quill.getText();  // Using Quill's API to get text
+            } else {
+                documentContent = document.getElementById("apiResponseTextArea").value;  // Directly read from textarea
+            }
+
+            fetch('/save_document', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    document_name: documentName,
+                    document_content: documentContent,
+                    document_type: documentType,
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
+                        alert("Resume saved successfully! You may view and download your Saved Resume's from your Dashboard");
+                    } else {
+                        alert("You must be logged in to access your Dashboard.");
+                    }
+                })
+                .catch(error => {
+                    console.error("An error occurred:", error);
+                });
+        }
+
+
+
+        function copyToClipboard() {
+            // Make sure to initialize quill beforehand or check its existence
+            if (typeof quill !== 'undefined') {
+                const textToCopy = quill.getText();  // Using Quill's API to get text
+                const textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+                alert("Copied to clipboard!");
+            } else {
+                console.error("Quill editor is not initialized.");
+            }
+        }
+
 
 
 
@@ -368,29 +403,19 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/cover-letter-generator" style="color: #003c86;">AI Cover Letter</a>
+                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
                 </li>
-                <!-- Dropdown Menu for AI Resume Tools -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="resumeDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
-                        AI Resume Tools
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="resumeDropdown">
-                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
-                        <a class="dropdown-item" href="/ai-builder" style="color: #003c86;">AI Resume Builder</a>
-                    </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
                 </li>
-                <!-- End of Dropdown -->
-
                 <li class="nav-item">
                     <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
@@ -417,103 +442,109 @@
     </div>
 
     <div class="container">
-        <h1 class="text-center" style="margin-top: 30px;">Resume Builder</h1>
+        <div style="text-align:center; margin-top: 40px;"> <!-- Added margin-top here -->
+            <img src="{{ url_for('static', filename='images/createresume.png') }}" alt="Your Logo"
+                style="max-width:100%;" />
+        </div>
+    </div>
 
-        <!-- Collapsible Introductory Text -->
-        <div class="text-center"> <button class="btn btn-link" type="button" data-toggle="collapse"
-                data-target="#introText" aria-expanded="false" aria-controls="introText">
-                👉 Click here to learn how to use our New Resume Builder!
-            </button>
 
-            <div class="collapse text-center" id="introText">
-                <div class="card card-body text-left">
-                    <h3 class="text-center">Welcome to our New Resume Builder!</h3>
-                    <p>Navigating today's job market is challenging, but we're here to give you the edge you need. Our
-                        tool is
-                        designed not just to build your resume, but to optimize it for Applicant Tracking Systems (ATS).
-                        Here's
-                        how to
-                        get started:</p>
+    <!-- Collapsible Introductory Text -->
+    <div class="text-center"> <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#introText"
+            aria-expanded="false" aria-controls="introText">
+            👉 Click here to learn how to use our New Resume Builder!
+        </button>
 
-                    <h4 class="text-center">How It Works</h4>
-                    <ol>
-                        <li><strong>Personal Information</strong>: Fill in your basic details like name, contact
-                            information,
-                            and online
-                            profiles.</li>
-                        <li><strong>Summary</strong>: Craft a compelling summary that encapsulates your career.</li>
-                        <li><strong>Work Experience</strong>: List your professional history including responsibilites.
-                            Start with your most recent/current position and work backwards.
-                        <li><strong>Education</strong>: Add your educational background, again starting with your most
-                            recent/current school and working backwards.
-                        </li>
-                        <li><strong>Skills</strong>: Detail your professional skills that make you the right fit for the
-                            job.
-                        </li>
-                        <li><strong>✨Keywords</strong>: This feature is only available when you use the AI-Enhanced
-                            option to build your resume. Input specific keywords that you wish to highlight and have
-                            them auto-integrated seamlessly throughout your resume.</li>
-                    </ol>
+        <div class="collapse text-center" id="introText">
+            <div class="card card-body text-left">
+                <h3 class="text-center">Welcome to our New Resume Builder!</h3>
+                <p>Navigating today's job market is challenging, but we're here to give you the edge you need. Our
+                    tool is
+                    designed not just to build your resume, but to optimize it for Applicant Tracking Systems (ATS).
+                    Here's
+                    how to
+                    get started:</p>
 
-                    <h4 class="text-center">Final Steps</h4>
-                    <ul>
-                        <li>Click <strong>Build Resume</strong> to generate an ATS-optimized resume with your provided
-                            details.</li>
-                        <li>Or, go a step further with our <strong>AI-Enhanced Resume Builder</strong> for a
-                            resume
-                            that's not
-                            just optimized but enhanced with AI-driven content.</li>
-                    </ul>
+                <h4 class="text-center">How It Works</h4>
+                <ol>
+                    <li><strong>Personal Information</strong>: Fill in your basic details like name, contact
+                        information,
+                        and online
+                        profiles.</li>
+                    <li><strong>Summary</strong>: Craft a compelling summary that encapsulates your career.</li>
+                    <li><strong>Work Experience</strong>: List your professional history including responsibilites.
+                        Start with your most recent/current position and work backwards.
+                    <li><strong>Education</strong>: Add your educational background, again starting with your most
+                        recent/current school and working backwards.
+                    </li>
+                    <li><strong>Skills</strong>: Detail your professional skills that make you the right fit for the
+                        job.
+                    </li>
+                    <li><strong>✨Keywords</strong>: This feature is only available when you use the AI-Enhanced
+                        option to build your resume. Input specific keywords that you wish to highlight and have
+                        them auto-integrated seamlessly throughout your resume.</li>
+                </ol>
 
-                    <h4 class="text-center">Why Choose the AI-Enhanced Option?</h4>
-                    <ul>
-                        <li><strong>ATS-Friendly</strong>: Before your resume ever reaches human eyes, it's screened by
-                            AI systems. Level the playing field with our
-                            <strong>ChatGPT-4</strong>-driven tool, specifically engineered to understand ATS algorithms
-                            and elevate your
-                            resume's ranking. Here are just 2 examples of specific sentence structure and bullet
-                            point
-                            models that are used.
+                <h4 class="text-center">Final Steps</h4>
+                <ul>
+                    <li>Click <strong>Build Resume</strong> to generate an ATS-optimized resume with your provided
+                        details.</li>
+                    <li>Or, go a step further with our <strong>AI-Enhanced Resume Builder</strong> for a
+                        resume
+                        that's not
+                        just optimized but enhanced with AI-driven content.</li>
+                </ul>
 
-                            <p><strong>Summary</strong> sentence structure: <strong>[Soft
-                                    Skill] +
-                                    [Most
-                                    Recent
-                                    Job Title]</strong> who is passionate about <strong>[Your Stance on the
-                                    Industry]</strong>
-                            </p>
-                            <p><strong>Work Experience</strong> bullet point model:
-                                <strong>[Action
-                                    Verb] +
-                                    [Cause] +
-                                    [Effect] + [Measurable Outcome]</strong>
-                            </p>
+                <h4 class="text-center">Why Choose the AI-Enhanced Option?</h4>
+                <ul>
+                    <li><strong>ATS-Friendly</strong>: Before your resume ever reaches human eyes, it's screened by
+                        AI systems. Level the playing field with our
+                        <strong>ChatGPT-4</strong>-driven tool, specifically engineered to understand ATS algorithms
+                        and elevate your
+                        resume's ranking. Here are just 2 examples of specific sentence structure and bullet
+                        point
+                        models that are used.
 
-                        </li>
-                        <li><strong>Enhanced Content</strong>: Benefit from these proven sentence structures that
-                            recruiters
-                            love, among many others.
-                        </li>
-                        <li><strong>Keyword Integration</strong>: Your provided keywords will be seamlessly woven into
-                            your
-                            resume,
-                            boosting its relevance.</li>
-                    </ul>
-                    <h4 class="text-center">Already have a resume and want to see your ATS-Friendliness score? Check out
-                        our Resume Scanner
-                        <a href="/resume-enhancer" class="text-info">HERE</a>
-                    </h4>
-                    <h4 class="text-center">Need a Cover Letter to go along with your newly enhanced resume? Let us take
-                        care of that for you. Click
-                        <a href="/cover-letter-generator" class="text-info"> HERE </a> to create your personalized,
-                        AI-generated, Cover Letter.
-                    </h4>
+                        <p><strong>Summary</strong> sentence structure: <strong>[Soft
+                                Skill] +
+                                [Most
+                                Recent
+                                Job Title]</strong> who is passionate about <strong>[Your Stance on the
+                                Industry]</strong>
+                        </p>
+                        <p><strong>Work Experience</strong> bullet point model:
+                            <strong>[Action
+                                Verb] +
+                                [Cause] +
+                                [Effect] + [Measurable Outcome]</strong>
+                        </p>
 
-                </div>
+                    </li>
+                    <li><strong>Enhanced Content</strong>: Benefit from these proven sentence structures that
+                        recruiters
+                        love, among many others.
+                    </li>
+                    <li><strong>Keyword Integration</strong>: Your provided keywords will be seamlessly woven into
+                        your
+                        resume,
+                        boosting its relevance.</li>
+                </ul>
+                <h4 class="text-center">Already have a resume and want to see your ATS-Friendliness score? Check out
+                    our Resume Scanner
+                    <a href="/resume-enhancer" class="text-info">HERE</a>
+                </h4>
+                <h4 class="text-center">Need a Cover Letter to go along with your newly enhanced resume? Let us take
+                    care of that for you. Click
+                    <a href="/cover-letter-generator" class="text-info"> HERE </a> to create your personalized,
+                    AI-generated, Cover Letter.
+                </h4>
+
             </div>
         </div>
+    </div>
 
-        <form method="post" class="custom-form-background">
+    <div class="container">
+        <form class="custom-form-background" method="post">
             <!-- Personal Information -->
             <div class="mb-3">
                 <label class="form-label"><strong>PERSONAL INFORMATION</strong></label>
@@ -521,34 +552,34 @@
                     <!-- Each of these divs will take up 6 columns on medium to large screens and 12 columns on small screens -->
                     <div class="col-12 col-md-6 mb-3">
                         <label>Full Name:</label>
-                        <input type="text" class="form-control" name="full_name">
+                        <input class="form-control" name="full_name" type="text" />
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label>Email:</label>
-                        <input type="text" class="form-control" name="email">
+                        <input class="form-control" name="email" type="text" />
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label>Phone Number:</label>
-                        <input type="text" class="form-control" name="phone">
+                        <input class="form-control" name="phone" type="text" />
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label>City, State:</label>
-                        <input type="text" class="form-control" name="city_state">
+                        <input class="form-control" name="city_state" type="text" />
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label>LinkedIn Profile:</label>
-                        <input type="text" class="form-control" name="linkedin">
+                        <input class="form-control" name="linkedin" type="text" />
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label>Website:</label>
-                        <input type="text" class="form-control" name="website">
+                        <input class="form-control" name="website" type="text" />
                     </div>
                 </div>
             </div>
             <!-- Summary -->
             <div class="mb-3">
                 <label class="form-label"><strong>SUMMARY</strong></label>
-                <textarea name="summary" rows="4" class="form-control"></textarea>
+                <textarea class="form-control" name="summary" rows="4"></textarea>
             </div>
             <!-- Work Experience -->
             <div class="mb-3">
@@ -557,15 +588,15 @@
                     <div class="row">
                         <div class="col-12 col-md-6 mb-3">
                             <label>Job Title:</label>
-                            <input type="text" class="form-control" name="job_title1">
+                            <input class="form-control" name="job_title1" type="text" />
                         </div>
                         <div class="col-12 col-md-6 mb-3">
                             <label>Company:</label>
-                            <input type="text" class="form-control" name="company1">
+                            <input class="form-control" name="company1" type="text" />
                         </div>
                         <div class="col-12 col-md-6 mb-3">
                             <label>Date:</label>
-                            <input type="text" class="form-control" name="date1">
+                            <input class="form-control" name="date1" type="text" />
                         </div>
                         <div class="col-12 mb-3">
                             <label>Responsibilities:</label>
@@ -573,11 +604,11 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-success mb-3" style="color: white;" onclick="addWorkExperience()">➕
+                <button class="btn btn-success mb-3" onclick="addWorkExperience()" style="color: white;" type="button">➕
                     Add
                     Experience</button>
-                <button type="button" class="btn btn-danger mb-3" style="color: white;"
-                    onclick="removeWorkExperience()">➖
+                <button class="btn btn-danger mb-3" onclick="removeWorkExperience()" style="color: white;"
+                    type="button">➖
                     Remove Experience</button>
             </div>
             <!-- Education -->
@@ -587,73 +618,71 @@
                     <div class="row">
                         <div class="col-12 col-md-6 mb-3">
                             <label>School Name:</label>
-                            <input type="text" class="form-control" name="school1">
+                            <input class="form-control" name="school1" type="text" />
                         </div>
                         <div class="col-12 col-md-6 mb-3">
                             <label>City:</label>
-                            <input type="text" class="form-control" name="city1">
+                            <input class="form-control" name="city1" type="text" />
                         </div>
                         <div class="col-12 col-md-6 mb-3">
                             <label>Degree:</label>
-                            <input type="text" class="form-control" name="degree1">
+                            <input class="form-control" name="degree1" type="text" />
                         </div>
                         <div class="col-12 col-md-6 mb-3">
                             <label>Major:</label>
-                            <input type="text" class="form-control" name="major1">
+                            <input class="form-control" name="major1" type="text" />
                         </div>
                         <div class="col-12 col-md-6 mb-3">
                             <label>Dates Attended:</label>
-                            <input type="text" class="form-control" name="dates1">
+                            <input class="form-control" name="dates1" type="text" />
                         </div>
                     </div>
                 </div>
-                <button id="addEducationButton" type="button" class="btn btn-success mb-3" style="color: white;"
-                    onclick="addEducation()">➕ Add Education</button>
-                <button id="removeEducationButton" type="button" class="btn btn-danger mb-3" style="color: white;"
-                    onclick="removeEducation()">➖ Remove Education</button>
+                <button class="btn btn-success mb-3" id="addEducationButton" onclick="addEducation()"
+                    style="color: white;" type="button">➕ Add Education</button>
+                <button class="btn btn-danger mb-3" id="removeEducationButton" onclick="removeEducation()"
+                    style="color: white;" type="button">➖ Remove Education</button>
             </div>
             <!-- Skills -->
             <div class="mb-3">
                 <label class="form-label"><strong>SKILLS</strong></label>
-                <textarea name="skills" rows="4" class="form-control"></textarea>
+                <textarea class="form-control" name="skills" rows="4"></textarea>
             </div>
             <!-- Keywords -->
             <div class="mb-3">
                 <label class="form-label"><strong>KEYWORDS</strong></label>
-                <input type="text" name="keywords" class="form-control"
-                    placeholder="e.g., Incident Management, Customer Satisfaction">
+                <input class="form-control" name="keywords"
+                    placeholder="e.g., Incident Management, Customer Satisfaction" type="text" />
             </div>
             <!-- Submit -->
-            <button type="button" class="btn btn-secondary mb-2" onclick="collectDataAndSubmitForm('generate')">Build
+            <button class="btn btn-secondary mb-2" onclick="collectDataAndSubmitForm('generate')" type="button">Build
                 Resume</button>
-            <button type="button" class="btn btn-primary mb-2" onclick="collectDataAndSubmitForm('rewrite')">✨Build
-                AI-Enhanced Resume✨</button>
-            <!-- New div to display API Response -->
-            <div id="apiResponse" style="margin-top: 30px;">
-                <textarea id="apiResponseTextArea" class="form-control" rows="50"
-                    style="visibility: hidden;"></textarea>
-            </div>
-            <!-- Buttons -->
-            <div style="margin-top: 15px;">
-                <!-- Download Button -->
-                <button type="button" class="btn btn-success mb-2" id="downloadButton" style="visibility: hidden;"
-                    onclick="downloadAsTxt()">⬇️ Download (.TXT)</button>
-                <!-- Copy to Clipboard Button -->
-                <button type="button" class="btn btn-info mb-2" id="copyButton" style="visibility: hidden;"
-                    onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-                <!-- Save to Dashboard Button -->
-                <button type="button" class="btn btn-primary mb-2" id="saveToDashboardBtn" style="visibility: hidden;"
-                    onclick="saveDocument()">💾 Save to Dashboard (.DOCX & .PDF)</button>
-
-            </div>
-
-
+            <button class="btn btn-primary mb-2" onclick="collectDataAndSubmitForm('rewrite')"
+                type="button">✨AI-Enhanced Resume</button>
         </form>
     </div>
-    </form>
+
+    <!-- New div to display API Response -->
+    <div id="apiResponse" style="margin-top: 30px;">
+        <div id="quillEditor" style="height: 400px;"></div>
     </div>
-    </form>
+    <!-- Buttons -->
+    <div style="margin-top: 15px;">
+        <!-- Download Button -->
+        <button class="btn btn-success mb-2" id="downloadButton" onclick="downloadAsTxt()" style="visibility: hidden;"
+            type="button">⬇️ Download (.TXT)</button>
+        <!-- Copy to Clipboard Button -->
+        <button class="btn btn-info mb-2" id="copyButton" onclick="copyToClipboard()" style="visibility: hidden;"
+            type="button">📋 Copy to Clipboard</button>
+        <!-- Save to Dashboard Button -->
+        <button class="btn btn-primary mb-2" id="saveToDashboardBtn" onclick="saveDocument()"
+            style="visibility: hidden;" type="button">💾 Save to Dashboard (.DOCX &amp; .PDF)</button>
     </div>
+    <script>
+        var quill = new Quill('#quillEditor', {
+            theme: 'snow'
+        });
+    </script>
 </body>
 
 </html>
