@@ -186,7 +186,10 @@ def delete_user_and_associated_data(username):
         # Close the connection
         conn.close()
 
-
+@app.route('/googleba8e248f290d00cf.html')
+def google_verification():
+    return render_template('googleba8e248f290d00cf.html')
+    
 @app.route("/delete_account", methods=["GET", "POST"])
 def delete_account():
     if request.method == "POST":
