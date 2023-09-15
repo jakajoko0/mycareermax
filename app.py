@@ -186,6 +186,13 @@ def delete_user_and_associated_data(username):
         # Close the connection
         conn.close()
 
+@app.route('/googleba8e248f290d00cf.html')
+def google_verification():
+    return render_template('googleba8e248f290d00cf.html')
+
+@app.route('/app-ads.txt')
+def serve_app_ads_txt():
+    return send_from_directory('static', 'app-ads.txt')
 
 @app.route("/delete_account", methods=["GET", "POST"])
 def delete_account():
@@ -195,6 +202,7 @@ def delete_account():
         flash("Account successfully deleted.")
         return redirect(url_for("delete_account"))
     return render_template("delete_account.html")
+
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
@@ -887,6 +895,8 @@ def generate_cover_letter():
     response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
 
     cover_letter = response["choices"][0]["message"]["content"].strip()
+    logging.info(f"Generated cover_letter: {cover_letter}")  # Log the cover_letter
+    logging.info(f"Type of cover_letter: {type(cover_letter)}")  # Log the type
 
     return jsonify({"cover_letter": cover_letter})
 
