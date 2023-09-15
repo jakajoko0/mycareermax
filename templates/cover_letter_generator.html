@@ -337,21 +337,24 @@
             });
         });
 
-
         // Event listener for the "Copy to Clipboard" button
         $("#btn-copy").click(function () {
-            // Get the content of the Quill editor
-            var outputContent = quill.getText();
-
-            // Copy the content to the clipboard
-            navigator.clipboard.writeText(outputContent)
-                .then(function () {
-                    alert("Content copied to clipboard!");
-                })
-                .catch(function () {
-                    alert("Failed to copy content to clipboard. Please try again.");
-                });
+            // Make sure to initialize quill beforehand or check its existence
+            if (typeof quill !== 'undefined') {
+                const textToCopy = quill.getText();  // Using Quill's API to get text
+                const textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+                alert("Copied to clipboard!");
+            } else {
+                console.error("Quill editor is not initialized.");
+            }
         });
+
 
         // Event listener for the "Download as Text" button
         $("#btn-download-txt").click(function () {
