@@ -190,52 +190,67 @@
             <!-- File upload section -->
             <form enctype="multipart/form-data" id="resume-upload-form">
                 <div class="mt-3">
-                    <label for="resume-upload">Upload your resume (.docx format):</label>
-                    <input accept=".docx" id="resume-upload" type="file" />
-                    <!-- Manual text entry section -->
-                    <div><label for="resume">Or manually paste/type your resume:</label></div>
-                    <textarea class="form-control" id="resume" rows="10"></textarea>
+                    <div style="margin-bottom: 10px;">*If you have already uploaded your resume to the Dashboard, you do
+                        not need to add it
+                        again here*</div>
                 </div>
-                <div class="mt-3">
-                    <div class="mt-3">
-                        <label for="job-description">Job Description:</label>
-                        <textarea class="form-control" id="job-description" name="job-description"></textarea>
-                    </div>
-                    <div class="mt-3">
-                        <label for="job-title">Job Title:</label>
-                        <textarea class="form-control" id="job-title" name="job-title"></textarea>
-                    </div>
-                    <div class="mt-3">
-                        <label for="company-name">Company Name:</label>
-                        <textarea class="form-control" id="company-name" name="company-name" type="text"></textarea>
-                    </div>
-                    <div class="mt-3">
-                        <label for="focus-areas">Focus Areas:</label>
-                        <textarea class="form-control" id="focus-areas" name="focus-areas" type="text"></textarea>
-                    </div>
-                    <div class="mt-3 button-container">
-                        <button class="btn btn-primary" id="btn-coverme">✨Generate AI Cover Letter</button>
-                    </div>
-                </div>
-            </form>
+                <label for="resume-upload">Upload your resume (.docx format):</label>
+                <input accept=".docx" id="resume-upload" type="file" />
+                <!-- Manual text entry section -->
+                <div><label for="resume">Or manually add your resume:</label></div>
+                <!-- Button to toggle textarea -->
+                <button id="toggle-resume-textarea" type="button" class="btn btn-primary">Add Resume</button>
+                <!-- Textarea initially hidden -->
+                <textarea class="form-control" id="resume" rows="10" style="display: none;"></textarea>
         </div>
-        <!-- Buttons and Output section -->
-        <div id="output-section" style="display:none;">
-            <!-- Cover Letter Output Quill Editor Section-->
-            <div class="mt-3">
-                <label for="quillEditor">Generated Cover Letter:</label>
-                <div id="quillEditor" style="height: 400px;"></div> <!-- Removed 'display: none;' -->
-            </div>
 
+        <div class="mt-3">
+            <div class="mt-3">
+                <label for="job-title">Job Title:</label>
+                <textarea class="form-control" id="job-title" name="job-title" rows="1" cols="35"></textarea>
+            </div>
+            <div class="mt-3">
+                <label for="job-description">Job Description:</label>
+                <textarea class="form-control" id="job-description" name="job-description" rows="6"
+                    cols="35"></textarea>
+            </div>
+            <div class="mt-3">
+                <label for="company-name">Company Name:</label>
+                <textarea class="form-control" id="company-name" name="company-name" type="text" rows="1"
+                    cols="35"></textarea>
+            </div>
+            <div class="mt-3">
+                <label for="focus-areas">Focus Areas:</label>
+                <textarea class="form-control" id="focus-areas" name="focus-areas" type="text" rows="5"
+                    cols="35"></textarea>
+            </div>
+            <div class="mt-3 button-container">
+                <button class="btn btn-primary" id="btn-coverme" style="margin-bottom: 20px;">✨Generate AI Cover
+                    Letter</button>
+            </div>
         </div>
-        <!-- Copy to Clipboard, download txt and save to dash btns -->
-        <div id="button-section" style="display: none;">
-            <button class="btn btn-info mb-2" id="btn-copy">📋 Copy to Clipboard</button>
-            <button class="btn btn-success mb-2" id="btn-download-txt">⬇️ Download (.TXT)</button>
-            <button onclick="saveCoverLetter()" class="btn btn-primary mb-2" id="save-button">💾 Save to Dashboard
-                (.DOCX &
-                .PDF)</button>
+        </form>
+    </div>
+    <!-- Buttons and Output section -->
+    <div id="output-section" style="display:none;">
+        <!-- Cover Letter Output Quill Editor Section-->
+        <div class="mt-3">
+            <label for="quillEditor">Generated Cover Letter:</label>
+            <div id="quillEditor" style="height: 400px;"></div> <!-- Removed 'display: none;' -->
         </div>
+
+    </div>
+    <!-- Copy to Clipboard, download txt and save to dash btns -->
+    <div id="button-section" style="display: none;">
+        <button class="btn btn-info mb-2" id="btn-copy" style="margin-bottom: 20px; margin-top: 30px;">📋 Copy to
+            Clipboard</button>
+        <button class="btn btn-success mb-2" id="btn-download-txt" style="margin-bottom: 20px; margin-top: 30px;">⬇️
+            Download
+            (.TXT)</button>
+        <button onclick="saveCoverLetter()" class="btn btn-primary mb-2" id="save-button"
+            style="margin-bottom: 20px; margin-top: 30px;">💾 Save
+            to Dashboard (.DOCX & .PDF)</button>
+    </div>
 
     </div>
     <script>
@@ -397,9 +412,6 @@
             }
         }
 
-        // ... rest of your code
-
-
         // Function to make the fetch request
         function fetchData() {
             // Get form field values
@@ -435,6 +447,15 @@
                     console.error('Error:', error);
                 });
         }
+
+        $(document).ready(function () {
+            $('#toggle-resume-textarea').click(function (event) {
+                event.preventDefault();
+                $('#resume').toggle();
+            });
+        });
+
+
     </script>
 </body>
 
