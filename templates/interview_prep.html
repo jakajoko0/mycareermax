@@ -53,7 +53,7 @@
 
     /* Gradient Background */
     body {
-      background-image: linear-gradient(120deg, #adadad, #007BFF);
+      background-image: linear-gradient(120deg, #ffffff, #007BFF);
       background-size: cover;
       background-attachment: fixed;
     }
@@ -220,6 +220,20 @@
       display: flex;
       justify-content: space-between;
     }
+
+    .light-blue-button {
+      background-color: #f1f9ff;
+      color: black;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(to right, #9543ff, #364eff);
+      color: rgb(255, 255, 255);
+      border-radius: 15px;
+      /* Rounded corners */
+      padding: 20px;
+      /* Padding */
+    }
   </style>
 
   <!-- Bootstrap CSS -->
@@ -230,10 +244,6 @@
 
   <!-- Popper.js -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-
-  <!-- Bootstrap JS -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 
   <script async src="https://fundingchoicesmessages.google.com/i/pub-2305706078196748?ers=1"
     nonce="z86J28-Ym2Qj5g2mmIoXOw"></script>
@@ -352,11 +362,20 @@
         <li class="nav-item">
           <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+        <!-- Tools Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+            Tools
+          </a>
+          <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+            <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+            <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+          </div>
         </li>
+        <!-- New link for CareerBot -->
         <li class="nav-item">
-          <a class="nav-link" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+          <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
         </li>
         <!-- Existing dropdown for the username -->
         <li class="nav-item dropdown">
@@ -382,6 +401,63 @@
   <div style="text-align:center;">
     <img src="{{ url_for('static', filename='images/intervueme.png') }}" alt="Your Logo" style="max-width:100%;" />
   </div>
+  <!-- IntervueME Collapsible Section -->
+  <div class="accordion" id="intervueMEAccordion">
+    <div class="accordion-item mx-auto" style="max-width: 800px;">
+      <h2 class="accordion-header text-center" id="intervueMEHeading">
+        <!-- Replacing the button with a light blue link -->
+        <a class="btn light-blue-button toggle-button" data-bs-toggle="collapse" data-bs-target="#intervueMECollapse"
+          aria-expanded="false" aria-controls="intervueMECollapse">
+          👉 Click here to learn about IntervueME!
+        </a>
+      </h2>
+      <div id="intervueMECollapse" class="accordion-collapse collapse gradient-bg" aria-labelledby="intervueMEHeading"
+        data-bs-parent="#intervueMEAccordion">
+        <div class="accordion-body">
+          <p><strong>What is IntervueME?</strong></p>
+          <p>IntervueME is a cutting-edge tool that uses the ChatGPT-4 API to simulate realistic job interviews. This
+            tool
+            offers you the opportunity to practice interview questions tailored specifically to your career background
+            and
+            the job you're interested in.</p>
+
+          <p><strong>How Does It Work?</strong></p>
+          <p>Simply upload your resume (or the simulator will use the one already uploaded in your dashboard) and fill out the additional
+            fields to get the most personalized experience. The available fields are:</p>
+          <ul>
+            <li>Job title</li>
+            <li>Job description</li>
+            <li>Job requirements</li>
+            <li>Industry</li>
+          </ul>
+
+          <p>At a minimum, you should provide your resume and job title. For a more focused interview related to a
+            specific job or job listing, include the job description and/or job requirements. You can also specify the
+            industry, although it's not as crucial.</p>
+
+          <p>Once you're ready, click the "Simulate Interview" button. The ChatGPT-4 API will generate 10 questions
+            based
+            on the information you've provided. You can navigate through these questions, skip any you don't want to
+            answer, and return to skipped questions later.</p>
+
+          <p><strong>What Do You Get?</strong></p>
+          <p>After answering a question and clicking "Submit," a modal will appear containing:</p>
+          <ul>
+            <li>A rating (0-5) on how well you answered the question</li>
+            <li>Detailed feedback explaining your score</li>
+            <li>Tips for improving your answers for next time</li>
+          </ul>
+
+          <p>Get ready to ace your next interview with IntervueME!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap JS (comes after the accordion) -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+
   <form enctype="multipart/form-data" id="interview-form">
     <style>
       /* Add this to hide the textarea by default */

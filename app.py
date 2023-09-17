@@ -7,6 +7,7 @@ import pdfkit
 import threading
 import re
 import time
+
 load_dotenv()
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -80,6 +81,7 @@ def create_connection(max_retries=5, wait_time_in_seconds=5):
         print("Max retries reached. Exiting.")
     return connection
 
+
 # Example usage
 if __name__ == "__main__":
     conn = create_connection()
@@ -131,16 +133,16 @@ pdf_options = {
 }
 
 
-#if os.name == "nt":  # Windows
- #   path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
-#else:  # Linux/Docker
- #   path_wkhtmltopdf = "/usr/bin/wkhtmltopdf"
+# if os.name == "nt":  # Windows
+#   path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
+# else:  # Linux/Docker
+#   path_wkhtmltopdf = "/usr/bin/wkhtmltopdf"
 
-#config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+# config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
-#pdf_options = {
- #   "encoding": "UTF-8",
-#}
+# pdf_options = {
+#   "encoding": "UTF-8",
+# }
 
 # Configure logging
 logging.basicConfig(
@@ -229,13 +231,16 @@ def delete_user_and_associated_data(username):
         # Close the connection
         conn.close()
 
-@app.route('/googleba8e248f290d00cf.html')
-def google_verification():
-    return render_template('googleba8e248f290d00cf.html')
 
-@app.route('/app-ads.txt')
+@app.route("/googleba8e248f290d00cf.html")
+def google_verification():
+    return render_template("googleba8e248f290d00cf.html")
+
+
+@app.route("/app-ads.txt")
 def serve_app_ads_txt():
-    return send_from_directory('static', 'app-ads.txt')
+    return send_from_directory("static", "app-ads.txt")
+
 
 @app.route("/delete_account", methods=["GET", "POST"])
 def delete_account():
@@ -245,7 +250,6 @@ def delete_account():
         flash("Account successfully deleted.")
         return redirect(url_for("delete_account"))
     return render_template("delete_account.html")
-
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
@@ -1381,6 +1385,33 @@ def extract_score_from_text(text):
     except ValueError:
         # If conversion fails, return a default value
         return 0
+
+
+@app.route("/careerbot")
+def careerbot():
+    return render_template("careerbot.html")
+
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("user_input").lower()
+
+    # Chat with the GPT-4 model for career advice
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are Max, an expert in career counseling, job searching, application processes, and interview preparation. Do not answer questions outside of these areas.",
+            },
+            {"role": "user", "content": f"{user_input}"},
+        ],
+        max_tokens=100,
+    )
+
+    chat_output = response["choices"][0]["message"]["content"].strip()
+
+    return jsonify({"response": chat_output})
 
 
 if __name__ == "__main__":

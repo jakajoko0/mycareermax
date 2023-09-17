@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Counselor Bot | myCareerMax</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Architects Daughter', cursive;
+            background: linear-gradient(to right, #0022ffbc, #ae00ff8b);
+        }
+
+        .navbar {
+            font-family: 'Prompt', sans-serif;
+        }
+
+        #chat-box {
+            height: 500px;
+            border-radius: 10px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                </li>
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <!-- Meet Max Button -->
+                <div class="text-center mb-4">
+                    <span role="img" aria-label="Pointing Finger" style="font-size: 24px;">👉</span>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#meetMaxModal"
+                        style="font-family: 'Prompt', sans-serif;">Meet Max</button>
+                </div>
+                <!-- Meet Max Modal -->
+                <div class="modal fade" id="meetMaxModal" tabindex="-1" role="dialog"
+                    aria-labelledby="meetMaxModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content" style="font-family: 'Prompt', sans-serif;">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="meetMaxModalLabel">Meet Max!</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Hi, I'm Max, your virtual career counselor!</p>
+                                <p>I specialize in helping people like you advance in their careers. Whether you're
+                                    looking for job
+                                    searching tips, interviewing techniques, or general career advice, I've got your
+                                    back.</p>
+                                <p>You can ask me questions like:</p>
+                                <ul>
+                                    <li>"How should I prepare for an interview?"</li>
+                                    <li>"Any tips for updating my resume?"</li>
+                                    <li>"How can I negotiate a better salary?"</li>
+                                </ul>
+                                <p>Let's make your career journey not just successful, but also a whole lot of fun!</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Adding the image here -->
+                <div class="text-center">
+                    <img src="/static/images/careerbot.png" alt="Career Counselor Bot" class="img-fluid mb-4">
+                </div>
+                <div id="chat-box" class="mb-3">
+                    <!-- Chat history will be appended here -->
+                </div>
+                <div class="input-group mb-5">
+                    <input type="text" class="form-control" id="user-input" placeholder="Type your message...">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function sendMessage() {
+            const user_input = $("#user-input").val();
+            if (user_input.trim() === "") return;
+
+            // Append user's message to chat box
+            $("#chat-box").append(`<div class="message"><strong>User:</strong> ${user_input}</div>`);
+
+            // Clear the input box
+            $("#user-input").val("");
+
+            // Send POST request to server
+            $.ajax({
+                url: "/chat",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ "user_input": user_input }),
+                success: function (response) {
+                    // Append bot's reply to chat box
+                    $("#chat-box").append(`<div class="message"><strong>Bot:</strong> ${response.response}</div>`);
+                    // Scroll to the bottom of the chat box
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
