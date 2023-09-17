@@ -107,6 +107,23 @@
 </script>
 
 <body>
+    <input type="hidden" id="userId" value="{{ user_id }}">
+
+    <script defer>
+        $(document).ready(function () {
+            console.log("Fetching username...");
+            $.get("/get-username", function (response) {
+                console.log("Username response:", response);
+                if (response.success) {
+                    const usernamePlaceholder = document.getElementById("username-placeholder");
+                    usernamePlaceholder.textContent = "Hello, " + response.username;
+                } else {
+                    console.error('Error fetching username:', response.error);
+                }
+            });
+
+        });
+    </script>
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
         <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"

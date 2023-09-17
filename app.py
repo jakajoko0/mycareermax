@@ -807,6 +807,11 @@ def tools():
     return render_template("tools.html")
 
 
+@app.route("/careerbot")
+def careerbot():
+    return render_template("careerbot.html")
+
+
 # RESUMETUNER OPENAI API CALLS
 @app.route("/analyze-resume", methods=["POST"])
 def analyze_resume():
@@ -1387,11 +1392,6 @@ def extract_score_from_text(text):
         return 0
 
 
-@app.route("/careerbot")
-def careerbot():
-    return render_template("careerbot.html")
-
-
 #####  MAX CHATGPT-4   ######
 # @app.route("/chat", methods=["POST"])
 # def chat():
@@ -1430,7 +1430,7 @@ def chat():
             {"role": "user", "content": user_input},
         ],
         temperature=1,
-       # max_tokens=256,
+        # max_tokens=256,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
