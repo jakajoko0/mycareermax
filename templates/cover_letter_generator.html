@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>AI Cover Letter | myCareerMax</title>
+    <title>Create Cover Letter | myCareerMax</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +24,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
+        .custom-spinner {
+            width: 6rem;
+            height: 6rem;
+            border-radius: 50%;
+            border: 8px solid transparent;
+            border-top-color: #0022ff;
+            border-right-color: #ae00ff;
+            border-bottom-color: #ae00ff;
+            border-left-color: #0022ff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+
         body {
             font-family: 'Prompt', sans-serif;
             /* Add this line */
@@ -132,22 +152,28 @@
     </div>
     </div>
 
-
     <div class="d-none" id="loading-spinner"
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-        <div class="spinner-border text-primary" role="status">
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; display: flex; flex-direction: column; align-items: center;">
+        <div class="custom-spinner" role="status">
             <span class="sr-only">Loading...</span>
         </div>
+        <p
+            style="margin-top: 20px; color: #ae00ff; font-weight: bold; text-align: center; white-space: nowrap; background-color: #ffffff; padding: 5px 10px; border-radius: 5px;">
+            Creating your Cover Letter</p>
     </div>
+
+
+
     <!-- START OF Collapsible Cover Letter Generator Intro -->
     <div class="text-center">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#coverLetterIntro"
+        <button class="btn btn-link toggle-button" type="button" data-toggle="collapse" data-target="#coverLetterIntro"
             aria-expanded="false" aria-controls="coverLetterIntro">
             👉 Click here to learn about our AI-Powered Cover Letter Generator!
         </button>
 
         <div class="collapse" id="coverLetterIntro">
-            <div class="card card-body" style="max-width: 834px; margin: auto;">
+            <div class="card card-body"
+                style="background: linear-gradient(to right, #0022ff, #ae00ff); color: white; max-width: 834px; margin: auto;">
                 <h3 class="text-center">Welcome to Your AI-Powered Cover Letter Generator!</h3>
                 <p class="text-left">Looking to make a memorable impression on your next job application? You're in the
                     right place! Our state-of-the-art tool employs advanced Artificial Intelligence to create
@@ -180,57 +206,67 @@
         </div>
     </div>
 
+
     <!-- END OF Collapsible Cover Letter Generator Intro -->
 
-    <div class="center-content">
-        <p> </p>
-        <p> </p>
-        <!-- FORM FIELDS -->
-        <div class="container-fluid">
-            <!-- File upload section -->
-            <form enctype="multipart/form-data" id="resume-upload-form">
-                <div class="mt-3">
-                    <div style="margin-bottom: 10px;">*If you have already uploaded your resume to the Dashboard, you do
-                        not need to add it
-                        again here*</div>
+    <div class="container"
+        style="background: linear-gradient(to right, #ffffff, #6b9aff); border-radius: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2); padding: 20px; max-width: 800px; margin: auto;">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <!-- Your content starts here -->
+                <div class="center-content">
+                    <!-- FORM FIELDS -->
+                    <form enctype="multipart/form-data" id="resume-upload-form">
+                        <!-- File upload section -->
+                        <div class="mt-3">
+                            <div style="margin-bottom: 10px;">💡 If you have already uploaded your resume to the
+                                Dashboard,
+                                you do not need to add it again here</div>
+                            <label for="resume-upload">Upload your resume (.docx format):</label>
+                            <input accept=".docx" id="resume-upload" type="file" />
+                        </div>
+                        <!-- Manual text entry section -->
+                        <div class="mt-3">
+                            <label for="resume">Or manually add your resume:</label>
+                            <!-- Button to toggle textarea -->
+                            <button id="toggle-resume-textarea" type="button" class="btn btn-primary">➕ Resume</button>
+                            <!-- Textarea initially hidden -->
+                            <textarea class="form-control" id="resume" rows="10"
+                                style="display: none; margin-top: 20px;"></textarea>
+                        </div>
+                        <div class="mt-3">
+                            <label for="job-title">Job Title:</label>
+                            <textarea class="form-control" id="job-title" name="job-title" rows="1"></textarea>
+                        </div>
+                        <div class="mt-3">
+                            <label for="job-description">Job Description:</label>
+                            <textarea class="form-control" id="job-description" name="job-description"
+                                rows="6"></textarea>
+                        </div>
+                        <div class="mt-3">
+                            <label for="company-name">Company Name:</label>
+                            <textarea class="form-control" id="company-name" name="company-name" type="text"
+                                rows="1"></textarea>
+                        </div>
+                        <div class="mt-3">
+                            <label for="focus-areas">Focus Areas:</label>
+                            <textarea class="form-control" id="focus-areas" name="focus-areas" type="text"
+                                rows="5"></textarea>
+                        </div>
+                        <div class="mt-3 button-container">
+                            <button class="btn btn-secondary ml-2 job-box-btn"
+                                style="background: linear-gradient(to right, #0022ff, #ae00ff); color: white; margin-bottom: 20px;"
+                                id="btn-coverme">
+                                ✨Generate AI Cover Letter
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <label for="resume-upload">Upload your resume (.docx format):</label>
-                <input accept=".docx" id="resume-upload" type="file" />
-                <!-- Manual text entry section -->
-                <div><label for="resume">Or manually add your resume:</label></div>
-                <!-- Button to toggle textarea -->
-                <button id="toggle-resume-textarea" type="button" class="btn btn-primary">Add Resume</button>
-                <!-- Textarea initially hidden -->
-                <textarea class="form-control" id="resume" rows="10" style="display: none;"></textarea>
-        </div>
-
-        <div class="mt-3">
-            <div class="mt-3">
-                <label for="job-title">Job Title:</label>
-                <textarea class="form-control" id="job-title" name="job-title" rows="1" cols="35"></textarea>
-            </div>
-            <div class="mt-3">
-                <label for="job-description">Job Description:</label>
-                <textarea class="form-control" id="job-description" name="job-description" rows="6"
-                    cols="35"></textarea>
-            </div>
-            <div class="mt-3">
-                <label for="company-name">Company Name:</label>
-                <textarea class="form-control" id="company-name" name="company-name" type="text" rows="1"
-                    cols="35"></textarea>
-            </div>
-            <div class="mt-3">
-                <label for="focus-areas">Focus Areas:</label>
-                <textarea class="form-control" id="focus-areas" name="focus-areas" type="text" rows="5"
-                    cols="35"></textarea>
-            </div>
-            <div class="mt-3 button-container">
-                <button class="btn btn-primary" id="btn-coverme" style="margin-bottom: 20px;">✨Generate AI Cover
-                    Letter</button>
+                <!-- Your content ends here -->
             </div>
         </div>
-        </form>
     </div>
+
     <!-- Buttons and Output section -->
     <div id="output-section" style="display:none;">
         <!-- Cover Letter Output Quill Editor Section-->
@@ -254,6 +290,16 @@
 
     </div>
     <script>
+        //toggle collapsible textbox to "close"
+        $(document).ready(function () {
+            $('#coverLetterIntro').on('show.bs.collapse', function () {
+                $('.toggle-button').html('Close');
+            });
+            $('#coverLetterIntro').on('hide.bs.collapse', function () {
+                $('.toggle-button').html('👉 Click here to learn about our AI-Powered Cover Letter Generator!');
+            });
+        });
+
         var quill;  // Declare quill here so it's accessible throughout the script
 
         $(document).ready(function () {

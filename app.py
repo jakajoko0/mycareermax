@@ -6,7 +6,7 @@ from flask import Response, stream_with_context
 import pdfkit
 import threading
 import re
-
+import time
 load_dotenv()
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -44,19 +44,49 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 
-def create_connection():
+def create_connection(max_retries=5, wait_time_in_seconds=5):
     """Establish a connection to the Azure SQL database."""
+    # Fetch database credentials from environment variables
     server = os.getenv("DB_SERVER")
     database = os.getenv("DB_NAME")
-    username = os.getenv("DB_USERNAME")  # Ensure this is the correct key from .env
-    password = os.getenv("DB_PASSWORD")  # Ensure this is the correct key from .env
+    username = os.getenv("DB_USERNAME")
+    password = os.getenv("DB_PASSWORD")
 
+    # Create the connection string
     connection_string = (
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
         f"SERVER={server};DATABASE={database};"
         f"UID={username};PWD={password}"
     )
-    return pyodbc.connect(connection_string)
+
+    # Initialize variables to keep track of the connection and attempt count
+    connection = None
+    attempt_count = 0
+
+    # Loop until we establish a connection or reach the maximum number of retries
+    while attempt_count < max_retries:
+        try:
+            connection = pyodbc.connect(connection_string)
+            print("Successfully connected to the database.")
+            break  # Exit the loop if the connection is successful
+        except pyodbc.OperationalError as e:
+            print(f"Attempt {attempt_count + 1} failed with error: {e}")
+            if attempt_count < max_retries - 1:
+                print(f"Retrying in {wait_time_in_seconds} seconds...")
+                time.sleep(wait_time_in_seconds)
+            attempt_count += 1  # Increment the attempt count
+
+    if connection is None:
+        print("Max retries reached. Exiting.")
+    return connection
+
+# Example usage
+if __name__ == "__main__":
+    conn = create_connection()
+    if conn:
+        print("Connection established.")
+    else:
+        print("Failed to establish connection.")
 
 
 # keys
@@ -88,8 +118,9 @@ mail = Mail(app)
 s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 node_process = None
 
+
 if os.name == "nt":  # Windows
-    path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
+    path_wkhtmltopdf = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"
 else:  # Linux/Docker
     path_wkhtmltopdf = "/usr/bin/wkhtmltopdf"
 
@@ -98,6 +129,18 @@ config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 pdf_options = {
     "encoding": "UTF-8",
 }
+
+
+#if os.name == "nt":  # Windows
+ #   path_wkhtmltopdf = "C:\\Users\\skala\\wkhtmltox-0.12.6-1.msvc2015-win64 (3).exe"
+#else:  # Linux/Docker
+ #   path_wkhtmltopdf = "/usr/bin/wkhtmltopdf"
+
+#config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+#pdf_options = {
+ #   "encoding": "UTF-8",
+#}
 
 # Configure logging
 logging.basicConfig(
@@ -844,7 +887,7 @@ def upload_docx():
         )
 
 
-# COVERME OPENAI API CALLS
+# COVER LETTER GENERATOR OPENAI API CALLS
 @app.route("/generate-cover-letter", methods=["POST"])
 def generate_cover_letter():
     logging.info("Inside /generate-cover-letter route")  # Debugging
@@ -1011,7 +1054,7 @@ def analyze_answer():
     return jsonify({"feedback": feedback})
 
 
-# COVERME PRO RapidAPI CALLS
+# AI Job Search RapidAPI CALLS
 RAPIDAPI_BASE_URL = "https://jsearch.p.rapidapi.com"
 headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 

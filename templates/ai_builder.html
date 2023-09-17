@@ -30,41 +30,57 @@
 
 
     <style>
+        /* Spinner styles */
+        .custom-spinner {
+            width: 5rem;
+            height: 5rem;
+            border-radius: 50%;
+            border: 8px solid transparent;
+            border-top-color: #0022ff;
+            border-bottom-color: #0022ff;
+            border-right-color: #ae00ff;
+            border-left-color: #ae00ff;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Spinner text */
+        .centered-spinner-text {
+            color: #ae00ff;
+            background-color: white;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Centering container */
+        .centered-spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Spinner wrapper */
+        #spinner-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         body {
             font-family: 'Prompt', sans-serif;
             margin: 0;
             padding: 0;
             background: linear-gradient(120deg, #ffffff, #ffffff);
             /* Correct property for gradient */
-        }
-
-
-        .spinner-border {
-            width: 5rem;
-            height: 5rem;
-            position: fixed;
-            z-index: 9999;
-            overflow: show;
-            margin: auto;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            border-color: blue;
-            border: 8px solid rgba(0, 0, 0, 0.1);
-            /* Light grey */
-            border-left-color: blue;
-            /* Blue */
-            border-radius: 50%;
-            /* Rounded */
-            animation: spin 0.75s linear infinite;
-            /* Spin animation */
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
         }
 
         .navbar {
@@ -106,17 +122,16 @@
     </style>
 
     <script>
+
         function showSpinner() {
-            const spinner = document.getElementById("spinner");
-            spinner.style.display = "block";
+            const spinnerWrapper = document.getElementById("spinner-wrapper");
+            spinnerWrapper.style.display = "block";
         }
 
         function hideSpinner() {
-            const spinner = document.getElementById("spinner");
-            spinner.style.display = "none";
+            const spinnerWrapper = document.getElementById("spinner-wrapper");
+            spinnerWrapper.style.display = "none";
         }
-
-
 
         let workExperienceCount = 1;
 
@@ -432,10 +447,16 @@
         </div>
     </nav>
 
-    <!-- Spinner -->
-    <div class="spinner-border text-primary" id="spinner" role="status" style="display: none;">
-        <span class="sr-only">Loading...</span>
+    <!-- Spinner Wrapper -->
+    <div id="spinner-wrapper" style="display: none;">
+        <!-- Spinner and Text -->
+        <div id="spinner" class="centered-spinner-container">
+            <div class="custom-spinner"></div>
+            <div class="centered-spinner-text">Creating Your Resume</div>
+        </div>
     </div>
+
+
 
     <div class="container">
         <div style="text-align:center; margin-top: 40px;"> <!-- Added margin-top here -->
@@ -651,10 +672,14 @@
                     placeholder="e.g., Incident Management, Customer Satisfaction" type="text" />
             </div>
             <!-- Submit -->
-            <button class="btn btn-secondary mb-2" onclick="collectDataAndSubmitForm('generate')" type="button">Build
+            <button class="btn btn-primary mb-2" onclick="collectDataAndSubmitForm('generate')" type="button">Build
                 Resume</button>
-            <button class="btn btn-primary mb-2" onclick="collectDataAndSubmitForm('rewrite')"
-                type="button">✨AI-Enhanced Resume</button>
+            <button class="btn btn-secondary ml-2 job-box-btn"
+                style="background: linear-gradient(to right, #0022ff, #ae00ff); color: white;"
+                onclick="collectDataAndSubmitForm('rewrite')" type="button">
+                ✨AI-Enhanced Resume
+            </button>
+
         </form>
     </div>
 

@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tools</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -18,6 +22,12 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
+        .gradient-button {
+            background: linear-gradient(to right, #0022ff, #ae00ff);
+            color: white;
+            border: none;
+        }
+
         /* Custom Styles */
         .image-button {
             width: 200px;
@@ -68,9 +78,9 @@
         }
 
         .spacing-class {
+            font-family: 'Architects Daughter', cursive;
             margin-bottom: 20px;
-            font-size: 24px;
-            /* Adjust the size as needed */
+            font-size: 30px;
         }
 
         .noto-font {
@@ -130,20 +140,20 @@
 
         <!-- Button Container with Background -->
         <div class="button-background py-5">
-            <div class="spacing-class noto-font">What would you like to create today?</div>
+            <div class="spacing-class">What would you like to create today?</div>
             &nbsp;
             &nbsp;
             <!-- Bootstrap Buttons -->
             <div class="row">
                 <div class="col-12 col-md-6 button-container">
                     <!-- Cover Letter Button -->
-                    <a href="/cover-letter-generator" class="btn btn-primary btn-lg">
+                    <a href="/cover-letter-generator" class="btn btn-lg gradient-button">
                         ✨Cover Letter
                     </a>
                 </div>
                 <div class="col-12 col-md-6 button-container">
                     <!-- Resume Button -->
-                    <a href="/ai-builder" class="btn btn-primary btn-lg">
+                    <a href="/ai-builder" class="btn btn-lg gradient-button">
                         ✨Resume
                     </a>
                 </div>

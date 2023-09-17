@@ -24,31 +24,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
 
     <style>
-        .pro-tip-box {
-            background-color: #e7e7e7;
-            /* Light grey background */
-            border: 1px solid #007BFF;
-            /* Grey border */
-            border-radius: 12px;
-            /* Rounded corners */
-            padding: 16px;
-            /* Padding */
-            width: 100%;
-            /* Full width */
-            box-sizing: border-box;
-            /* Make sure padding and width stay in place */
-            margin-bottom: 16px;
-            /* Bottom margin */
-            color: #007BFF;
-            /* Dark grey text */
-
+        .purple-border {
+            border: 1px solid #ae00ff;
+            /* Purple color */
         }
 
-        @media (max-width: 768px) {
-            .pro-tip-box {
-                font-size: 14px;
-                /* Smaller text on mobile */
-            }
+        .gradient-button {
+            background: linear-gradient(to right, #0022ff, #ae00ff);
+            color: white;
+            border: none;
+        }
+
+        .modal-fullscreen {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .modal-fullscreen .modal-content {
+            height: 100%;
+            border: 0;
+            border-radius: 0;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(to bottom, #0022ff, #ae00ff);
+        }
+
+        .text-white {
+            color: white !important;
+        }
+
+        .text-center {
+            text-align: center;
         }
 
         body {
@@ -236,12 +244,6 @@
         </div>
     </nav>
 
-
-    <script>
-        console.log("jQuery version:", $().jquery);
-        console.log("Bootstrap:", typeof ($.fn.modal));
-    </script>
-
 </body>
 
 <body>
@@ -254,15 +256,15 @@
         <div class="mb-4" id="job-search-section">
             <div class="form-row">
                 <div class="col">
-                    <input class="form-control" id="job-query" placeholder="Job title, e.g., Python Developer"
+                    <input class="form-control purple-border" id="job-query"
+                        placeholder="Job title, e.g., Python Developer" type="text" />
+                </div>
+                <div class="col">
+                    <input class="form-control purple-border" id="job-location" placeholder="Location, e.g., Texas, USA"
                         type="text" />
                 </div>
                 <div class="col">
-                    <input class="form-control" id="job-location" placeholder="Location, e.g., Texas, USA"
-                        type="text" />
-                </div>
-                <div class="col">
-                    <button class="btn btn-primary" onclick="fetchJobListings()">Search</button>
+                    <button class="btn gradient-button" onclick="fetchJobListings()">Search</button>
                 </div>
             </div>
         </div>
@@ -307,600 +309,738 @@
             <div id="loading-overlay"
                 style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
                 <div
-                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
-                    Hold please. Doing AI things. Your generated content will be available at the top of the page
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(to bottom, #0022ff, #ae00ff); color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
+                    ✨ Hold please. Doing AI things. Your generated content will be available at the top of the page
                     when
-                    I'm
-                    finished.
+                    I'm finished. 🪄
                 </div>
             </div>
-            <div class="pro-tip-box">
-                Pro-tip: ATS systems prefer minimal formatting, plain text, and standard date formats. Include as many
-                keywords as possible. Our ATS Optimizer handles
-                all of this
-                for you. Check it out by clicking the ✨ATS Optimized Resume button within any job posting or try out our
-                Resume Scanner if you just want to know how ATS friendly your resume is by clicking
-                <a href="/resume-enhancer" style="color: rgb(0, 174, 41);">HERE!</a>
-            </div>
 
-
-            <!-- Generated Resume Display -->
-            <div class="cover-letter-section" id="cover-letter-section-1" style="display: none;">
-                <h3
-                    style="text-align: center !important; color: #007BFF !important; font-family: 'Crimson Text', serif !important;">
-                    Optimized Resume</h3>
-                <textarea class="form-control" id="cover-letter-text-1" readonly="" rows="10"></textarea>
-                <!-- New buttons added here -->
-                <div class="mt-2">
-                    <button class="btn btn-primary mt-2" id="download-resume-1" onclick="downloadResume_1()">⬇️ Download
-                        (.TXT)</button>
-                    <button class="btn btn-secondary mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">📋 Copy
-                        to Clipboard</button>
-                    <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">💾 Save to Dashboard (.DOCX &
-                        .PDF)</button>
-                </div>
-            </div>
-             
-
-            <!-- Generated Cover Letter Display -->
-            <div class="mb-4" id="cover-letter-section" style="display: none;">
-                <h3
-                    style="text-align: center !important; color: #007BFF !important; font-family: 'Crimson Text', serif !important;">
-                    AI Generated Cover Letter</h3>
-                <textarea class="form-control" id="cover-letter-text" readonly="" rows="10"></textarea>
-                <div class="mt-2">
-                    <button class="btn btn-success" onclick="downloadCoverLetter()">⬇️ Download (.TXT)</button>
-                    <button class="btn btn-info" onclick="copyToClipboard()">📋 Copy to Clipboard</button><button
-                        class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">💾 Save to Dashboard (.DOCX &
-                        .PDF)</button>
-                </div>
-            </div>
-            <!-- Job Listings Container -->
-            <div class="mb-4" id="job-listings-container">
-                <!-- Job listings will be populated here -->
-            </div>
-            <script>
-                var userId = {{ user_id }};
-            </script>
-            <script>
-
-                function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName, applyLink) { // Add applyLink parameter
-                    console.log("Job Description:", jobDescription);
-                    console.log("Resume:", resume);
-
-                    // Show the loading overlay
-                    document.getElementById('loading-overlay').style.display = 'block';
-
-                    // Make a POST request to the backend with the required data
-                    fetch('/resume.1', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            resume: resume,
-                            job_description: jobDescription,
-                            job_title: jobTitle
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Cover Letter Response:", data);
-
-                            // Hide the loading overlay
-                            document.getElementById('loading-overlay').style.display = 'none';
-
-                            // Store the job details in data attributes on the text box element
-                            var textBox = document.getElementById('cover-letter-text-1');
-                            textBox.value = data.cover_letter;
-                            textBox.setAttribute('data-job-title', jobTitle);
-                            textBox.setAttribute('data-company-name', companyName);
-                            textBox.setAttribute('data-apply-link', applyLink); // Store the apply link
-
-                            document.getElementById('cover-letter-section-1').style.display = 'block';
-                        })
-                        .catch(error => {
-                            console.error("Error generating cover letter:", error);
-
-                            // Hide the loading overlay even in case of error
-                            document.getElementById('loading-overlay').style.display = 'none';
-                        });
-                }
-
-
-
-                function generateCoverLetter(jobDescription, resume, jobTitle, companyName, applyLink) { // Add applyLink parameter
-                    console.log("Generate Cover Letter button clicked.");
-                    console.log("Job Description:", jobDescription);
-                    console.log("Resume:", resume);
-
-                    // Show the loading overlay
-                    document.getElementById('loading-overlay').style.display = 'block';
-
-                    // Make an AJAX call to the Flask backend
-                    fetch('/career_click', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            resume: resume,
-                            job_description: jobDescription,
-                            company_name: companyName,
-                            job_title: jobTitle
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Cover Letter Response:", data);
-
-                            // Hide the loading overlay
-                            document.getElementById('loading-overlay').style.display = 'none';
-
-                            // Store the job details in data attributes on the text box element
-                            var textBox = document.getElementById('cover-letter-text');
-                            textBox.value = data.cover_letter;
-                            textBox.setAttribute('data-job-title', jobTitle);
-                            textBox.setAttribute('data-company-name', companyName);
-                            textBox.setAttribute('data-apply-link', applyLink); // Store the apply link
-
-                            document.getElementById('cover-letter-section').style.display = 'block';
-                        })
-                        .catch(error => {
-                            console.error('Error generating cover letter:', error);
-
-                            // Hide the loading overlay even in case of error
-                            document.getElementById('loading-overlay').style.display = 'none';
-                        });
-                }
-
-
-
-                // Fetch job listings based on user input
-                function fetchJobListings() {
-                    const jobQuery = document.getElementById('job-query').value;
-                    const jobLocation = document.getElementById('job-location').value;
-
-                    const requestData = {
-                        query: jobQuery,
-                        location: jobLocation
-                    };
-
-                    fetch('/fetch-job-listings', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(requestData)
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Jobs Array:", data.data);  // Log the jobs array
-                            if (data.data) {
-                                displayJobListings({ jobs: data.data }); // Adjusting the data structure
-                            } else {
-                                console.error("No jobs found or unexpected data structure:", data);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching job listings:', error);
-                        });
-                }
-
-                function displayJobListings(response) {
-                    const jobs = response.jobs;
-                    const listingsContainer = document.getElementById('job-listings-container');
-                    listingsContainer.innerHTML = '';  // Clear any previous listings
-
-                    jobs.forEach(job => {
-                        const jobBox = document.createElement('div');
-                        jobBox.className = 'job-box';
-                        jobBox.style.marginBottom = '50px';
-                        jobBox.style.position = 'relative';
-                        jobBox.style.borderRadius = '10px'; // Adjust this value as needed
-
-                        // Add the job identifier as a data attribute to the job box
-                        jobBox.dataset.jobIdentifier = job.job_id;
-
-                        // Append the employer logo if it exists
-                        if (job.employer_logo) {
-                            const logoImg = document.createElement('img');
-                            logoImg.src = job.employer_logo;
-                            logoImg.alt = job.employer_name + ' logo';
-                            logoImg.style.width = '75px'; // Adjust this to your preferred size
-                            jobBox.appendChild(logoImg);
-                        }
-                        // Append the job posted timestamp
-                        const jobPostedTimestamp = document.createElement('p');
-                        const dateObj = new Date(job.job_posted_at_timestamp * 1000); // Convert to milliseconds
-                        jobPostedTimestamp.innerText = 'Posted At: ' + dateObj.toDateString();
-                        jobPostedTimestamp.style.fontSize = '12px';  // You can adjust '12px' to your preferred size
-                        jobBox.appendChild(jobPostedTimestamp);
-
-
-                        // Create the "Save Job" heart-shaped button
-                        const saveJobButton = document.createElement('i');
-                        saveJobButton.className = 'fa fa-heart save-job-btn';
-                        saveJobButton.dataset.jobId = job.job_id;
-                        saveJobButton.style.cursor = 'pointer';
-                        saveJobButton.style.marginRight = '10px';  // Adjusted the margin property name
-                        saveJobButton.style.fontSize = '24px';
-
-                        saveJobButton.onclick = function () {
-                            if (!this.classList.contains('saved')) {
-                                this.classList.add('saved');
-                                this.style.color = 'red';
-
-                                // Capture job details
-                                const jobDetails = {
-                                    job_id: job.job_id,
-                                    job_title: job.job_title,
-                                    job_description: job.job_description,
-                                    job_link: job.job_apply_link,
-                                    job_loc: '',  // You might need to capture this if available in your job object
-                                    company_name: job.employer_name || "Unknown Company",
-                                    link: '',  // You might need to capture this if available in your job object
-                                    employer_logo: job.employer_logo || ""  // Capture the employer logo URL
-                                };
-
-                                // Send job details to backend using AJAX
-                                $.ajax({
-                                    url: "/save-job",
-                                    type: "POST",
-                                    contentType: "application/json",  // Set the Content-Type header
-                                    data: JSON.stringify(jobDetails),
-                                    success: function (response) {
-                                        if (response.success) {
-                                            console.log("Job saved successfully!");
-                                        } else {
-                                            alert("You must be logged in to Save Jobs to your Dashboard.");
-                                        }
-                                    },
-                                    error: function (xhr, status, error) {
-                                        console.error("Failed to save job:", error);
-                                    }
-                                });
-
-                            } else {
-                                this.classList.remove('saved');
-                                this.style.color = '';
-                                // TODO: Optionally send a request to backend to unsave the job
-                            }
-                        };
-
-                        jobBox.appendChild(saveJobButton);
-
-                        const analyzeSymbol = document.createElement('a');
-                        analyzeSymbol.href = '#';  // Prevent default navigation
-                        analyzeSymbol.innerText = '$';
-                        analyzeSymbol.style.color = 'green';  // Give it the color green
-                        analyzeSymbol.style.fontSize = '30px';  // Adjust size as needed
-                        analyzeSymbol.style.marginLeft = '5px';  // Provide some margin for better spacing
-                        analyzeSymbol.style.marginRight = '10px';  // Provide some margin for better spacing
-                        analyzeSymbol.style.cursor = 'pointer';  // Change cursor to pointer to indicate clickability
-                        analyzeSymbol.style.fontWeight = 'bold';  // Make the symbol bold
-                        analyzeSymbol.onclick = (event) => {
-                            event.preventDefault();  // Prevent default navigation
-                            // AJAX call to Flask backend with separate parameters for job title
-                            $.post("/analyze-job", {
-                                job_title: job.job_title
-                            }, function (data) {
-                                // Display the result in the modal
-                                document.getElementById('analyzeResult').innerText = data.response;
-                                $('#analyzeModal').modal('show');
-                            });
-                        };
-                        jobBox.appendChild(analyzeSymbol);
-
-                        // Append the Apply button
-                        const applyButton = document.createElement('a');
-                        applyButton.href = job.job_apply_link;
-                        applyButton.target = '_blank';
-                        applyButton.className = 'btn btn-primary job-box-btn';
-                        applyButton.innerText = 'Apply!';
-                        applyButton.style.marginBottom = '10px';
-                        applyButton.style.marginLeft = '8px';
-                        jobBox.appendChild(applyButton);
-
-
-                        // Append the job title
-                        const jobTitle = document.createElement('h4');
-                        jobTitle.innerText = (job.job_title || 'N/A');
-                        jobTitle.style.color = '#black';
-                        jobBox.appendChild(jobTitle);
-
-                        // Append the employer name
-                        const employerName = document.createElement('p');
-                        employerName.innerText = (job.employer_name || 'N/A');
-                        employerName.style.color = '#007BFF';
-                        jobBox.appendChild(employerName);
-
-                        // Create the "Generate Cover Letter" button first
-                        const generateButton = document.createElement('button');
-                        generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
-                        generateButton.innerText = '✨AI Cover Letter'; // Added paper and pencil emojis here
-                        generateButton.style.backgroundColor = '#99ff99';
-                        generateButton.style.color = 'black';
-                        generateButton.style.marginBottom = '10px';
-                        generateButton.style.marginLeft = '20px';
-                        generateButton.onclick = () => generateCoverLetter(
-                            job.job_description,
-                            document.getElementById('resume-text').value,
-                            job.job_title,
-                            job.employer_name || "Unknown Company",
-                            job.job_apply_link // Include the apply link
-                        );
-                        jobBox.appendChild(generateButton);
-
-
-                        // Create the "Generate Cover Letter (Resume.1)" button
-                        const generateButton_1 = document.createElement('button');
-                        generateButton_1.className = 'btn btn-secondary ml-2 job-box-btn';
-                        generateButton_1.innerText = '✨ATS Optimized Resume';
-                        generateButton_1.style.backgroundColor = '#99ff99';
-                        generateButton_1.style.color = 'black';
-                        generateButton_1.style.marginBottom = '10px';
-                        generateButton_1.onclick = () => generateCoverLetter_1(
-                            job.job_description,
-                            document.getElementById('resume-text').value,
-                            job.job_title,
-                            job.employer_name || "Unknown Company",
-                            job.job_apply_link // Include the apply link
-                        );
-                        jobBox.appendChild(generateButton_1);
-
-
-                        // Append the remote status
-                        const jobRemoteStatus = document.createElement('p');
-                        jobRemoteStatus.innerText = 'Remote: ' + (job.job_is_remote ? 'Yes' : 'No');
-                        jobBox.appendChild(jobRemoteStatus);
-
-                        // Append the job employment type
-                        const jobEmploymentType = document.createElement('p');
-                        jobEmploymentType.innerText = 'Employment Type: ' + (job.job_employment_type || 'N/A');
-                        jobBox.appendChild(jobEmploymentType);
-
-                        // Append the job description
-                        const jobDescription = document.createElement('p');
-                        jobDescription.innerText = 'Description: ' + (job.job_description || 'N/A');
-                        jobBox.appendChild(jobDescription);
-
-                        // Append the job publisher
-                        const jobPublisher = document.createElement('p');
-                        jobPublisher.innerText = 'Publisher: ' + (job.job_publisher || 'N/A');
-                        jobBox.appendChild(jobPublisher);
-
-                        // Append the apply link
-                        const applyLink = document.createElement('a');
-                        applyLink.href = job.job_apply_link;
-                        applyLink.innerText = 'Apply Here';
-                        applyLink.target = '_blank';
-                        jobBox.appendChild(applyLink);
-
-                        // Append the job ID
-                        const jobId = document.createElement('p');
-                        jobId.innerText = 'Job ID: ' + (job.job_id || 'N/A');
-                        jobBox.appendChild(jobId);
-
-
-
-                        listingsContainer.appendChild(jobBox);
-                    });
-
-                    // When a jobBox or any of its children are clicked, toggle its active state and adjust overflow
-                    document.addEventListener('click', function (event) {
-                        // Deactivate all active job boxes first
-                        document.querySelectorAll('.job-box.active').forEach(function (box) {
-                            box.classList.remove('active');
-                            box.style.overflow = 'hidden';
-                        });
-
-                        // Find the closest .job-box to the clicked element
-                        let closestJobBox = event.target.closest('.job-box');
-
-                        if (closestJobBox) {
-                            closestJobBox.classList.add('active');
-                            closestJobBox.style.overflow = 'auto';
-                        }
-                    });
-                }
-
-
-                // Download the generated cover letter as a .txt file
-                function downloadCoverLetter() {
-                    const coverLetter = document.getElementById('cover-letter-text').value;
-                    const blob = new Blob([coverLetter], { type: 'text/plain' });
-                    const a = document.createElement('a');
-                    a.download = 'cover_letter.txt';
-                    a.href = URL.createObjectURL(blob);
-                    a.click();
-                }
-
-                // Copy the generated cover letter to the clipboard
-                function copyToClipboard() {
-                    const coverLetterTextarea = document.getElementById('cover-letter-text');
-                    coverLetterTextarea.select();
-                    document.execCommand('copy');
-                    alert('AI Cover letter copied to clipboard!');
-                }
-
-                // Function to download the resuME
-                function downloadResume_1() {
-                    const textToSave = document.getElementById('cover-letter-text-1').value;
-                    const blob = new Blob([textToSave], { type: "text/plain" });
-                    const anchor = document.createElement("a");
-                    anchor.download = "resume_1.txt";
-                    anchor.href = window.URL.createObjectURL(blob);
-                    anchor.target = "_blank";
-                    anchor.click();
-                }
-
-                // Function to copy the resuME to clipboard
-                function copyToClipboard_1() {
-                    const copyText = document.getElementById('cover-letter-text-1');
-                    copyText.select();
-                    document.execCommand("copy");
-                    alert("Optimized Resume copied to clipboard!");
-                }
-
-                // Event listener for file upload
-                $("#resume-upload").change(function () {
-                    var form_data = new FormData();
-                    var file_data = $("#resume-upload")[0].files[0];
-                    form_data.append("file", file_data);
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/upload-search",
-                        data: form_data,
-                        contentType: false,
-                        cache: false,
-                        processData: false,
-                        success: function (data) {
-                            // Check if data is a string (error message) or an object (JSON response)
-                            if (typeof data === 'string') {
-                                // Display error message in the console
-                                console.error(data);
-                                // Show the error message to the user (You can use an alert or other UI element)
-                                alert(data);
-                            } else {
-                                // Data is an object (JSON response) with a 'content' property
-                                console.log(data.content);
-                                // Set the content in the existing text area (resume)
-                                $("#resume-text").val(data.content);
-
-                                // Show the existing text area
-                                $("#resume-upload").show();
-                            }
-                        },
-                        error: function (xhr, textStatus, error) {
-                            console.error("Error while uploading the file:", error);
-                            alert("An error occurred while uploading the file. Please try again later.");
-                        }
-                    });
-                });
-
-            </script>
         </div>
-        <script>
-            $(document).ready(function () {
-                $(".job-box").click(function () {
-                    // Display the entire content in an alert for now
-                    // You can replace this with a modal or another method of your choice
-                    alert($(this).text());
-                });
-            });
 
-
-        </script>
-
-        <div aria-hidden="true" aria-labelledby="analyzeModalLabel" class="modal fade" id="analyzeModal" role="dialog"
-            tabindex="-1">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="analyzeModalLabel">Salary Range:</h5>
-                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="analyzeResult"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            var userId = {{ user_id }};
-        </script>
-        <script>
-            function saveDocument() {
-                const textBox = document.getElementById('cover-letter-text');
-                const documentContent = textBox.value;
-                const documentName = "Cover Letter (Job Search)";
-                const documentType = "Cover Letter (Job Search)";
-                const jobTitle = textBox.getAttribute('data-job-title');
-                const companyName = textBox.getAttribute('data-company-name');
-                const applyLink = textBox.getAttribute('data-apply-link');
-
-                fetch("/save_document", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        document_name: documentName,
-                        document_content: documentContent,
-                        document_type: documentType,
-                        job_title: jobTitle,
-                        company_name: companyName,
-                        apply_link: applyLink
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
-                            alert("Cover Letter saved successfully! You may view and download your Saved Documents from your Dashboard");
-                        } else {
-                            alert("You must be logged in to access your Dashboard.");
-                        }
-                    });
-            }
-
-            function saveResume() {
-                const textBox = document.getElementById('cover-letter-text-1');
-                const resumeContent = textBox.value;
-                const resumeName = "ATS Enhanced Resume (Job Search)";
-                const documentType = "ATS Enhanced Resume (Job Search)";
-                const jobTitle = textBox.getAttribute('data-job-title');
-                const companyName = textBox.getAttribute('data-company-name');
-                const applyLink = textBox.getAttribute('data-apply-link');
-
-                fetch("/save_document", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        document_name: resumeName,
-                        document_content: resumeContent,
-                        document_type: documentType,
-                        job_title: jobTitle,
-                        company_name: companyName,
-                        apply_link: applyLink
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
-                            alert("Resume saved successfully! You may view and download your Saved Documents from your Dashboard");
-                        } else {
-                            alert("You must be logged in to access your Dashboard.");
-                        }
-                    });
-            }
-
-
-        </script>
+    </div>
+    <!-- "How does this work" link that triggers the modal -->
+    <div style="text-align: center;">
+        <a href="#" id="howDoesThisWork">🔮 How does this work?</a>
     </div>
 
+    <!-- Full-screen Modal -->
+    <div class="modal fade" id="fullscreenModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">
+            <div class="modal-content gradient-bg d-flex flex-column justify-content-center align-items-center">
+                <div class="modal-header text-center w-100">
+                    <h5 class="modal-title text-white">How does this work?</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-white text-center w-100" style="overflow-y: auto;">
+                    <!-- Your content here -->
+                    <div class="pro-tip-box">
+                        <h2>✨🔍 AI Job Search: Powered by ChatGPT-4 and Google Jobs</h2>
+                        <p>Welcome to myCareerMax's AI Job Search, your one-stop solution for a smarter, more efficient
+                            job
+                            search.</p>
+
+                        <h2>🛠️ How to Use</h2>
+                        <div></div>
+                        <div></div>
+                        <h3>Upload/Enter Resume📜</h3>
+                        <ul>
+                            <li><strong>Upload:</strong> The system will always default to using the resume you have
+                                uploaded to your Dashboard first and we will securely store your resume for you so that
+                                you do not have to upload it each time you sign in. If no resume has been uploaded to
+                                your Dashboard, it will then use any resume that you upload using the File upload
+                                feature directly on the Search screen underneath the search boxes. Please note that only
+                                .DOCX files are accepted at this time.</li>
+                            <li><strong>Enter Manually:</strong> If you don't upload a resume to either your Dashboard
+                                or using the file upload feature directly on the Search screen, you must type or paste
+                                your resume into the provided resume area directly underneath the search boxes.</li>
+                        </ul>
+                        <h3>Job Search 🔍</h3>
+                        <ul>
+                            <li><strong>Keywords:</strong> Enter the job title, skills, or company you're interested in.
+                            </li>
+                            <li><strong>Location:</strong> Specify the location where you'd like to work.</li>
+                            <li><strong>Search:</strong> Click the Search button to scan all major job boards and view a
+                                list of your best matches.
+                            </li>
+                        </ul>
+
+                        <h3>Job Boxes 📋</h3>
+                        <p>Each “job box” (or job listing) neatly displays the following basic details: </p>
+                        <ul>
+                            <li>🏢 Company Logo</li>
+                            <li>📝 Job Title</li>
+                            <li>🗓️ Date Posted</li>
+                            <li>🆔 Job ID</li>
+                            <li>📄 Job Description</li>
+                        </ul>
+
+                        <h3>Additional Features in Job Boxes 🪄</h3>
+                        <p>In addition to the basic details provided in each job box, you can take advantage of these
+                            additional features:</p>
+                        <ul>
+                            <li>❤️ Save Job: Click the heart icon to save this job to your dashboard.</li>
+                            <li>🔗 Apply: Takes you directly to the job application to apply directly at the source.
+                            </li>
+                            <li>💰 Salary Insights: Get a glimpse of the salary range for the job.</li>
+                            <li>✨ AI Cover Letter: Using OpenAI’s ChatGPT-4, this button generates a custom Cover
+                                Letter,
+                                personalized and tailored to the specific job posting.</li>
+                            <li>✨ ATS Optimized Resume: Using OpenAI’s ChatGPT-4, this option optimizes your resume for
+                                Applicant Tracking Systems and tailors it to the job listing by integrating keywords
+                                extracted from the job description seamlessly throughout your resume.</li>
+                        </ul>
+                        <p>🌟 In order for the system to accurately generate your Cover Letter and Resume's, you must
+                            have a resume either uploaded to your Dashboard, or provided here at the top of the Search
+                            page</p>
+
+                        <h2>✨ AI Generated Content </h2>
+                        <p>Your generated Cover Letters and Resumes will be displayed at the top of the page in an
+                            editable
+                            text box above the search results and will have the following options:</p>
+                        <ul>
+                            <li>⬇️ Download (.TXT): Downloads a .TXT file (plain text) locally to your device</li>
+                            <li>📋 Copy to Clipboard: Copy the entire text content to easily paste in a job application
+                                or
+                                just to keep someplace else</li>
+                            <li>💾 Save to Dashboard: Keep your documents for later use. They will be saved to “My Docs”
+                                on
+                                your Dashboard and can be downloaded as either a .DOCX or .PDF file</li>
+                        </ul>
+
+                        <h2>❓FAQ❓</h2>
+                        <h3>What is the Save Job feature? 💾</h3>
+                        <p>The "Save Job" button allows you to save jobs you're interested in to your dashboard. Please
+                            note
+                            that you must be logged in in order to access your Dashboard.</p>
+                        <h3>How does the AI Cover Letter work? 🤖</h3>
+                        <p>This feature utilizes OpenAI's latest ChatGPT-4 to generate a bespoke cover letter, tailored
+                            to
+                            the job description and your resume data.</p>
+                        <h3>What is the Save to Dashboard feature? 💾</h3>
+                        <p>The "Save to Dashboard" button allows you to save jobs you're interested in to your dashboard
+                            to
+                            reference whenever you wish. You can apply directly to the job from the Saved Jobs area of
+                            the
+                            Dashboard. Adding jobs to your Saved Jobs list will automatically be rated and given a
+                            compatibility score based on how well the job description matches your resume and
+                            background.
+                            Once it receives a compatibility score, it will be ranked against all of your other saved
+                            jobs
+                            in the Top Candidate board on your Dashboard. You can use these rankings to decide which
+                            jobs to
+                            focus more of your time and efforts on. ⚹ You must be logged in to access the Dashboard ⚹
+                        </p>
+                        <h3>What is an ATS Optimized Resume? 🎯</h3>
+                        <p>The ATS Optimizer makes your resume more appealing to Applicant Tracking Systems. It uses AI
+                            to
+                            incorporate relevant keywords and optimize formatting. OpenAI’s ChatGPT-4 is the engine
+                            behind
+                            this feature.</p>
+                        <h3>Where can I find my Saved Documents? 📂</h3>
+                        <p>Head over to the "My Documents" section on your Dashboard to find all your saved documents.
+                            They
+                            are available for download in PDF and DOCX formats. You must be logged in to access your
+                            Dashboard. If you only need a plain text file
+                            (.txt),
+                            you can click the green “⬇️ Download .(TXT)” button under your generated content on the
+                            search
+                            results page without logging in.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Generated Resume Display -->
+    <div class="cover-letter-section" id="cover-letter-section-1" style="display: none;">
+        <h3
+            style="text-align: center !important; background: linear-gradient(to right, #0022ff, #ae00ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-family: 'Crimson Text', serif !important;">
+            Optimized Resume
+        </h3>
+        <textarea class="form-control" id="cover-letter-text-1" rows="10"></textarea>
+        <!-- New buttons added here -->
+        <div class="mt-2">
+            <button class="btn btn-success mt-2" id="download-resume-1" onclick="downloadResume_1()">⬇️ Download
+                (.TXT)</button>
+            <button class="btn btn-info mt-2 ml-2" id="copy-resume-1" onclick="copyToClipboard_1()">📋 Copy
+                to
+                Clipboard</button>
+            <button class="btn btn-primary mt-2 ml-2" onclick="saveResume()">💾 Save to Dashboard (.DOCX &
+                .PDF)</button>
+        </div>
+    </div>
+
+     
+
+    <!-- Generated Cover Letter Display -->
+    <div class="mb-4" id="cover-letter-section" style="display: none;">
+        <h3
+            style="text-align: center !important; background: linear-gradient(to right, #0022ff, #ae00ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-family: 'Crimson Text', serif !important;">
+            AI Generated Cover Letter
+        </h3>
+        <textarea class="form-control" id="cover-letter-text" rows="10"></textarea>
+        <div class="mt-2">
+            <button class="btn btn-success" onclick="downloadCoverLetter()">⬇️ Download (.TXT)</button>
+            <button class="btn btn-info" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            <button class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">💾 Save to Dashboard (.DOCX &
+                .PDF)</button>
+        </div>
+    </div>
+
+    <!-- Job Listings Container -->
+    <div class="mb-4" id="job-listings-container">
+        <!-- Job listings will be populated here -->
+    </div>
+    <script>
+        var userId = {{ user_id }};
+    </script>
+    <script>
+        //Intro Modal
+        $(document).ready(function () {
+            // Show the modal when "How does this work?" is clicked
+            $("#howDoesThisWork").on("click", function () {
+                $("#fullscreenModal").modal("show");
+            });
+        });
+
+
+
+        function generateCoverLetter_1(jobDescription, resume, jobTitle, companyName, applyLink) { // Add applyLink parameter
+            console.log("Job Description:", jobDescription);
+            console.log("Resume:", resume);
+
+            // Show the loading overlay
+            document.getElementById('loading-overlay').style.display = 'block';
+
+            // Make a POST request to the backend with the required data
+            fetch('/resume.1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    resume: resume,
+                    job_description: jobDescription,
+                    job_title: jobTitle
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Cover Letter Response:", data);
+
+                    // Hide the loading overlay
+                    document.getElementById('loading-overlay').style.display = 'none';
+
+                    // Store the job details in data attributes on the text box element
+                    var textBox = document.getElementById('cover-letter-text-1');
+                    textBox.value = data.cover_letter;
+                    textBox.setAttribute('data-job-title', jobTitle);
+                    textBox.setAttribute('data-company-name', companyName);
+                    textBox.setAttribute('data-apply-link', applyLink); // Store the apply link
+
+                    document.getElementById('cover-letter-section-1').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error("Error generating cover letter:", error);
+
+                    // Hide the loading overlay even in case of error
+                    document.getElementById('loading-overlay').style.display = 'none';
+                });
+        }
+
+
+
+        function generateCoverLetter(jobDescription, resume, jobTitle, companyName, applyLink) { // Add applyLink parameter
+            console.log("Generate Cover Letter button clicked.");
+            console.log("Job Description:", jobDescription);
+            console.log("Resume:", resume);
+
+            // Show the loading overlay
+            document.getElementById('loading-overlay').style.display = 'block';
+
+            // Make an AJAX call to the Flask backend
+            fetch('/career_click', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    resume: resume,
+                    job_description: jobDescription,
+                    company_name: companyName,
+                    job_title: jobTitle
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Cover Letter Response:", data);
+
+                    // Hide the loading overlay
+                    document.getElementById('loading-overlay').style.display = 'none';
+
+                    // Store the job details in data attributes on the text box element
+                    var textBox = document.getElementById('cover-letter-text');
+                    textBox.value = data.cover_letter;
+                    textBox.setAttribute('data-job-title', jobTitle);
+                    textBox.setAttribute('data-company-name', companyName);
+                    textBox.setAttribute('data-apply-link', applyLink); // Store the apply link
+
+                    document.getElementById('cover-letter-section').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error generating cover letter:', error);
+
+                    // Hide the loading overlay even in case of error
+                    document.getElementById('loading-overlay').style.display = 'none';
+                });
+        }
+
+
+
+        // Fetch job listings based on user input
+        function fetchJobListings() {
+            const jobQuery = document.getElementById('job-query').value;
+            const jobLocation = document.getElementById('job-location').value;
+
+            const requestData = {
+                query: jobQuery,
+                location: jobLocation
+            };
+
+            fetch('/fetch-job-listings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Jobs Array:", data.data);  // Log the jobs array
+                    if (data.data) {
+                        displayJobListings({ jobs: data.data }); // Adjusting the data structure
+                    } else {
+                        console.error("No jobs found or unexpected data structure:", data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching job listings:', error);
+                });
+        }
+
+        function displayJobListings(response) {
+            const jobs = response.jobs;
+            const listingsContainer = document.getElementById('job-listings-container');
+            listingsContainer.innerHTML = '';  // Clear any previous listings
+
+            jobs.forEach(job => {
+                const jobBox = document.createElement('div');
+                jobBox.className = 'job-box';
+                jobBox.style.marginBottom = '50px';
+                jobBox.style.position = 'relative';
+                jobBox.style.borderRadius = '10px'; // Adjust this value as needed
+
+                // Add the job identifier as a data attribute to the job box
+                jobBox.dataset.jobIdentifier = job.job_id;
+
+                // Append the employer logo if it exists
+                if (job.employer_logo) {
+                    const logoImg = document.createElement('img');
+                    logoImg.src = job.employer_logo;
+                    logoImg.alt = job.employer_name + ' logo';
+                    logoImg.style.width = '75px'; // Adjust this to your preferred size
+                    jobBox.appendChild(logoImg);
+                }
+                // Append the job posted timestamp
+                const jobPostedTimestamp = document.createElement('p');
+                const dateObj = new Date(job.job_posted_at_timestamp * 1000); // Convert to milliseconds
+                jobPostedTimestamp.innerText = 'Posted At: ' + dateObj.toDateString();
+                jobPostedTimestamp.style.fontSize = '12px';  // You can adjust '12px' to your preferred size
+                jobBox.appendChild(jobPostedTimestamp);
+
+
+                // Create the "Save Job" heart-shaped button
+                const saveJobButton = document.createElement('i');
+                saveJobButton.className = 'fa fa-heart save-job-btn';
+                saveJobButton.dataset.jobId = job.job_id;
+                saveJobButton.style.cursor = 'pointer';
+                saveJobButton.style.marginRight = '10px';  // Adjusted the margin property name
+                saveJobButton.style.fontSize = '24px';
+
+                saveJobButton.onclick = function () {
+                    if (!this.classList.contains('saved')) {
+                        this.classList.add('saved');
+                        this.style.color = 'red';
+
+                        // Capture job details
+                        const jobDetails = {
+                            job_id: job.job_id,
+                            job_title: job.job_title,
+                            job_description: job.job_description,
+                            job_link: job.job_apply_link,
+                            job_loc: '',  // You might need to capture this if available in your job object
+                            company_name: job.employer_name || "Unknown Company",
+                            link: '',  // You might need to capture this if available in your job object
+                            employer_logo: job.employer_logo || ""  // Capture the employer logo URL
+                        };
+
+                        // Send job details to backend using AJAX
+                        $.ajax({
+                            url: "/save-job",
+                            type: "POST",
+                            contentType: "application/json",  // Set the Content-Type header
+                            data: JSON.stringify(jobDetails),
+                            success: function (response) {
+                                if (response.success) {
+                                    console.log("Job saved successfully!");
+                                } else {
+                                    alert("You must be logged in to Save Jobs to your Dashboard.");
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Failed to save job:", error);
+                            }
+                        });
+
+                    } else {
+                        this.classList.remove('saved');
+                        this.style.color = '';
+                        // TODO: Optionally send a request to backend to unsave the job
+                    }
+                };
+
+                jobBox.appendChild(saveJobButton);
+
+                const analyzeSymbol = document.createElement('a');
+                analyzeSymbol.href = '#';  // Prevent default navigation
+                analyzeSymbol.innerText = '💰';
+                analyzeSymbol.style.color = 'green';  // Give it the color green
+                analyzeSymbol.style.fontSize = '30px';  // Adjust size as needed
+                analyzeSymbol.style.marginLeft = '5px';  // Provide some margin for better spacing
+                analyzeSymbol.style.marginRight = '10px';  // Provide some margin for better spacing
+                analyzeSymbol.style.cursor = 'pointer';  // Change cursor to pointer to indicate clickability
+                analyzeSymbol.style.fontWeight = 'bold';  // Make the symbol bold
+                analyzeSymbol.onclick = (event) => {
+                    event.preventDefault();  // Prevent default navigation
+                    // AJAX call to Flask backend with separate parameters for job title
+                    $.post("/analyze-job", {
+                        job_title: job.job_title
+                    }, function (data) {
+                        // Display the result in the modal
+                        document.getElementById('analyzeResult').innerText = data.response;
+                        $('#analyzeModal').modal('show');
+                    });
+                };
+                jobBox.appendChild(analyzeSymbol);
+
+                // Append the Apply button
+                const applyButton = document.createElement('a');
+                applyButton.href = job.job_apply_link;
+                applyButton.target = '_blank';
+                applyButton.className = 'btn btn-success job-box-btn';
+                applyButton.innerText = 'Apply!';
+                applyButton.style.marginBottom = '10px';
+                applyButton.style.marginLeft = '8px';
+                jobBox.appendChild(applyButton);
+
+
+                // Append the job title
+                const jobTitle = document.createElement('h4');
+                jobTitle.innerText = (job.job_title || 'N/A');
+                jobTitle.style.color = '#black';
+                jobBox.appendChild(jobTitle);
+
+                // Append the employer name
+                const employerName = document.createElement('p');
+                employerName.innerText = (job.employer_name || 'N/A');
+                employerName.style.color = '#007BFF';
+                jobBox.appendChild(employerName);
+
+                // Create the "Generate Cover Letter" button first
+                const generateButton = document.createElement('button');
+                generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
+                generateButton.innerText = '✨AI Cover Letter';
+                generateButton.style.background = 'linear-gradient(to right, #0022ff, #ae00ff)';
+                generateButton.style.color = 'white';
+                generateButton.style.marginBottom = '10px';
+                generateButton.style.marginLeft = '20px';
+                generateButton.onclick = () => generateCoverLetter(
+                    job.job_description,
+                    document.getElementById('resume-text').value,
+                    job.job_title,
+                    job.employer_name || "Unknown Company",
+                    job.job_apply_link // Include the apply link
+                );
+                jobBox.appendChild(generateButton);
+
+
+
+                // Create the "Generate Cover Letter (Resume.1)" button
+                const generateButton_1 = document.createElement('button');
+                generateButton_1.className = 'btn btn-secondary ml-2 job-box-btn';
+                generateButton_1.innerText = '✨ATS Optimized Resume';
+                generateButton_1.style.background = 'linear-gradient(to right, #0022ff, #ae00ff)';
+                generateButton_1.style.color = 'white';
+                generateButton_1.style.marginBottom = '10px';
+                generateButton_1.onclick = () => generateCoverLetter_1(
+                    job.job_description,
+                    document.getElementById('resume-text').value,
+                    job.job_title,
+                    job.employer_name || "Unknown Company",
+                    job.job_apply_link // Include the apply link
+                );
+                jobBox.appendChild(generateButton_1);
+
+
+
+
+
+
+                // Append the remote status
+                const jobRemoteStatus = document.createElement('p');
+                jobRemoteStatus.innerText = 'Remote: ' + (job.job_is_remote ? 'Yes' : 'No');
+                jobBox.appendChild(jobRemoteStatus);
+
+                // Append the job employment type
+                const jobEmploymentType = document.createElement('p');
+                jobEmploymentType.innerText = 'Employment Type: ' + (job.job_employment_type || 'N/A');
+                jobBox.appendChild(jobEmploymentType);
+
+                // Append the job description
+                const jobDescription = document.createElement('p');
+                jobDescription.innerText = 'Description: ' + (job.job_description || 'N/A');
+                jobBox.appendChild(jobDescription);
+
+                // Append the job publisher
+                const jobPublisher = document.createElement('p');
+                jobPublisher.innerText = 'Publisher: ' + (job.job_publisher || 'N/A');
+                jobBox.appendChild(jobPublisher);
+
+                // Append the apply link
+                const applyLink = document.createElement('a');
+                applyLink.href = job.job_apply_link;
+                applyLink.innerText = 'Apply Here';
+                applyLink.target = '_blank';
+                jobBox.appendChild(applyLink);
+
+                // Append the job ID
+                const jobId = document.createElement('p');
+                jobId.innerText = 'Job ID: ' + (job.job_id || 'N/A');
+                jobBox.appendChild(jobId);
+
+
+
+                listingsContainer.appendChild(jobBox);
+            });
+
+            // When a jobBox or any of its children are clicked, toggle its active state and adjust overflow
+            document.addEventListener('click', function (event) {
+                // Deactivate all active job boxes first
+                document.querySelectorAll('.job-box.active').forEach(function (box) {
+                    box.classList.remove('active');
+                    box.style.overflow = 'hidden';
+                });
+
+                // Find the closest .job-box to the clicked element
+                let closestJobBox = event.target.closest('.job-box');
+
+                if (closestJobBox) {
+                    closestJobBox.classList.add('active');
+                    closestJobBox.style.overflow = 'auto';
+                }
+            });
+        }
+
+
+        // Download the generated cover letter as a .txt file
+        function downloadCoverLetter() {
+            const coverLetter = document.getElementById('cover-letter-text').value;
+            const blob = new Blob([coverLetter], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.download = 'cover_letter.txt';
+            a.href = URL.createObjectURL(blob);
+            a.click();
+        }
+
+        // Copy the generated cover letter to the clipboard
+        function copyToClipboard() {
+            const coverLetterTextarea = document.getElementById('cover-letter-text');
+            coverLetterTextarea.select();
+            document.execCommand('copy');
+            alert('AI Cover letter copied to clipboard!');
+        }
+
+        // Function to download the resuME
+        function downloadResume_1() {
+            const textToSave = document.getElementById('cover-letter-text-1').value;
+            const blob = new Blob([textToSave], { type: "text/plain" });
+            const anchor = document.createElement("a");
+            anchor.download = "resume_1.txt";
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.target = "_blank";
+            anchor.click();
+        }
+
+        // Function to copy the resuME to clipboard
+        function copyToClipboard_1() {
+            const copyText = document.getElementById('cover-letter-text-1');
+            copyText.select();
+            document.execCommand("copy");
+            alert("Optimized Resume copied to clipboard!");
+        }
+
+        // Event listener for file upload
+        $("#resume-upload").change(function () {
+            var form_data = new FormData();
+            var file_data = $("#resume-upload")[0].files[0];
+            form_data.append("file", file_data);
+
+            $.ajax({
+                type: "POST",
+                url: "/upload-search",
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+                    // Check if data is a string (error message) or an object (JSON response)
+                    if (typeof data === 'string') {
+                        // Display error message in the console
+                        console.error(data);
+                        // Show the error message to the user (You can use an alert or other UI element)
+                        alert(data);
+                    } else {
+                        // Data is an object (JSON response) with a 'content' property
+                        console.log(data.content);
+                        // Set the content in the existing text area (resume)
+                        $("#resume-text").val(data.content);
+
+                        // Show the existing text area
+                        $("#resume-upload").show();
+                    }
+                },
+                error: function (xhr, textStatus, error) {
+                    console.error("Error while uploading the file:", error);
+                    alert("An error occurred while uploading the file. Please try again later.");
+                }
+            });
+        });
+
+    </script>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $(".job-box").click(function () {
+                // Display the entire content in an alert for now
+                // You can replace this with a modal or another method of your choice
+                alert($(this).text());
+            });
+        });
+
+
+    </script>
+
+    <div aria-hidden="true" aria-labelledby="analyzeModalLabel" class="modal fade" id="analyzeModal" role="dialog"
+        tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="analyzeModalLabel">Salary Range:</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="analyzeResult"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var userId = {{ user_id }};
+    </script>
+    <script>
+        function saveDocument() {
+            const textBox = document.getElementById('cover-letter-text');
+            const documentContent = textBox.value;
+            const documentName = "Cover Letter (Job Search)";
+            const documentType = "Cover Letter (Job Search)";
+            const jobTitle = textBox.getAttribute('data-job-title');
+            const companyName = textBox.getAttribute('data-company-name');
+            const applyLink = textBox.getAttribute('data-apply-link');
+
+            fetch("/save_document", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    document_name: documentName,
+                    document_content: documentContent,
+                    document_type: documentType,
+                    job_title: jobTitle,
+                    company_name: companyName,
+                    apply_link: applyLink
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
+                        alert("Cover Letter saved successfully! You may view and download your Saved Documents from your Dashboard");
+                    } else {
+                        alert("You must be logged in to access your Dashboard.");
+                    }
+                });
+        }
+
+        function saveResume() {
+            const textBox = document.getElementById('cover-letter-text-1');
+            const resumeContent = textBox.value;
+            const resumeName = "ATS Enhanced Resume (Job Search)";
+            const documentType = "ATS Enhanced Resume (Job Search)";
+            const jobTitle = textBox.getAttribute('data-job-title');
+            const companyName = textBox.getAttribute('data-company-name');
+            const applyLink = textBox.getAttribute('data-apply-link');
+
+            fetch("/save_document", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    document_name: resumeName,
+                    document_content: resumeContent,
+                    document_type: documentType,
+                    job_title: jobTitle,
+                    company_name: companyName,
+                    apply_link: applyLink
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
+                        alert("Resume saved successfully! You may view and download your Saved Documents from your Dashboard");
+                    } else {
+                        alert("You must be logged in to access your Dashboard.");
+                    }
+                });
+        }
+    </script>
     <script>
         console.log("jQuery version:", $().jquery);
         console.log("Bootstrap:", typeof ($.fn.modal));
     </script>
-
+    </div>
 </body>
-
-<script>
-    console.log("jQuery version:", $().jquery);
-    console.log("Bootstrap:", typeof ($.fn.modal));
-</script>
-
 </body>
 
 </html>
