@@ -52,6 +52,17 @@
             margin-bottom: 20px;
             line-height: 1.6;
         }
+
+        .user-message {
+            color: blue;
+        }
+
+        .max-message {
+            color: purple;
+        }
+    </style>
+
+
     </style>
 </head>
 
@@ -168,8 +179,8 @@
             const user_input = $("#user-input").val();
             if (user_input.trim() === "") return;
 
-            // Append user's message to chat box
-            $("#chat-box").append(`<div class="message"><strong>User:</strong> ${user_input}</div>`);
+            // Append user's message to chat box and add class for color
+            $("#chat-box").append(`<div class="message user-message"><strong>Me:</strong> ${user_input}</div>`);
 
             // Clear the input box
             $("#user-input").val("");
@@ -181,14 +192,15 @@
                 contentType: "application/json",
                 data: JSON.stringify({ "user_input": user_input }),
                 success: function (response) {
-                    // Append bot's reply to chat box
-                    $("#chat-box").append(`<div class="message"><strong>Bot:</strong> ${response.response}</div>`);
+                    // Append Max's reply to chat box and add class for color (Changed "Bot" to "Max")
+                    $("#chat-box").append(`<div class="message max-message"><strong>Max:</strong> ${response.response}</div>`);
                     // Scroll to the bottom of the chat box
                     $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
                 }
             });
         }
     </script>
+
 </body>
 
 </html>

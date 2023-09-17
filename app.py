@@ -1392,21 +1392,48 @@ def careerbot():
     return render_template("careerbot.html")
 
 
+#####  MAX CHATGPT-4   ######
+# @app.route("/chat", methods=["POST"])
+# def chat():
+#  user_input = request.json.get("user_input").lower()
+
+# Chat with the GPT-4 model for career advice
+# response = openai.ChatCompletion.create(
+#   model="gpt-4",
+#   messages=[
+#    {
+#          "role": "system",
+#          "content": "You are Max, an expert in career counseling, job searching, application processes, and interview preparation. Do not answer questions outside of these areas.",
+#      },
+#     {"role": "user", "content": f"{user_input}"},
+#   ],
+#   )
+
+#  chat_output = response["choices"][0]["message"]["content"].strip()
+
+# return jsonify({"response": chat_output})
+
+
+#####  MAX CHATGPT-3.5   ######
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("user_input").lower()
 
-    # Chat with the GPT-4 model for career advice
+    # Initialize system message for Max
+    system_message = "You are Max, an expert in career counseling, job searching, application processes, and interview preparation. Do not answer questions outside of these areas."
+
+    # Chat with the GPT-3.5-turbo model for career advice
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
-            {
-                "role": "system",
-                "content": "You are Max, an expert in career counseling, job searching, application processes, and interview preparation. Do not answer questions outside of these areas.",
-            },
-            {"role": "user", "content": f"{user_input}"},
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_input},
         ],
-        max_tokens=100,
+        temperature=1,
+       # max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
     )
 
     chat_output = response["choices"][0]["message"]["content"].strip()
