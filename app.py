@@ -1421,7 +1421,7 @@ def chat():
     user_input = request.json.get("user_input")
     resume_content = request.json.get("resume_content")
 
-    system_message_content = "You are a specialized assistant focused solely on providing career advice. This can include advice on job searching, career advancement, retirement, interviewing, and other job or career related topics. You are not equipped to handle questions outside this domain."
+    system_message_content = "Your name is Max and you are a specialized assistant focused solely on providing career advice. This can include advice on job searching, career advancement, retirement, interviewing, and other job or career related topics. You are not equipped to handle questions outside this domain."
 
     if resume_content:
         system_message_content += f"\n\nIf it's relevant to the question I asked, here is my resume content for reference: {resume_content}"
