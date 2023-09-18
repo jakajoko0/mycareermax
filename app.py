@@ -7,6 +7,7 @@ import pdfkit
 import threading
 import re
 import time
+from flask_cors import CORS
 
 load_dotenv()
 from flask_mail import Mail, Message
@@ -107,6 +108,8 @@ app.config[
 ] = "/path/to/upload/folder"  # set this to your desired upload folder
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
+
+CORS(app)
 
 # Configure Flask-Mail
 app.config["MAIL_SERVER"] = "smtp.office365.com"
@@ -230,6 +233,25 @@ def delete_user_and_associated_data(username):
     finally:
         # Close the connection
         conn.close()
+
+
+@app.route("/get_resume_max", methods=["GET"])
+def get_resume_max():
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        try:
+            with create_connection().cursor() as cursor:
+                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+                cursor.execute(query, user_id)
+                row = cursor.fetchone()
+                if row:
+                    return jsonify({"success": True, "resume_content": row[0]})
+                else:
+                    return jsonify({"success": False})
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)})
+    else:
+        return jsonify({"success": False})
 
 
 @app.route("/googleba8e248f290d00cf.html")
@@ -792,6 +814,12 @@ def cover_letter_generator():
     return render_template("cover_letter_generator.html", user_id=user_id)
 
 
+@app.route("/careerbot")
+def careerbot():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("careerbot.html", user_id=user_id)
+
+
 @app.route("/resume-enhancer")
 def resume_enhancer():
     return render_template("resume_enhancer.html")
@@ -805,11 +833,6 @@ def interview_prep():
 @app.route("/tools")
 def tools():
     return render_template("tools.html")
-
-
-@app.route("/careerbot")
-def careerbot():
-    return render_template("careerbot.html")
 
 
 # RESUMETUNER OPENAI API CALLS
@@ -1392,53 +1415,41 @@ def extract_score_from_text(text):
         return 0
 
 
-#####  MAX CHATGPT-4   ######
-# @app.route("/chat", methods=["POST"])
-# def chat():
-#  user_input = request.json.get("user_input").lower()
-
-# Chat with the GPT-4 model for career advice
-# response = openai.ChatCompletion.create(
-#   model="gpt-4",
-#   messages=[
-#    {
-#          "role": "system",
-#          "content": "You are Max, an expert in career counseling, job searching, application processes, and interview preparation. Do not answer questions outside of these areas.",
-#      },
-#     {"role": "user", "content": f"{user_input}"},
-#   ],
-#   )
-
-#  chat_output = response["choices"][0]["message"]["content"].strip()
-
-# return jsonify({"response": chat_output})
-
-
-#####  MAX CHATGPT-3.5   ######
+# MAX COUNSELOR BOT API CALL
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json.get("user_input").lower()
+    user_input = request.json.get("user_input")
+    resume_content = request.json.get("resume_content")
 
-    # Initialize system message for Max
-    system_message = "You are Max, an expert in career counseling, job searching, application processes, and interview preparation. Do not answer questions outside of these areas."
+    system_message_content = "You are a specialized assistant focused solely on providing career advice. This can include advice on job searching, career advancement, retirement, interviewing, and other job or career related topics. You are not equipped to handle questions outside this domain."
 
-    # Chat with the GPT-3.5-turbo model for career advice
+    if resume_content:
+        system_message_content += f"\n\nIf it's relevant to the question I asked, here is my resume content for reference: {resume_content}"
+
+    messages = [
+        {
+            "role": "system",
+            "content": system_message_content,
+        },
+        {
+            "role": "user",
+            "content": user_input,
+        },
+    ]
+
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": user_input},
-        ],
-        temperature=1,
-        # max_tokens=256,
+        model="gpt-4",
+        messages=messages,
+        temperature=0.9,
+        max_tokens=256,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
     )
 
-    chat_output = response["choices"][0]["message"]["content"].strip()
+    chat_response = response["choices"][0]["message"]["content"].strip()
 
-    return jsonify({"response": chat_output})
+    return jsonify({"response": chat_response})
 
 
 if __name__ == "__main__":

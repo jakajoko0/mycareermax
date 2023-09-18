@@ -156,18 +156,23 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <p>Hi, I'm Max, your virtual career counselor!</p>
-                                <p>I specialize in helping people like you advance in their careers. Whether you're
-                                    looking for job
-                                    searching tips, interviewing techniques, or general career advice, I've got your
-                                    back.</p>
+                                <p>Hi, I'm Max, your personalized virtual career counselor!</p>
+                                <p>Not only do I specialize in helping you advance in your career—offering tips on job
+                                    searching,
+                                    interviewing techniques, and general career advice—I also adapt to your unique
+                                    needs. If you've
+                                    uploaded your resume to the dashboard, I'll study it to understand your background
+                                    and experience.
+                                    This allows me to provide you with individualized and targeted advice.</p>
+                                <p>It's like having your own personal career advisor who knows you inside out.</p>
                                 <p>You can ask me questions like:</p>
                                 <ul>
                                     <li>"How should I prepare for an interview?"</li>
                                     <li>"Any tips for updating my resume?"</li>
                                     <li>"How can I negotiate a better salary?"</li>
                                 </ul>
-                                <p>Let's make your career journey not just successful, but also a whole lot of fun!</p>
+                                <p>Let's embark on a career journey that's not just successful, but also personally
+                                    tailored to you!</p>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -193,31 +198,36 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // JavaScript variable to hold the resume content
+        let resume_content = "";
+
+        // Fetch the resume content when the page loads
+        $(document).ready(function () {
+            $.get("/get_resume_max", function (response) {
+                resume_content = response.resume_content;
+            });
+        });
+
         function sendMessage() {
             const user_input = $("#user-input").val();
             if (user_input.trim() === "") return;
 
-            // Append user's message to chat box and add class for color
-            $("#chat-box").append(`<div class="message user-message"><strong>Me:</strong> ${user_input}</div>`);
+            $("#chat-box").append(`<div class="message user-message"><strong>You:</strong> ${user_input}</div>`);
 
-            // Clear the input box
             $("#user-input").val("");
 
-            // Send POST request to server
             $.ajax({
                 url: "/chat",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({ "user_input": user_input }),
+                data: JSON.stringify({ "user_input": user_input, "resume_content": resume_content }),
                 success: function (response) {
-                    // Append Max's reply to chat box and add class for color (Changed "Bot" to "Max")
-                    $("#chat-box").append(`<div class="message max-message"><strong>Max:</strong> ${response.response}</div>`);
-                    // Scroll to the bottom of the chat box
-                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                    $("#chat-box").append(`<div class="message bot-message"><strong>Max:</strong> ${response.response}</div>`);
                 }
             });
         }
     </script>
+
 
 </body>
 
