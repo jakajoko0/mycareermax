@@ -507,27 +507,27 @@ def save_document():
         )
 
 
-@app.route("/dashboard", methods=["GET"])
-@login_required
-def get_user_documents():
-    user_id = current_user.id
-    user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
+# @app.route("/dashboard", methods=["GET"])
+# @login_required
+# def get_user_documents():
+#   user_id = current_user.id
+#  user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
 
-    documents_list = [
-        {
-            "id": doc.id,
-            "document_name": doc.document_name,
-            "document_content": doc.document_content,
-            "document_type": doc.document_type,
-            "creation_date": doc.creation_date,
-            "job_title": doc.job_title,  # Include job title
-            "company_name": doc.company_name,  # Include company name
-            "apply_link": doc.apply_link,  # Include apply link
-        }
-        for doc in user_documents
-    ]
+# documents_list = [
+#   {
+#        "id": doc.id,
+#      "document_name": doc.document_name,
+#     "document_content": doc.document_content,
+#    "document_type": doc.document_type,
+#   "creation_date": doc.creation_date,
+#  "job_title": doc.job_title,  # Include job title
+# "company_name": doc.company_name,  # Include company name
+# "apply_link": doc.apply_link,  # Include apply link
+#    }
+#   for doc in user_documents
+#  ]
 
-    return render_template("dashboard.html", documents=documents_list)
+# return render_template("dashboard.html", documents=documents_list)
 
 
 @app.route("/delete_document/<int:document_id>", methods=["DELETE"])
@@ -709,18 +709,6 @@ def delete_resume():
         return jsonify({"success": False, "error": "Failed to delete resume."})
 
 
-@app.route("/test_connection")
-def test_connection():
-    documents = UserDocuments.query.all()
-    return jsonify([doc.id for doc in documents])
-
-
-from flask import Flask, request, send_file, Response, stream_with_context
-from docx import Document
-import io
-import pdfkit
-
-
 @app.route("/download_document/<int:document_id>", methods=["GET"])
 def download_document(document_id):
     # Fetch the document from the database
@@ -778,10 +766,27 @@ def download_document(document_id):
         return "Invalid format specified", 400
 
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET"])
 @login_required  # Only logged-in users can access this route
 def dashboard():
-    return render_template("dashboard.html")
+    user_id = current_user.id
+    user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
+
+    documents_list = [
+        {
+            "id": doc.id,
+            "document_name": doc.document_name,
+            "document_content": doc.document_content,
+            "document_type": doc.document_type,
+            "creation_date": doc.creation_date,
+            "job_title": doc.job_title,  # Include job title
+            "company_name": doc.company_name,  # Include company name
+            "apply_link": doc.apply_link,  # Include apply link
+        }
+        for doc in user_documents
+    ]
+
+    return render_template("dashboard.html", documents=documents_list)
 
 
 @app.route("/logout")
@@ -833,6 +838,57 @@ def interview_prep():
 @app.route("/tools")
 def tools():
     return render_template("tools.html")
+
+
+@app.route("/sitemap.xml", methods=["GET"])
+def sitemap():
+    try:
+        """Generate sitemap.xml. Makes a list of URLs and date modified."""
+        pages = []
+
+        # List of routes to explicitly include in the sitemap
+        include_routes = [
+            "/forgot-password",
+            "/tools",
+            "/interview-prep",
+            "/resume-enhancer",
+            "/",
+            "/careerbot",
+            "/cover-letter-generator",
+            "/dashboard",
+            "/logout",
+            "/careerclick",
+            "/ai-builder",
+            "/delete_account",
+            "/register",
+            "/login",
+        ]
+
+        # List of routes to explicitly exclude from the sitemap
+        exclude_routes = [
+            "/get_resume_max",
+            "/googleba8e248f290d00cf.html",
+            "/app-ads.txt",
+            "/get-username",
+            "/get-saved-jobs",
+            "/get_latest_resume_name",
+            "/sitemap.xml",
+            "/resume-builder",
+            "/get-ranked-jobs",
+        ]
+
+        for rule in app.url_map.iter_rules():
+            if rule.rule in exclude_routes:
+                continue
+            if rule.rule in include_routes:
+                pages.append([rule.rule, "2023-01-01"])
+
+        sitemap_template = render_template("sitemap_template.xml", pages=pages)
+        response = Response(sitemap_template, content_type="application/xml")
+
+        return response
+    except Exception as e:
+        return str(e)
 
 
 # RESUMETUNER OPENAI API CALLS
