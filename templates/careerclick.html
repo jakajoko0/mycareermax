@@ -482,7 +482,7 @@
         </h3>
         <textarea class="form-control" id="cover-letter-text" rows="10"></textarea>
         <div class="mt-2">
-            <button class="btn btn-success" onclick="downloadCoverLetter()">⬇️ Download (.TXT)</button>
+            <!--   <button class="btn btn-success" onclick="downloadCoverLetter()">⬇️ Download (.TXT)</button>  -->
             <button class="btn btn-info" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
             <button class="btn btn-primary mt-2 ml-2" onclick="saveDocument()">💾 Save to Dashboard (.DOCX &
                 .PDF)</button>
@@ -855,14 +855,14 @@
 
 
         // Download the generated cover letter as a .txt file
-        function downloadCoverLetter() {
-            const coverLetter = document.getElementById('cover-letter-text').value;
-            const blob = new Blob([coverLetter], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.download = 'cover_letter.txt';
-            a.href = URL.createObjectURL(blob);
-            a.click();
-        }
+        //  function downloadCoverLetter() {
+        //    const coverLetter = document.getElementById('cover-letter-text').value;
+        //  const blob = new Blob([coverLetter], { type: 'text/plain' });
+        //   const a = document.createElement('a');
+        //   a.download = 'cover_letter.txt';
+        //   a.href = URL.createObjectURL(blob);
+        //   a.click();
+        //   }
 
         // Copy the generated cover letter to the clipboard
         function copyToClipboard() {

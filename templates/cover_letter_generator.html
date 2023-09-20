@@ -412,16 +412,16 @@
 
 
         // Event listener for the "Download as Text" button
-        $("#btn-download-txt1").click(function () {
-            // Get the content of the Quill editor
-            var outputContent = quill.getText();
+        //     $("#btn-download-txt1").click(function () {
+        // Get the content of the Quill editor
+        //       var outputContent = quill.getText();
 
-            // Create a blob with the content
-            var blob = new Blob([outputContent], { type: "text/plain" });
+        // Create a blob with the content
+        //     var blob = new Blob([outputContent], { type: "text/plain" });
 
-            // Save the blob as a text file using FileSaver.js
-            saveAs(blob, "cover_letter.txt");
-        });
+        // Save the blob as a text file using FileSaver.js
+        //   saveAs(blob, "cover_letter.txt");
+        //  });
 
         function saveCoverLetter() {
             // Fetch the elements first
