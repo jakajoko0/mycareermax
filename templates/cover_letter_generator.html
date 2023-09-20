@@ -289,9 +289,9 @@
     <div id="button-section" style="display: none;">
         <button class="btn btn-info mb-2" id="btn-copy" style="margin-bottom: 20px; margin-top: 30px;">📋 Copy to
             Clipboard</button>
-        <button class="btn btn-success mb-2" id="btn-download-txt" style="margin-bottom: 20px; margin-top: 30px;">⬇️
+        <!--<button class="btn btn-success mb-2" id="btn-download-txt1" style="margin-bottom: 20px; margin-top: 30px;">⬇️
             Download
-            (.TXT)</button>
+            (.TXT)</button>-->
         <button onclick="saveCoverLetter()" class="btn btn-primary mb-2" id="save-button"
             style="margin-bottom: 20px; margin-top: 30px;">💾 Save
             to Dashboard (.DOCX & .PDF)</button>
@@ -412,7 +412,7 @@
 
 
         // Event listener for the "Download as Text" button
-        $("#btn-download-txt").click(function () {
+        $("#btn-download-txt1").click(function () {
             // Get the content of the Quill editor
             var outputContent = quill.getText();
 
