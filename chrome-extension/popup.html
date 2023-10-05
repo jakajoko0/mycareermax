@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Job Application Auto-filler</title>
+    <link href="bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Job Application Auto-filler</h1>
+        <p id="questionnaireStatus" class="mb-2">Questionnaire Status: Not Completed</p>
+        <div class="mb-3">
+            <label for="resumeUpload" class="form-label">Upload Your Resume</label>
+            <input type="file" class="form-control" id="resumeUpload">
+        </div>
+        <p id="resumeStatus" class="mb-2"></p>
+        <!-- PIN Section -->
+        <div class="mb-3">
+            <label for="emailInput" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="emailInput">
+        </div>
+        <button id="generatePinButton" class="btn btn-primary mb-2">Generate PIN</button>
+        <div class="mb-3">
+            <label for="pinInput" class="form-label">Enter PIN</label>
+            <input type="text" class="form-control" id="pinInput">
+        </div>
+        <button id="pinButton" class="btn btn-secondary mb-2">Validate PIN</button>
+        <p id="pinStatus" class="mb-2"></p>
+        <!-- End of PIN Section -->
+        <button id="autoFillButton" class="btn btn-primary mb-2">Auto-fill Form</button>
+        <button id="questionnaireButton" class="btn btn-secondary mb-2" data-bs-toggle="modal"
+            data-bs-target="#questionnaireModal">Complete Questionnaire</button>
+        <!-- Job Description Section -->
+        <div class="mb-3">
+            <label for="jobDescription" class="form-label">Job Description</label>
+            <textarea class="form-control" id="jobDescription"></textarea>
+        </div>
+        <button id="generateCoverLetterButton" class="btn btn-primary mb-2">Generate Cover Letter</button>
+        <p id="coverLetterStatus" class="mb-2"></p>
+    </div>
+    <!-- Questionnaire Modal -->
+    <div class="modal fade" id="questionnaireModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Questionnaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Questionnaire form fields here -->
+                    <div class="mb-3">
+                        <label for="genderSelect" class="form-label">Gender</label>
+                        <select class="form-select" id="genderSelect">
+                            <option selected>Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dobInput" class="form-label">DOB</label>
+                        <input type="date" class="form-control" id="dobInput">
+                    </div>
+                    <div class="mb-3">
+                        <label for="citizenshipSelect" class="form-label">Citizenship Status</label>
+                        <select class="form-select" id="citizenshipSelect">
+                            <option selected>Select...</option>
+                            <option value="Citizen">Citizen</option>
+                            <option value="Permanent Resident">Permanent Resident</option>
+                            <option value="Non-Resident">Non-Resident</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="educationSelect" class="form-label">Highest Education Level</label>
+                        <select class="form-select" id="educationSelect">
+                            <option selected>Select...</option>
+                            <option value="High School">High School</option>
+                            <option value="Associate's Degree">Associate's Degree</option>
+                            <option value="Bachelor's Degree">Bachelor's Degree</option>
+                            <option value="Master's Degree">Master's Degree</option>
+                            <option value="Doctorate">Doctorate</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="submitQuestionnaire" type="button" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Local JS Files -->
+    <script src="popper.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html>

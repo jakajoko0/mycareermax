@@ -9,6 +9,7 @@ import re
 import time
 from flask_cors import CORS
 from flask import Flask, send_from_directory
+import random
 
 load_dotenv()
 from flask_mail import Mail, Message
@@ -1507,6 +1508,119 @@ def chat():
     chat_response = response["choices"][0]["message"]["content"].strip()
 
     return jsonify({"response": chat_response})
+
+
+@app.route("/autofill", methods=["POST"])
+def autofill():
+    field_context = request.json.get("field_context")
+    resume_content = request.json.get("resume_content")
+    questionnaire_data = request.json.get("questionnaire_data")
+
+    # Logging with app.logger
+    app.logger.debug(f"Received field context: {field_context}")
+    app.logger.debug(f"Received resume content: {resume_content}")
+    app.logger.debug(f"Received questionnaire data: {questionnaire_data}")
+
+    system_message_content = "You are an AI trained to auto-fill text fields based on the context, the user's resume, and their questionnaire answers."
+
+    if resume_content:
+        system_message_content += (
+            f"\n\nHere is the resume content for reference: {resume_content}"
+        )
+
+    if questionnaire_data:
+        system_message_content += (
+            f"\n\nHere are the user's questionnaire answers: {questionnaire_data}"
+        )
+
+    messages = [
+        {
+            "role": "system",
+            "content": system_message_content,
+        },
+        {
+            "role": "user",
+            "content": f"Auto-fill this field with context: {field_context}",
+        },
+    ]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=messages,
+        temperature=0.9,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+    )
+
+    autofill_response = response["choices"][0]["message"]["content"].strip()
+
+    return jsonify({"response": autofill_response})
+
+
+def update_pin_in_database(cursor, email, pin):
+    query = "UPDATE users SET access_token=? WHERE email=?"
+    cursor.execute(query, (pin, email))
+    cursor.commit()
+
+
+def get_pin_from_database(cursor, email):
+    query = "SELECT access_token FROM users WHERE email = ?"
+    cursor.execute(query, (email,))
+    row = cursor.fetchone()
+    if row:
+        return row.access_token
+    return None
+
+
+@app.route("/generate_pin", methods=["POST"])
+def generate_pin():
+    email = request.json.get("email")
+    pin = random.randint(100000, 999999)
+
+    cursor = create_connection()
+
+    if cursor is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    update_pin_in_database(cursor, email, pin)
+
+    msg = Message(
+        "Your Verification PIN", sender=app.config["MAIL_USERNAME"], recipients=[email]
+    )
+    msg.body = f"Your verification PIN is {pin}."
+    mail.send(msg)
+
+    return jsonify({"pin": pin})
+
+
+@app.route("/validate_pin", methods=["POST"])
+def validate_pin():
+    email = request.json.get("email")
+    entered_pin = request.json.get("pin")
+
+    local_conn = create_connection()
+    if local_conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        with local_conn.cursor() as cursor:
+            stored_pin = get_pin_from_database(cursor, email)
+            if stored_pin is None:
+                return (
+                    jsonify(
+                        {"status": "failure", "message": "No PIN found for this email"}
+                    ),
+                    401,
+                )
+
+            if entered_pin == stored_pin:
+                return jsonify({"status": "success"}), 200
+            else:
+                return jsonify({"status": "failure", "message": "Invalid PIN"}), 401
+    finally:
+        local_conn.close()
 
 
 if __name__ == "__main__":

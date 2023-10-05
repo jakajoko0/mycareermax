@@ -55,7 +55,7 @@
 
 
         .navbar {
-            background-image: linear-gradient(120deg, #ffffff, #4a83ff);
+            background-image: linear-gradient(120deg, #ae00ff, #0051ff);
             background-size: cover;
             background-attachment: fixed;
         }
@@ -105,7 +105,7 @@
     </script>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
-        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #ffffff;">myCareerMax.com</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -113,37 +113,37 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                    <a class="nav-link" href="/dashboard" style="color: #ffffff;">myDashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                    <a class="nav-link" href="/careerclick" style="color: #ffffff;">AI Job Search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
+                    <a class="nav-link" href="/tools" style="color: #ffffff;">Create✨</a>
                 </li>
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        aria-haspopup="true" aria-expanded="false" style="color: #ffffff;">
                         Tools
                     </a>
                     <div class="dropdown-menu" aria-labelledby="toolsDropdown">
-                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #ffffff;">Resume Scanner</a>
                         <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
                     </div>
                 </li>
                 <!-- New link for CareerBot -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                    <a class="nav-link" href="/careerbot" style="color: #ffffff;">Max</a>
                 </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ffffff;">
                         <span id="username-placeholder">Login Here</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #ffffff;">My AI Docs</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
                         <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
@@ -155,10 +155,15 @@
         </div>
     </nav>
 
-    <div style="text-align:center; margin-top: 40px;"> <!-- Added margin-top here -->
-        <img src="{{ url_for('static', filename='images/createcoverletter.png') }}" alt="Your Logo"
-            style="max-width:100%;" />
-    </div>
+    <div class="container">
+        <div style="text-align:center; margin-top: 40px; display: flex; justify-content: center;">
+            <!-- Wrapper div with default width and height -->
+            <div style="width: 300px; height: 150px;">
+                <!-- Image with Bootstrap's img-fluid class -->
+                <img src="{{ url_for('static', filename='images/createcoverletter.png') }}" alt="Your Logo"
+                    class="img-fluid" />
+            </div>
+        </div>
     </div>
 
     <div class="d-none" id="loading-spinner"
@@ -219,7 +224,7 @@
     <!-- END OF Collapsible Cover Letter Generator Intro -->
 
     <div class="container"
-        style="background: linear-gradient(to right, #ffffff, #6b9aff); border-radius: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2); padding: 20px; max-width: 800px; margin: auto;">
+        style="background: linear-gradient(120deg, #6b9aff, #d06aff); border-radius: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2); padding: 20px; max-width: 800px; margin: auto;">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6">
                 <!-- Your content starts here -->
