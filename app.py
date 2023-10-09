@@ -111,7 +111,17 @@ app.config[
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
 
+# CORS(
+#   app, resources={r"/validate": {"origins": "chrome-extension://*"}}
+# )  # Allow requests from any Chrome extension
+
 CORS(app)
+
+
+@app.before_request
+def log_request_size():
+    app.logger.debug(f"Request size: {len(request.get_data())}")
+
 
 # Configure Flask-Mail
 app.config["MAIL_SERVER"] = "smtp.office365.com"
@@ -235,6 +245,11 @@ def delete_user_and_associated_data(username):
     finally:
         # Close the connection
         conn.close()
+
+
+@app.route("/extension_test")
+def extension_test():
+    return render_template("extension_test.html")
 
 
 @app.route("/get_resume_max", methods=["GET"])
@@ -1510,117 +1525,146 @@ def chat():
     return jsonify({"response": chat_response})
 
 
-@app.route("/autofill", methods=["POST"])
-def autofill():
-    field_context = request.json.get("field_context")
-    resume_content = request.json.get("resume_content")
-    questionnaire_data = request.json.get("questionnaire_data")
-
-    # Logging with app.logger
-    app.logger.debug(f"Received field context: {field_context}")
-    app.logger.debug(f"Received resume content: {resume_content}")
-    app.logger.debug(f"Received questionnaire data: {questionnaire_data}")
-
-    system_message_content = "You are an AI trained to auto-fill text fields based on the context, the user's resume, and their questionnaire answers."
-
-    if resume_content:
-        system_message_content += (
-            f"\n\nHere is the resume content for reference: {resume_content}"
-        )
-
-    if questionnaire_data:
-        system_message_content += (
-            f"\n\nHere are the user's questionnaire answers: {questionnaire_data}"
-        )
-
-    messages = [
-        {
-            "role": "system",
-            "content": system_message_content,
-        },
-        {
-            "role": "user",
-            "content": f"Auto-fill this field with context: {field_context}",
-        },
-    ]
-
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=messages,
-        temperature=0.9,
-        max_tokens=256,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-    )
-
-    autofill_response = response["choices"][0]["message"]["content"].strip()
-
-    return jsonify({"response": autofill_response})
+################### AUTOMAX EXTENSION #######################
 
 
-def update_pin_in_database(cursor, email, pin):
-    query = "UPDATE users SET access_token=? WHERE email=?"
-    cursor.execute(query, (pin, email))
-    cursor.commit()
+@app.route("/api/message", methods=["GET"])
+def get_message():
+    return jsonify({"message": ""})
 
 
-def get_pin_from_database(cursor, email):
-    query = "SELECT access_token FROM users WHERE email = ?"
-    cursor.execute(query, (email,))
-    row = cursor.fetchone()
-    if row:
-        return row.access_token
-    return None
-
-
-@app.route("/generate_pin", methods=["POST"])
+@app.route("/api/generate_pin", methods=["POST"])
 def generate_pin():
     email = request.json.get("email")
-    pin = random.randint(100000, 999999)
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
 
-    cursor = create_connection()
+    pin = random.randint(1000, 9999)
 
-    if cursor is None:
-        return jsonify({"error": "Database connection failed"}), 500
-
-    update_pin_in_database(cursor, email, pin)
-
+    # Sending email
     msg = Message(
-        "Your Verification PIN", sender=app.config["MAIL_USERNAME"], recipients=[email]
+        "Your PIN", sender="password_reset@mycareermax.com", recipients=[email]
     )
-    msg.body = f"Your verification PIN is {pin}."
+    msg.body = f"Your generated PIN is {pin}"
     mail.send(msg)
+
+    # Connecting to Azure SQL Database
+    connection = create_connection()
+    cursor = connection.cursor()
+    update_query = f"UPDATE dbo.users SET access_token = ? WHERE email = ?"
+    cursor.execute(update_query, (str(pin), email))
+    connection.commit()
+    cursor.close()
+    connection.close()
 
     return jsonify({"pin": pin})
 
 
-@app.route("/validate_pin", methods=["POST"])
+@app.route("/api/validate_pin", methods=["POST"])
 def validate_pin():
     email = request.json.get("email")
-    entered_pin = request.json.get("pin")
+    pin = request.json.get("pin")
 
-    local_conn = create_connection()
-    if local_conn is None:
-        return jsonify({"error": "Database connection failed"}), 500
+    if not email or not pin:
+        return jsonify({"error": "Email and PIN are required"}), 400
 
+    # Connecting to Azure SQL Database
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    select_query = f"SELECT access_token FROM dbo.users WHERE email = ?"
+    cursor.execute(select_query, email)
+
+    row = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    if row:
+        stored_pin = row.access_token
+        if stored_pin == str(pin):
+            return jsonify(
+                {"status": "success", "message": "PIN validated successfully."}
+            )
+        else:
+            return jsonify({"status": "fail", "message": "Invalid PIN."}), 401
+    else:
+        return jsonify({"status": "fail", "message": "Email not found."}), 404
+
+
+def get_resume_text(pin):
     try:
-        with local_conn.cursor() as cursor:
-            stored_pin = get_pin_from_database(cursor, email)
-            if stored_pin is None:
-                return (
-                    jsonify(
-                        {"status": "failure", "message": "No PIN found for this email"}
-                    ),
-                    401,
-                )
+        # Establish a database connection
+        connection_string = (
+            f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+            f"SERVER={os.getenv('DB_SERVER')};DATABASE={os.getenv('DB_NAME')};"
+            f"UID={os.getenv('DB_USERNAME')};PWD={os.getenv('DB_PASSWORD')}"
+        )
+        conn = pyodbc.connect(connection_string)
 
-            if entered_pin == stored_pin:
-                return jsonify({"status": "success"}), 200
-            else:
-                return jsonify({"status": "failure", "message": "Invalid PIN"}), 401
-    finally:
-        local_conn.close()
+        # Query the database to retrieve the user_id based on the provided access_token (pin)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE access_token = ?", (pin,))
+        user_id_result = cursor.fetchone()
+
+        if not user_id_result:
+            return None
+
+        user_id = user_id_result[0]
+
+        # Now that we have the user_id, retrieve the resume_text from user_resumes
+        cursor.execute(
+            "SELECT resume_text FROM user_resumes WHERE user_id = ?", (user_id,)
+        )
+        result = cursor.fetchone()
+        resume_text = result[0] if result else None
+
+        # Close the database connection
+        conn.close()
+
+        return resume_text
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+
+@app.route("/api/autofill", methods=["POST"])
+def autofill():
+    # Parse JSON request data
+    data = request.json
+    pin = data.get("pin")
+    highlighted_text = data.get("highlighted_text")
+
+    # Check if PIN and highlighted text are provided
+    if not pin or not highlighted_text:
+        return jsonify({"error": "PIN and highlighted_text are required"}), 400
+
+    # Retrieve the user's resume text based on the PIN
+    resume_text = get_resume_text(pin)
+
+    if not resume_text:
+        return jsonify({"error": "User not found or resume not available"}), 404
+
+    # Define the chat messages for OpenAI API
+    messages = [
+        {
+            "role": "system",
+            "content": "You are an AI developed by Open AI and are trained to be an expert at completing job application forms. Your response should only contain the actual answer to the question or request and nothing more. All responses should be provided as if you were the one actually completing the application.",
+        },
+        {
+            "role": "user",
+            "content": f"Pretend you are the job applicant described in the resume_text below. Provide a response to the highlighted_text as if you were the applicant responding.\n\nresume_text:\n{resume_text}\nhighlighted_text:\n{highlighted_text}",
+        },
+    ]
+
+    # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
+    response = openai.ChatCompletion.create(
+        model="gpt-4", messages=messages, temperature=0.7, max_tokens=100
+    )
+
+    # Extract the generated response from the OpenAI API
+    api_response = response.choices[0].message["content"]
+
+    return jsonify({"response": api_response})
 
 
 if __name__ == "__main__":
