@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () { 
     // Fetch message from Flask API
-    fetch('http://localhost:5000/api/message')
+    fetch('https://mycareermax.azurewebsites.net/api/message')
         .then(response => response.json())
         .then(data => {
             document.getElementById("message").textContent = data.message;
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Generate PIN button functionality
     document.getElementById("generatePin").addEventListener("click", function () {
         const email = document.getElementById("email").value;
-        fetch('http://localhost:5000/api/generate_pin', {
+        fetch('https://mycareermax.azurewebsites.net/api/generate_pin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("validatePin").addEventListener("click", function () {
         const enteredPin = document.getElementById("pinInput").value;
         const email = document.getElementById("email").value;
-        fetch('http://localhost:5000/api/validate_pin', {
+        fetch('https://mycareermax.azurewebsites.net/api/validate_pin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,18 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Flask API Interaction",
+    "name": "Your Extension Name",
     "version": "1.0",
-    "icons": {
-        "16": "icon16.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
-    },
-    "action": {
-        "default_popup": "popup.html"
-    },
-    "background": {
-        "service_worker": "background.js"
-    },
+    "description": "Your extension description here.",
     "permissions": [
         "storage",
         "activeTab",
@@ -20,8 +10,21 @@
         "clipboardWrite"
     ],
     "host_permissions": [
-        "<all_urls>"
+        "http://*/*",
+        "https://*/*",
+        "https://mycareermax.azurewebsites.net/*"
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
     "content_scripts": [
         {
             "matches": [

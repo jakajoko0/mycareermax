@@ -27,7 +27,7 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
       };
 
       try {
-        const response = await fetch('http://localhost:5000/api/autofill', {
+        const response = await fetch('https://mycareermax.azurewebsites.net/api/autofill', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

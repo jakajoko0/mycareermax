@@ -14,17 +14,25 @@ document.body.appendChild(clipboardTooltip);
 
 // Function to copy text to clipboard
 function copyTextToClipboard(text) {
+  console.log("Active element before copy:", document.activeElement);  // Debug line
+  
   var textArea = document.createElement("textarea");
   textArea.value = text;
   
   // Append the textarea element to the DOM
   document.body.appendChild(textArea);
   
+  // Explicitly set focus to the textarea
+  textArea.focus();
+  
   // Select the text in the textarea
   textArea.select();
   
   // Execute the "copy" command to copy the selected text to clipboard
-  document.execCommand('copy');
+  const successful = document.execCommand('copy');
+  
+  // Log whether the copy command was successful
+  console.log('Copy command was ' + (successful ? 'successful' : 'unsuccessful'));
   
   // Remove the textarea element from the DOM
   document.body.removeChild(textArea);
@@ -45,20 +53,17 @@ function showTooltip(event) {
   }, 3000);
 }
 
-
-
 // Listen for messages from background.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.type === 'sendToChatGPT') {
     // ... Existing logic ...
-  }
-  else if (request.type === 'copyToClipboard') {
+  } else if (request.type === 'copyToClipboard') {
     console.log('Received message to copy to clipboard:', request.text);
     
     // Call the function to copy text to clipboard
     copyTextToClipboard(request.text);
 
-    // Update: Use a mouse event listener to capture the cursor's position
+    // Use a mouse event listener to capture the cursor's position
     document.addEventListener('mousemove', function onMouseMove(event) {
       // Show tooltip
       showTooltip(event);

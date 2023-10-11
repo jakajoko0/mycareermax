@@ -1658,7 +1658,7 @@ def autofill():
 
     # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
     response = openai.ChatCompletion.create(
-        model="gpt-4", messages=messages, temperature=0.7, max_tokens=100
+        model="gpt-4", messages=messages, temperature=0.7, max_tokens=1000
     )
 
     # Extract the generated response from the OpenAI API
