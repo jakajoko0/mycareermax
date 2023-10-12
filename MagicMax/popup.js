@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 if (data.pin) {
                     chrome.storage.local.set({ 'pin': data.pin }, function () {
-                        alert("PIN generated and stored.");
+                        alert("Email sent containing Pin");
                         // Hide Generate Pin button and show Validate Pin field and button
                         document.getElementById("generatePin").style.display = "none";
                         document.getElementById("pinInput").style.display = "block";

@@ -34,14 +34,12 @@
             display: block;
             margin: auto;
             margin-top: 20px;
-            /* New margin at the top */
             width: 175px;
             height: 125px;
         }
 
         .login-text-color {
             color: black;
-            /* New color for "Login" text */
             font-family: 'Noto Sans Duployan', sans-serif;
         }
 
@@ -57,13 +55,20 @@
 <body>
 
     <div class="container login-container">
+        <!-- Adding the clickable, resizable, and responsive image here -->
+        <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfKmx5JY3hUsuamQ-k6yUELRiM9Vm--tVpdK_3mZkwOamppmA/viewform?usp=sf_link">
+            <img src="/static/images/magicmaxbanner.png" alt="MagicMax Banner" class="img-fluid"
+                style="width: 500px; height: auto; border-radius: 15px;">
+        </a><br>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfKmx5JY3hUsuamQ-k6yUELRiM9Vm--tVpdK_3mZkwOamppmA/viewform?usp=sf_link"
+            class="btn btn-link">⚡ Click here to sign up for beta access</a>
+        <p>Automate job app questions with MagicMax. Sign up for beta now. ✨</p>
+        <hr>
         <div class="login-header">
-            <!-- SVG image -->
             <img src="/static/images/bluetransdoc.svg" alt="Logo" class="logo">
-            <!-- "myCareerMax" text -->
             <h3 class="custom-header-text">myCareerMax</h3>
             <hr>
-            <!-- "Login" text -->
             <h2 class="login-text-color">Login</h2>
         </div>
 
@@ -74,7 +79,7 @@
         </div>
         {% endif %}
         {% endwith %}
-        <!-- Existing login form -->
+
         <form action="/login" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
@@ -87,14 +92,13 @@
             <button type="submit" class="btn btn-primary btn-block mb-2">Login</button>
         </form>
 
-        <!-- New separate form for Guest Login -->
         <form action="/careerclick" method="get">
             <button type="submit" class="btn btn-secondary btn-block">Guest Login</button>
         </form>
 
         <div class="text-center mt-3">
             <a href="/forgot-password" class="btn btn-link">Forgot Password?</a><br>
-            <a href="/register" class="btn btn-link">Don't have an account? Register here</a>
+            <a href="/register" class="btn btn-link">Don't have an account? Register here</a><br>
         </div>
     </div>
 
