@@ -252,6 +252,11 @@ def extension_test():
     return render_template("extension_test.html")
 
 
+@app.route("/submitted")
+def submitted():
+    return render_template("submitted.html")
+
+
 @app.route("/get_resume_max", methods=["GET"])
 def get_resume_max():
     if current_user.is_authenticated:
@@ -1494,7 +1499,7 @@ def chat():
     user_input = request.json.get("user_input")
     resume_content = request.json.get("resume_content")
 
-    system_message_content = "Your name is Max and you are a specialized assistant focused solely on providing career advice. This can include advice on job searching, career advancement, retirement, interviewing, and other job or career related topics. You are not equipped to handle questions outside this domain."
+    system_message_content = "Your name is Max and you are a specialized assistant focused solely on providing career advice. This can include advice on job searching, career advancement, retirement, interviewing, and other job or career related topics. You are not equipped to handle questions outside this domain unless you are provided with the following password: maxin"
 
     if resume_content:
         system_message_content += f"\n\nIf it's relevant to the question I asked, here is my resume content for reference: {resume_content}"
@@ -1633,10 +1638,16 @@ def autofill():
     data = request.json
     pin = data.get("pin")
     highlighted_text = data.get("highlighted_text")
+    job_description = data.get("job_description")  # New parameter
 
-    # Check if PIN and highlighted text are provided
-    if not pin or not highlighted_text:
-        return jsonify({"error": "PIN and highlighted_text are required"}), 400
+    # Check if PIN, highlighted text, and job description are provided
+    if not pin or not highlighted_text or not job_description:
+        return (
+            jsonify(
+                {"error": "PIN, highlighted_text, and job_description are required"}
+            ),
+            400,
+        )
 
     # Retrieve the user's resume text based on the PIN
     resume_text = get_resume_text(pin)
@@ -1652,19 +1663,194 @@ def autofill():
         },
         {
             "role": "user",
-            "content": f"Pretend you are the job applicant described in the resume_text below. Provide a response to the highlighted_text as if you were the applicant responding.\n\nresume_text:\n{resume_text}\nhighlighted_text:\n{highlighted_text}",
+            "content": f"Pretend you are the job applicant described in the resume_text and you are applying to the job_description below. Provide a response to the highlighted_text as if you were the applicant responding.\n\nresume_text:\n{resume_text}\njob_description:\n{job_description}\nhighlighted_text:\n{highlighted_text}",
         },
     ]
 
     # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
     response = openai.ChatCompletion.create(
-        model="gpt-4", messages=messages, temperature=0.7, max_tokens=1000
+        model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
     )
 
     # Extract the generated response from the OpenAI API
     api_response = response.choices[0].message["content"]
 
     return jsonify({"response": api_response})
+
+
+@app.route("/api/generate_cover_letter_ext", methods=["POST"])
+def generate_cover_letter_ext():
+    data = request.json
+    pin = data.get("pin")
+    job_description = data.get("job_description")
+
+    if not pin or not job_description:
+        return jsonify({"error": "PIN and job_description are required"}), 400
+
+    resume_text = get_resume_text(
+        pin
+    )  # Assuming you have a function to get the resume text based on the PIN
+
+    if not resume_text:
+        return jsonify({"error": "User not found or resume not available"}), 404
+
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant trained to generate cover letters. Your response should be a fully formed cover letter based on the provided resume and job description.",
+        },
+        {
+            "role": "user",
+            "content": f"Generate a cover letter for the following job description based on the resume:\n\nJob Description:\n{job_description}\n\nResume:\n{resume_text}",
+        },
+    ]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4", messages=messages, temperature=0.7, max_tokens=1000
+    )
+
+    api_response = response.choices[0].message["content"]
+
+    return jsonify({"response": api_response})
+
+
+def summarize(text):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an expert at summarizing job descriptions.",
+            },
+            {
+                "role": "user",
+                "content": f"In 1 concise paragraph, summarize the following job description. Make sure to include company name, job title, and other important details that would be needed to write a cover letter.\n\nJob Description: 💰\n{text}",
+            },
+        ],
+        temperature=1,
+        max_tokens=2154,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+    )
+
+    # Assuming the summary is in the 'choices' list in the response object
+    summary = response["choices"][0]["message"]["content"]
+    return summary
+
+
+def summarize_text(text):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an expert at summarizing job descriptions.",
+            },
+            {
+                "role": "user",
+                "content": f"In 1 concise paragraph, summarize the following job description. Make sure to include company name, job title, and other important details that would be needed to write a cover letter.\n\nJob Description: 💰\n{text}",
+            },
+        ],
+        temperature=1,
+        max_tokens=2154,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+    )
+    summary = response["choices"][0]["message"]["content"]
+    return summary
+
+
+@app.route("/summarize", methods=["POST"])
+def summarize():
+    try:
+        print("Received Request: ", request.json)
+
+        # Step 1: Validate incoming data
+        job_description = request.json.get("job_description")
+        if not job_description:
+            return jsonify({"error": "job_description field is required"}), 400
+
+        # Step 2: Summarize the job description using OpenAI API
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+
+        summarized_description = summarize_text(job_description)
+        print("Summarized Description: ", summarized_description)
+
+        return jsonify({"summarized_description": summarized_description}), 200
+
+    except Exception as e:
+        print("Error: ", e)
+        return jsonify({"error": "An error occurred"}), 400
+
+    # Function to get saved jobs
+
+
+@app.route("/api/get_saved_jobs_ext", methods=["POST"])
+def get_saved_jobs_ext():
+    try:
+        pin = request.json.get("pin")
+        print(f"Received request to get saved jobs for PIN: {pin}")
+
+        conn = create_connection()
+        cursor = conn.cursor()
+
+        query = """
+        SELECT [job_link], [employer_logo], [job_title], [company_name], [job_description]
+        FROM saved_jobs
+        JOIN users ON saved_jobs.user_id = users.id
+        WHERE users.access_token = ?
+        """
+        cursor.execute(query, (pin,))
+        saved_jobs = [
+            dict(zip([column[0] for column in cursor.description], row))
+            for row in cursor.fetchall()
+        ]
+
+        print(f"Successfully fetched saved jobs for PIN: {pin}")
+        return jsonify({"saved_jobs": saved_jobs})
+
+    except pyodbc.Error as e:
+        print(f"Database error occurred: {e}")
+        return jsonify({"error": "Database error occurred"}), 500
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred"}), 500
+
+
+# show current resume in popup extension
+@app.route("/api/get_resume_filename", methods=["POST"])
+def get_resume_filename():
+    try:
+        pin = request.json.get("pin")
+        print(f"Received request to get resume filename for PIN: {pin}")
+
+        conn = create_connection()
+        cursor = conn.cursor()
+
+        query = """
+        SELECT user_resumes.filename
+        FROM users
+        INNER JOIN user_resumes ON users.id = user_resumes.user_id
+        WHERE users.access_token = ?
+        """
+        cursor.execute(query, (pin,))
+        row = cursor.fetchone()
+
+        if row:
+            filename = row[0]
+            print(f"Successfully fetched resume filename for PIN: {pin}")
+            return jsonify({"filename": filename})
+        else:
+            return jsonify({"error": "No resume found"}), 404
+
+    except pyodbc.Error as e:
+        print(f"Database error occurred: {e}")
+        return jsonify({"error": "Database error occurred"}), 500
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred"}), 500
 
 
 if __name__ == "__main__":

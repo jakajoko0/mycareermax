@@ -3,35 +3,219 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Bootstrap Form</title>
-    <!-- Add Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Application Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        hr.pronounced {
+            border: 0;
+            height: 5px;
+            background-color: #000;
+            box-shadow: 0px 0px 10px #888888;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function showMessage() {
+            document.getElementById("message").innerHTML = "Application submitted";
+        }
+    </script>
 </head>
 
 <body>
-    <iframe
-        src="https://docs.google.com/forms/d/e/1FAIpQLSfKmx5JY3hUsuamQ-k6yUELRiM9Vm--tVpdK_3mZkwOamppmA/viewform?embedded=true"
-        width="640" height="1267" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
     <div class="container mt-5">
-        <h1>Application Questions</h1>
-        <form>
+        <h1>Job Description</h1>
+        <form action="/submit" method="post">
             <div class="form-group">
-                <label for="question1">Do you currently </label>
-                <textarea class="form-control" id="question1" rows="4"></textarea>
+                <h2>Director, Implementation & Technical Support</h2>
+                <p><strong>Company:</strong> Skipify</p>
+                <p><strong>Remote:</strong> No</p>
+                <p><strong>Employment Type:</strong> FULLTIME</p>
+
+                <h3>Description: Who we are</h3>
+                <p>At Skipify, our mission is to eliminate friction in the shopper's journey while helping merchants
+                    build even stronger
+                    relationships with their customers. We are an early stage technology platform that is building the
+                    next generation of
+                    ubiquitous ecommerce infrastructure to bring the most efficient checkout experience to
+                    shoppers-wherever, whenever they
+                    want to make a purchase. We bridge the gap between financial institutions, ecommerce providers, and
+                    merchants so
+                    shoppers can simply enter their email and checkout instantly, with all their details pre-filled. The
+                    challenge ahead is
+                    unprecedented and oftentimes will find us having to define the opportunity for ourselves, as well as
+                    the industry at
+                    large. That means you have the unique latitude to roll up your sleeves and be a leading voice in
+                    defining the vision
+                    that drives the next generation of shopping experiences.</p>
+
+                <h3>Who you'll be working with</h3>
+                <p>At Skipify, we believe in a culture of autonomy, using values to take action. But autonomy doesn't
+                    mean you're isolated.
+                    Far from it. Our team focuses on collaboration and alignment, ensuring you have the resources at
+                    your disposal to have
+                    the most impact you can.
+
+                    The Implementation and Technical Operations team at Skipify guides our partners, both internal and
+                    external, through
+                    every stage of our partner's implementation, from strategy and design to technical development and
+                    launch. Skipify takes
+                    both an advisory and a consultative role in helping our partners successfully execute against their
+                    goals.</p>
+
+                <h3>What you'll do</h3>
+                <p>As the Director of Implementation, you will be responsible for developing and leading the
+                    implementation and technical
+                    operations team at Skipify. The team drives three key initiatives at Skipify: technical support,
+                    both internal and
+                    external; consulting and advising partners on their ideal integration strategy for success; and
+                    executing against
+                    internal and external go-live timelines.
+
+                    As we continue to scale, we are looking for a hands-on leader to help build a collaborative
+                    ecosystem where these
+                    functions work collaboratively and seamlessly.</p>
+
+                <h3>Responsibilities</h3>
+                <ul>
+                    <li><strong>Implementation:</strong>
+                        <ul>
+                            <li> Lead end-to-end client onboarding and implementation processes, working closely with
+                                clients to understand their
+                                unique needs, requirements, and workflows.
+                            </li>
+                            <li> Collaborate with cross-functional teams including sales, channel partnerships,
+                                product, and engineering to ensure
+                                smooth project execution and timely delivery of solutions.
+                            </li>
+                            <li> Conduct comprehensive training sessions for clients to ensure a deep understanding of
+                                our products' capabilities and
+                                features.
+
+
+                            </li>
+                            <li> Design and execute implementation plans, customized to each client's needs, to ensure
+                                seamless integration and rapid
+                                time-to-value.
+
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Technical Operations:</strong>
+                        <ul>
+                            <li>Provide exceptional technical support to clients, acting as the main point of contact
+                                for their inquiries, issues, and
+                                escalations.</li>
+                            <li>Troubleshoot technical problems, work closely with our engineering team to resolve
+                                complex issues, and manage
+                                communication to clients throughout the resolution process./li>
+                            <li>Document support requests and resolutions, building a knowledge base to improve
+                                efficiency and enable self-service
+                                support options.</li>
+                            <li>Proactively identify opportunities to enhance the client experience and product
+                                functionality based on feedback and
+                                recurring issues.</li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
-            <div class="form-group">
-                <label for="question2">2. What are some process changes or improvements that you've made in your current
-                    role that have been successful?</label>
-                <textarea class="form-control" id="question2" rows="4"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 
-    <!-- Add Bootstrap and jQuery JS (required for some Bootstrap components) -->
+    <hr class="pronounced">
+
+    <div class="container mt-5">
+        <h1>Application Form</h1>
+        <form action="/submit" method="post">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" class="form-control" id="fullName" name="fullName"
+                    placeholder="Enter your full name">
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
+            </div>
+
+            <!-- Website -->
+            <div class="form-group">
+                <label for="website">Website</label>
+                <input type="text" class="form-control" id="website" name="website" placeholder="Enter your website">
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" class="form-control" id="address" name="address" placeholder="Enter your address">
+            </div>
+
+            <!-- City -->
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city">
+            </div>
+
+            <!-- State -->
+            <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" class="form-control" id="state" name="state" placeholder="Enter your state">
+            </div>
+
+            <!-- Current Job Title -->
+            <div class="form-group">
+                <label for="jobTitle">Current Job Title</label>
+                <input type="text" class="form-control" id="jobTitle" name="jobTitle"
+                    placeholder="Enter your current job title">
+            </div>
+
+            <!-- Why do you want to work here? -->
+            <div class="form-group">
+                <label for="reason">Why do you want to work here?</label>
+                <textarea class="form-control" id="reason" name="reason" rows="4"
+                    placeholder="Why do you want to work here?"></textarea>
+            </div>
+
+            <!-- Example of process change -->
+            <div class="form-group">
+                <label for="example">Can you give an example of a time where you had to make a process change that was
+                    unwelcomed,
+                    how you handled the situation, and what the outcome was?</label>
+                <textarea class="form-control" id="example" name="example" rows="4"
+                    placeholder="Your answer here"></textarea>
+            </div>
+
+            <!-- Why a good fit -->
+            <div class="form-group">
+                <label for="fit">Why do you think you would be a good fit for this position?</label>
+                <textarea class="form-control" id="fit" name="fit" rows="4" placeholder="Your answer here"></textarea>
+            </div>
+
+            <!-- Cover Letter -->
+            <div class="form-group">
+                <label for="coverLetter">Cover Letter</label>
+                <textarea class="form-control" id="coverLetter" name="coverLetter" rows="6"
+                    placeholder="Your cover letter here"></textarea>
+            </div>
+
+            <!-- Submit button -->
+            <a href="/submitted"
+                style="font-size: 24px; font-weight: bold; border: 2px solid black; padding: 10px;">Submit
+                Application</a>
+
+        </form>
+        <!-- Message will be displayed here -->
+        <div id="message" style="margin-top: 20px; font-size: 24px;"></div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 </body>
 

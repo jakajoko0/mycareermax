@@ -1,57 +1,146 @@
-// Initialize the context menu
+// Function to notify the user
+function notifyUser(message) {
+  console.log("notifyUser function called");
+
+  const notificationOptions = {
+    type: 'basic',
+    iconUrl: 'icon48.png', // Make sure this icon exists in your extension's root directory
+    title: 'MagicMax Copilot',
+    message: message
+  };
+
+  chrome.notifications.create('noPinNotification', notificationOptions, function(notificationId) {
+    if (chrome.runtime.lastError) {
+      console.error("Notification Error: ", chrome.runtime.lastError);
+    } else {
+      console.log("Notification displayed with ID: ", notificationId);
+    }
+  });
+}
+
+
+
+
+// Initialize the Context Menu with a parent menu item called "MagicMax Copilot"
 chrome.runtime.onInstalled.addListener(function() {
   chrome.contextMenus.create({
-    id: "autofillWithMagicMax",
-    title: "AutoFill With MagicMax",
-    contexts: ["selection"],
+    id: 'magicMaxCopilot',
+    title: 'MagicMax Copilot',
+    contexts: ['all']
+  });
+
+  chrome.contextMenus.create({
+    id: 'autofillFromHighlightedText',
+    title: 'Autofill from highlighted text',
+    parentId: 'magicMaxCopilot',
+    contexts: ['selection']
+  });
+
+  chrome.contextMenus.create({
+    id: 'generateCoverLetter',
+    title: 'Generate Cover Letter',
+    parentId: 'magicMaxCopilot',
+    contexts: ['all']
+  });
+
+  chrome.contextMenus.create({
+    id: 'customPrompt',
+    title: 'Custom prompt',
+    parentId: 'magicMaxCopilot',
+    contexts: ['all']
+  });
+
+  chrome.contextMenus.create({
+    id: 'setJobDescription',
+    title: 'Set Job Description',
+    parentId: 'magicMaxCopilot',
+    contexts: ['all']
   });
 });
 
-// Add a click event listener for the context menu item
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  if (info.menuItemId === "autofillWithMagicMax") {
-    const highlightedText = info.selectionText;
-    
-    // Retrieve the stored PIN
-    chrome.storage.local.get(['pin'], async function(result) {
-      const storedPin = result.pin;
-      if (!storedPin) {
-        console.error('No PIN stored.');
+  if (info.menuItemId === 'setJobDescription') {
+    // Send the job description to Flask server for summarizing
+    fetch('https://mycareermax.azurewebsites.net/summarize', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ job_description: info.selectionText }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Save the summarized job description in local storage
+      chrome.storage.local.set({ job_description: data.summarized_description }, function() {
+        console.log('Summarized job description saved.');
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  if (info.menuItemId === 'autofillFromHighlightedText' || info.menuItemId === 'generateCoverLetter' || info.menuItemId === 'customPrompt') {
+    chrome.storage.local.get(['pin'], function(result) {
+      if (!result.pin) {
+        notifyUser("No PIN stored. Please generate a PIN first.");
         return;
       }
 
-      // Send the highlighted text and PIN to Flask
-      const dataToSend = {
-        pin: storedPin,
-        highlighted_text: highlightedText,
-      };
+      chrome.tabs.sendMessage(tab.id, { type: "showSpinner" });
 
-      try {
-        const response = await fetch('https://mycareermax.azurewebsites.net/api/autofill', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dataToSend),
-        });
+      const highlightedText = info.selectionText;
+      let apiEndpoint = '';
+      chrome.storage.local.get(['pin', 'job_description'], async function(result) {
+        const storedPin = result.pin;
+        const storedJobDescription = result.job_description || '';
 
-        const data = await response.json();
-        console.log('Server Response:', data);
+        const dataToSend = {
+          pin: storedPin,
+          highlighted_text: highlightedText,
+          job_description: storedJobDescription,
+        };
 
-        if (data.response) {
-          console.log('Response from server:', data.response);
+        if (info.menuItemId === 'autofillFromHighlightedText') {
+          apiEndpoint = 'https://mycareermax.azurewebsites.net/api/autofill';
+        } else if (info.menuItemId === 'generateCoverLetter') {
+          apiEndpoint = 'https://mycareermax.azurewebsites.net/api/generate_cover_letter_ext';
+        } else if (info.menuItemId === 'customPrompt') {
+          apiEndpoint = 'https://mycareermax.azurewebsites.net/api/custom_prompt';
+        }
 
-          // Send a message to content.js to copy the data to the clipboard
-          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {type: "copyToClipboard", text: data.response});
+        try {
+          const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
           });
 
-        } else {
-          console.error('No valid response received from server.');
+          const data = await response.json();
+
+          if (data.response) {
+            chrome.tabs.sendMessage(tab.id, { type: "copyToClipboard", text: data.response });
+          } else {
+            console.error('No valid response received from server.');
+          }
+        } catch (error) {
+          console.error('Error:', error);
         }
-      } catch (error) {
-        console.error('Error:', error);
-      }
+      });
     });
+  }
+});
+chrome.notifications.create({
+  type: 'basic',
+  iconUrl: 'icon48.png',
+  title: 'Test Notification',
+  message: 'This is a test!'
+}, function(notificationId) {
+  if (chrome.runtime.lastError) {
+    console.log("Could not create notification: ", chrome.runtime.lastError);
+  } else {
+    console.log("Notification created with ID: ", notificationId);
   }
 });

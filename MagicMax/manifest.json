@@ -7,7 +7,8 @@
         "storage",
         "activeTab",
         "contextMenus",
-        "clipboardWrite"
+        "clipboardWrite",
+        "notifications"
     ],
     "host_permissions": [
         "http://*/*",
@@ -18,7 +19,15 @@
         "service_worker": "background.js"
     },
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        },
+        "default_title": "MagicMax",
+        "default_width": 400,
+        "default_height": 300
     },
     "icons": {
         "16": "icon16.png",

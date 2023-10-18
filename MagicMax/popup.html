@@ -3,15 +3,141 @@
 
 <head>
     <title>MagicMax</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet" />
+    <style>
+        /* Body styles */
+        body {
+            width: 400px;
+            background: linear-gradient(to right, #1100ff, #ae00ff);
+            color: white;
+        }
+
+        /* Header 1 styles */
+        h1 {
+            font-family: 'Modern Antiqua', serif;
+            text-align: center;
+            font-size: 46px;
+            margin-bottom: 0;
+        }
+
+        /* Header 2 and Paragraph styles */
+        h2,
+        p {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        /* Textarea styles */
+        textarea {
+            color: black;
+        }
+
+        /* Active Job Description styles */
+        .sections {
+            font-size: 20px;
+            margin-left: 10px;
+            text-align: left;
+        }
+
+        /* Header 3 styles */
+        h3 {
+            text-align: right;
+        }
+
+        /* Style for "View Job" link */
+        .jobLink {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* Style for the saved job boxes */
+        .savedJobBox {
+            display: inline-block;
+            border: 1px solid white;
+            margin: 5px;
+            padding: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+            /* Set the width to 100% of the parent container */
+            text-align: left;
+            background-color: white;
+            color: blue;
+            white-space: normal;
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+                0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            /* 3D look */
+        }
+
+        /* Specifically align job titles to the left */
+        .savedJobBox h3 {
+            text-align: left;
+        }
+
+        /* Updated style for the saved jobs container */
+        #savedJobsContainer {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+
+        /* Style for the dashboard button */
+        #goToDashboard {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: white;
+            color: blue;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+                0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>MagicMax</h1>
+    <h1>&#9889;MagicMax</h1>
+    <h2>Application Copilot (beta)</h2>
     <p id="message"></p>
-    <input type="email" id="email" placeholder="Enter email">
+
+    <!-- Email and PIN section -->
+    <label for="email" id="emailLabel">Email:</label>
+    <input type="email" id="email" placeholder="Enter email" required />
     <button id="generatePin">Generate Pin</button>
-    <input type="text" id="pinInput" placeholder="Enter received PIN" style="display:none;">
+
+    <label for="pinInput" style="display:none;">PIN:</label>
+    <input type="text" id="pinInput" placeholder="Enter received PIN" style="display:none;" required />
     <button id="validatePin" style="display:none;">Validate Pin</button>
+
+    <!-- Add a button to go to the dashboard -->
+    <button id="goToDashboard">Add Resume to myCareerMax Dashboard</button>
+    <div id="resumeFilename" style="text-align: center;"></div>
+
+
+    <!-- Saved Jobs section -->
+    <h2 id="savedJobsHeader" class="sections">Saved Jobs</h2>
+    <div id="savedJobsContainer">
+        <!-- Saved jobs will be appended here -->
+    </div>
+
+    <!-- Active Job Description section -->
+    <h2 id="activeJobDescriptionHeader" class="sections">Active Job Description</h2>
+    <textarea id="jobDescription" rows="10" cols="50"></textarea>
+
+
+    <!-- Footer section -->
+    <h3><a href="https://mycareermax.com" target="_blank" style="text-decoration: none; color: white;">Extension
+            developed by myCareerMax</a></h3>
+
     <script src="popup.js"></script>
 </body>
 

@@ -1,6 +1,44 @@
 console.log("Content script is running on this page.");
 
-// Create clipboard tooltip
+let spinnerStyle = document.createElement('style');
+spinnerStyle.type = 'text/css';
+spinnerStyle.innerHTML = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+document.getElementsByTagName('head')[0].appendChild(spinnerStyle);
+
+function showSpinner() {
+  let overlay = document.createElement('div');
+  overlay.id = 'spinnerOverlay';
+  overlay.style.position = 'fixed';
+  overlay.style.left = '0';
+  overlay.style.top = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+  overlay.style.zIndex = '10000';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+
+  let spinner = document.createElement('div');
+  spinner.id = 'loadingSpinner';
+  spinner.style.border = '5px solid transparent';
+  spinner.style.borderTopColor = 'blue';
+  spinner.style.borderRadius = '50%';
+  spinner.style.width = '50px';
+  spinner.style.height = '50px';
+  spinner.style.animation = 'spin 1s linear infinite';
+
+  overlay.appendChild(spinner);
+  document.body.appendChild(overlay);
+}
+
+function removeSpinner() {
+  let overlay = document.getElementById('spinnerOverlay');
+  if (overlay) {
+    document.body.removeChild(overlay);
+  }
+}
+
 let clipboardTooltip = document.createElement('span');
 clipboardTooltip.innerHTML = "Ready To Paste";
 clipboardTooltip.style.position = "absolute";
@@ -9,66 +47,40 @@ clipboardTooltip.style.zIndex = "9999";
 clipboardTooltip.style.backgroundColor = "white";
 clipboardTooltip.style.border = "1px solid black";
 clipboardTooltip.style.padding = "5px";
-clipboardTooltip.style.display = "none";  // Initially set to 'none'
+clipboardTooltip.style.display = "none";
 document.body.appendChild(clipboardTooltip);
 
-// Function to copy text to clipboard
 function copyTextToClipboard(text) {
-  console.log("Active element before copy:", document.activeElement);  // Debug line
-  
+  let currentScrollPos = window.pageYOffset;
+
   var textArea = document.createElement("textarea");
   textArea.value = text;
-  
-  // Append the textarea element to the DOM
+  textArea.style.position = 'fixed';
   document.body.appendChild(textArea);
-  
-  // Explicitly set focus to the textarea
   textArea.focus();
-  
-  // Select the text in the textarea
   textArea.select();
-  
-  // Execute the "copy" command to copy the selected text to clipboard
-  const successful = document.execCommand('copy');
-  
-  // Log whether the copy command was successful
-  console.log('Copy command was ' + (successful ? 'successful' : 'unsuccessful'));
-  
-  // Remove the textarea element from the DOM
+  document.execCommand('copy');
   document.body.removeChild(textArea);
+  window.scrollTo(0, currentScrollPos);
+  removeSpinner();
 }
 
-// Function to show tooltip
 function showTooltip(event) {
-  // Position the tooltip at the mouse cursor's position
   clipboardTooltip.style.left = event.clientX + window.scrollX + 'px';
   clipboardTooltip.style.top = event.clientY + window.scrollY + 'px';
-  
-  // Make the tooltip visible
   clipboardTooltip.style.display = 'inline';
-  
-  // Remove tooltip after 3 seconds
   setTimeout(() => {
     clipboardTooltip.style.display = 'none';
   }, 3000);
 }
 
-// Listen for messages from background.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.type === 'sendToChatGPT') {
-    // ... Existing logic ...
+  if (request.type === 'showSpinner') {
+    showSpinner();
   } else if (request.type === 'copyToClipboard') {
-    console.log('Received message to copy to clipboard:', request.text);
-    
-    // Call the function to copy text to clipboard
     copyTextToClipboard(request.text);
-
-    // Use a mouse event listener to capture the cursor's position
     document.addEventListener('mousemove', function onMouseMove(event) {
-      // Show tooltip
       showTooltip(event);
-
-      // Remove the event listener
       document.removeEventListener('mousemove', onMouseMove);
     });
   }
