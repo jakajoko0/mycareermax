@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_login">Login</string>
+    <string name="app_name">mycareermax</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="title_dashboard">myDashboard</string>
+    <string name="title_careerclick">AI Job Search</string>
+    <string name="title_tools_create">Create✨</string>
+    <string name="title_resume_scanner">Resume Scanner</string>
+    <string name="title_interview_prep">Interview Prep</string>
+    <string name="title_max">Max - AI Career Coach</string>
+    <string name="title_logout">Logout</string>
+    <string name="title_delete_account">Delete Account</string>
+</resources>

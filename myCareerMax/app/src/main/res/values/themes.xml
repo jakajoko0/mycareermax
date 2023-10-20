@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MyCareerMax" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#0022FF</item>
+        <item name="colorPrimaryVariant">#6A00FF</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#37FF00</item>
+        <item name="colorSecondaryVariant">#00FFC4</item>
+        <item name="colorOnSecondary">#000000</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">#0022FF</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!-- NavigationView Theme -->
+    <style name="NavigationViewTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Color for the icons -->
+        <item name="colorOnSurface">#FFFFFF</item>
+        <!-- Color for the text -->
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+</resources>
