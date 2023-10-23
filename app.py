@@ -1719,34 +1719,6 @@ def generate_cover_letter_ext():
     return jsonify({"response": api_response})
 
 
-def summarize(text):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are an expert at summarizing job descriptions.",
-            },
-            {
-                "role": "user",
-                "content": f"In 1 concise paragraph, summarize the following job description. Make sure to include company name, job title, and other important details that would be needed to write a cover letter.\n\nJob Description: 💰\n{text}",
-            },
-        ],
-        temperature=1,
-        max_tokens=2154,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-    )
-
-    # Assuming the summary is in the 'choices' list in the response object
-    summary = response["choices"][0]["message"]["content"]
-    return summary
-
-
-import openai  # Make sure to import the OpenAI library
-
-
 def summarize_text(text):
     try:
         response = openai.ChatCompletion.create(
@@ -1785,8 +1757,6 @@ def summarize():
             return jsonify({"error": "job_description field is required"}), 400
 
         # Step 2: Summarize the job description using OpenAI API
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-
         summarized_description = summarize_text(job_description)
         print("Summarized Description: ", summarized_description)
 
@@ -1795,8 +1765,6 @@ def summarize():
     except Exception as e:
         print("Error: ", e)
         return jsonify({"error": "An error occurred"}), 400
-
-    # Function to get saved jobs
 
 
 @app.route("/api/get_saved_jobs_ext", methods=["POST"])
