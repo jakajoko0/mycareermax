@@ -101,6 +101,25 @@
                 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             cursor: pointer;
         }
+
+        #signOut {
+            display: block;
+            margin: 20px auto;
+            /* Add margin for spacing */
+            padding: 10px 20px;
+            background-color: white;
+            color: blue;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+                0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            cursor: pointer;
+        }
+
+        /* Style for the 'Register Here' hyperlink */
+        #unauthenticatedMessage #registerLink {
+            color: white;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -108,7 +127,12 @@
     <h1>&#9889;MagicMax</h1>
     <h2>Application Copilot (beta)</h2>
     <p id="message"></p>
-
+    <div id="unauthenticatedMessage" style="display:block; margin-bottom: 20px;">
+        You must have a myCareerMax account in order to access the MagicMax browser extension.
+        Provide the email associated with your myCareerMax account below to generate a Pin for access.<br><br>
+        Don't have a myCareerMax account yet? <a href="https://app.mycareermax.com/register" target="_blank"
+            id="registerLink">Register Here</a>
+    </div>
     <!-- Email and PIN section -->
     <label for="email" id="emailLabel">Email:</label>
     <input type="email" id="email" placeholder="Enter email" required />
@@ -133,6 +157,7 @@
     <h2 id="activeJobDescriptionHeader" class="sections">Active Job Description</h2>
     <textarea id="jobDescription" rows="10" cols="50"></textarea>
 
+    <button id="signOut">Sign Out</button>
 
     <!-- Footer section -->
     <h3><a href="https://mycareermax.com" target="_blank" style="text-decoration: none; color: white;">Extension

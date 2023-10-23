@@ -22,78 +22,96 @@ document.addEventListener("DOMContentLoaded", function () {
             'jobDescription',
             'resumeFilename',
             'savedJobsHeader',
-            'activeJobDescriptionHeader'
+            'activeJobDescriptionHeader',
+            'signOut'
         ];
 
-        if (result.isAuthenticated) {
-            // Show the relevant elements
-            elementsToHide.forEach(id => {
-                document.getElementById(id).style.display = 'block';
-            });
+if (result.isAuthenticated) {
+    elementsToHide.forEach(id => {
+        document.getElementById(id).style.display = 'block';
+    });
+    document.getElementById("signOut").style.display = 'block';
+    document.getElementById("email").style.display = "none";
+    document.getElementById("emailLabel").style.display = "none";
+    document.getElementById("generatePin").style.display = "none";
+    document.getElementById("unauthenticatedMessage").style.display = "none";
+} else {
+    elementsToHide.forEach(id => {
+        document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById("signOut").style.display = 'none';
+    document.getElementById("unauthenticatedMessage").style.display = "block";
+    if (result.pin) {
+        storedPin = result.pin;
+        document.getElementById("generatePin").style.display = "block";
+        document.getElementById("pinInput").style.display = "block";
+        document.getElementById("validatePin").style.display = "block";
+    }
+}
 
-            // Hide authentication-related fields
-            document.getElementById("email").style.display = "none";
-            document.getElementById("emailLabel").style.display = "none";
-            document.getElementById("generatePin").style.display = "none";
-        } else {
-            // Hide the relevant elements
-            elementsToHide.forEach(id => {
-                document.getElementById(id).style.display = 'none';
-            });
-
-            if (result.pin) {
-                storedPin = result.pin;
-                document.getElementById("generatePin").style.display = "none";
-                document.getElementById("pinInput").style.display = "block";
-                document.getElementById("validatePin").style.display = "block";
-            }
-        }
 
         if (result.job_description) {
             document.getElementById("jobDescription").value = result.job_description;
         }
 
-        // Fetch saved jobs and resume filename if a PIN is stored
         if (result.pin) {
             fetchSavedJobs(result.pin);
             fetchResumeFilename(result.pin);
         }
     });
 
-    // Initialize a variable to keep track of the current job index
+    // Event Listener for Sign Out button
+    document.getElementById("signOut").addEventListener("click", function () {
+        chrome.storage.local.remove(['pin', 'isAuthenticated'], function() {
+            document.getElementById("email").style.display = "block";
+            document.getElementById("emailLabel").style.display = "block";
+            document.getElementById("generatePin").style.display = "block";
+            const elementsToHide = [
+                'goToDashboard',
+                'savedJobsContainer',
+                'jobDescription',
+                'resumeFilename',
+                'savedJobsHeader',
+                'activeJobDescriptionHeader',
+                'signOut'
+            ];
+            elementsToHide.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            alert("You have been signed out.");
+        });
+    });
+
     let currentJobIndex = 0;
     let allJobs = [];
 
-    // Function to display saved jobs
-// Function to display saved jobs
-function displaySavedJobs() {
-    const savedJobsContainer = document.getElementById("savedJobsContainer");
-    savedJobsContainer.innerHTML = ""; // Clear previous entries
+    function displaySavedJobs() {
+        const savedJobsContainer = document.getElementById("savedJobsContainer");
+        savedJobsContainer.innerHTML = "";
 
-    allJobs.forEach((job, index) => {
-        const jobDiv = document.createElement("div");
-        jobDiv.className = "savedJobBox"; // Style the div
+        allJobs.forEach((job, index) => {
+            const jobDiv = document.createElement("div");
+            jobDiv.className = "savedJobBox";
 
-        const jobTitle = document.createElement("h3");
-        jobTitle.textContent = job.job_title;
+            const jobTitle = document.createElement("h3");
+            jobTitle.textContent = job.job_title;
 
-        const jobCompany = document.createElement("p");
-        jobCompany.textContent = job.company_name;  // Make sure the attribute name matches your Flask route's output
+            const jobCompany = document.createElement("p");
+            jobCompany.textContent = job.company_name;
 
-        const jobLink = document.createElement("a");
-        jobLink.href = job.job_link;  // Make sure the attribute name matches your Flask route's output
-        jobLink.target = "_blank";
-        jobLink.textContent = "View Job";
+            const jobLink = document.createElement("a");
+            jobLink.href = job.job_link;
+            jobLink.target = "_blank";
+            jobLink.textContent = "View Job";
 
-        jobDiv.appendChild(jobTitle);
-        jobDiv.appendChild(jobCompany);
-        jobDiv.appendChild(jobLink);
+            jobDiv.appendChild(jobTitle);
+            jobDiv.appendChild(jobCompany);
+            jobDiv.appendChild(jobLink);
 
-        savedJobsContainer.appendChild(jobDiv);
-    });
-}
+            savedJobsContainer.appendChild(jobDiv);
+        });
+    }
 
-    // Function to fetch saved jobs
     function fetchSavedJobs(pin) {
         fetch('https://mycareermax.azurewebsites.net/api/get_saved_jobs_ext', {
             method: 'POST',
@@ -106,7 +124,7 @@ function displaySavedJobs() {
         .then(data => {
             if (data.saved_jobs) {
                 allJobs = data.saved_jobs;
-                displaySavedJobs(); // Display the saved jobs
+                displaySavedJobs();
             }
         })
         .catch(error => {
@@ -114,7 +132,6 @@ function displaySavedJobs() {
         });
     }
 
-    // Function to fetch resume filename
     function fetchResumeFilename(pin) {
         fetch('https://mycareermax.azurewebsites.net/api/get_resume_filename', {
             method: 'POST',
@@ -135,10 +152,8 @@ function displaySavedJobs() {
         });
     }
 
-    // Event Listener for Generate Pin button
     document.getElementById("generatePin").addEventListener("click", function () {
         const email = document.getElementById("email").value;
-
         fetch('https://mycareermax.azurewebsites.net/api/generate_pin', {
             method: 'POST',
             headers: {
@@ -151,7 +166,6 @@ function displaySavedJobs() {
             if (data.pin) {
                 chrome.storage.local.set({ 'pin': data.pin }, function () {
                     alert("Email sent containing Pin");
-                    document.getElementById("generatePin").style.display = "none";
                     document.getElementById("pinInput").style.display = "block";
                     document.getElementById("validatePin").style.display = "block";
                 });
@@ -162,11 +176,9 @@ function displaySavedJobs() {
         });
     });
 
-    // Event Listener for Validate Pin button
     document.getElementById("validatePin").addEventListener("click", function () {
         const enteredPin = document.getElementById("pinInput").value;
         const email = document.getElementById("email").value;
-
         fetch('https://mycareermax.azurewebsites.net/api/validate_pin', {
             method: 'POST',
             headers: {
@@ -178,11 +190,12 @@ function displaySavedJobs() {
         .then(data => {
             if (data.status === 'success') {
                 chrome.storage.local.set({ 'isAuthenticated': true }, function () {
+                    document.getElementById("generatePin").style.display = "none";
                     document.getElementById("email").style.display = "none";
                     document.getElementById("emailLabel").style.display = "none";
-                    document.getElementById("generatePin").style.display = "none";
                     document.getElementById("pinInput").style.display = "none";
                     document.getElementById("validatePin").style.display = "none";
+                    document.getElementById("unauthenticatedMessage").style.display = "none";
                     const elementsToShow = [
                         'goToDashboard',
                         'savedJobsContainer',
@@ -204,9 +217,6 @@ function displaySavedJobs() {
         });
     });
 
-
-
-    // Add click event for the 'goToDashboard' button
     document.getElementById("goToDashboard").addEventListener("click", function () {
         window.open('https://app.mycareermax.com/dashboard', '_blank');
     });

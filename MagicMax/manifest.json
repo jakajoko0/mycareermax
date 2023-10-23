@@ -1,19 +1,14 @@
 {
     "manifest_version": 3,
-    "name": "Your Extension Name",
-    "version": "1.0",
-    "description": "Your extension description here.",
+    "name": "MagicMax - Job Application Copilot",
+    "version": "1.1",
+    "description": "Automate your job applications with our 1-Click Autofill Solution. Just Upload Your Resume. Powered by ChatGPT-4.",
     "permissions": [
         "storage",
         "activeTab",
         "contextMenus",
         "clipboardWrite",
         "notifications"
-    ],
-    "host_permissions": [
-        "http://*/*",
-        "https://*/*",
-        "https://mycareermax.azurewebsites.net/*"
     ],
     "background": {
         "service_worker": "background.js"

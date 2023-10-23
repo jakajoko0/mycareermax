@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Application Tracker</title>
+    <script src="background.js"></script>
+</head>
+
+<body>
+    <h1>Application Tracker</h1>
+
+    <h2>Manually trigger actions</h2>
+    <button onclick="manualTrigger('addToTracker')">Add To Tracker</button>
+    <button onclick="manualTrigger('setJobDescription')">Set Job Description</button>
+    <button onclick="manualTrigger('autofillFromHighlightedText')">Autofill From Highlighted Text</button>
+    <button onclick="manualTrigger('generateCoverLetter')">Generate Cover Letter</button>
+    <button onclick="manualTrigger('customPrompt')">Custom Prompt</button>
+
+    <script>
+        function manualTrigger(action) {
+            chrome.runtime.sendMessage({
+                type: "manualTrigger",
+                action: action,
+                selectionText: "This is a test job description."
+            });
+        }
+    </script>
+</body>
+
+</html>

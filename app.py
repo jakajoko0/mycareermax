@@ -862,6 +862,11 @@ def tools():
     return render_template("tools.html")
 
 
+@app.route("/apptracker")
+def apptracker():
+    return render_template("apptracker.html")
+
+
 @app.route("/sitemap.xml", methods=["GET"])
 def sitemap():
     try:
@@ -1848,6 +1853,60 @@ def get_resume_filename():
     except pyodbc.Error as e:
         print(f"Database error occurred: {e}")
         return jsonify({"error": "Database error occurred"}), 500
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred"}), 500
+
+
+from flask import request, jsonify
+import pyodbc
+import os
+
+
+@app.route("/api/add_job", methods=["POST"])
+def add_job():
+    try:
+        # Extract the required data from the request payload
+        pin = request.json.get("pin")
+        summarized_description = request.json.get("summarized_description")
+        job_url = request.json.get("job_url")
+
+        if not all([pin, summarized_description, job_url]):
+            return jsonify({"error": "All fields are required"}), 400
+
+        # Establish a database connection
+        connection_string = (
+            f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+            f"SERVER={os.getenv('DB_SERVER')};DATABASE={os.getenv('DB_NAME')};"
+            f"UID={os.getenv('DB_USERNAME')};PWD={os.getenv('DB_PASSWORD')}"
+        )
+        conn = pyodbc.connect(connection_string)
+
+        # Query the database to retrieve the user_id based on the provided pin (access_token)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE access_token = ?", (pin,))
+        user_id_result = cursor.fetchone()
+
+        if not user_id_result:
+            return jsonify({"error": "Invalid PIN"}), 400
+
+        user_id = user_id_result[0]
+
+        # Insert the new job application into dbo.application_tracker
+        insert_query = """
+        INSERT INTO dbo.application_tracker (user_id, job_url, summarized_description, status)
+        VALUES (?, ?, ?, ?)
+        """
+        cursor.execute(
+            insert_query, (user_id, job_url, summarized_description, "Applied")
+        )
+        conn.commit()
+
+        # Close the database connection
+        conn.close()
+
+        return jsonify({"message": "Job added to tracker successfully"}), 200
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({"error": "An error occurred"}), 500
