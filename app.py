@@ -1744,27 +1744,34 @@ def summarize(text):
     return summary
 
 
+import openai  # Make sure to import the OpenAI library
+
+
 def summarize_text(text):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are an expert at summarizing job descriptions.",
-            },
-            {
-                "role": "user",
-                "content": f"Begin by stating the company name and job title on separate lines, followed by 1 concise paragraph, summarizing the following job description responsibilities and qualifications. Capture all important details that would be needed to write a cover letter.\n\nJob Description: 💰\n{text}",
-            },
-        ],
-        temperature=1,
-        max_tokens=2154,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-    )
-    summary = response["choices"][0]["message"]["content"]
-    return summary
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert at summarizing job descriptions.",
+                },
+                {
+                    "role": "user",
+                    "content": f"In 1 concise paragraph, summarize this job description, using the following format. job description:{text}. Format: [Company Name]\n[Job Title]\n\n[Summary of Job Description]",
+                },
+            ],
+            temperature=1,
+            max_tokens=2154,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
+        summary = response["choices"][0]["message"]["content"]
+        return summary
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # or some default value
 
 
 @app.route("/summarize", methods=["POST"])
