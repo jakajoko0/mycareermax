@@ -1867,7 +1867,7 @@ import os
 def add_job():
     try:
         pin = request.json.get("pin")
-        summarized_description = request.json.get("job_summary")
+        job_summary = request.json.get("job_summary")
         job_url = request.json.get("application_url")
 
         if not all([pin, summarized_description, job_url]):
