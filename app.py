@@ -1754,7 +1754,7 @@ def summarize_text(text):
             },
             {
                 "role": "user",
-                "content": f"In 1 concise paragraph, summarize the following job description. Make sure to include company name, job title, and other important details that would be needed to write a cover letter.\n\nJob Description: 💰\n{text}",
+                "content": f"Begin by stating the company name and job title on separate lines, followed by 1 concise paragraph, summarizing the following job description responsibilities and qualifications. Capture all important details that would be needed to write a cover letter.\n\nJob Description: 💰\n{text}",
             },
         ],
         temperature=1,
@@ -1867,7 +1867,7 @@ import os
 def add_job():
     try:
         pin = request.json.get("pin")
-        job_summary = request.json.get("job_summary")  
+        job_summary = request.json.get("job_summary")
         job_url = request.json.get("job_url")
 
         if not all([pin, job_summary, job_url]):
@@ -1895,9 +1895,7 @@ def add_job():
         INSERT INTO dbo.application_tracker (user_id, job_url, job_summary, status)
         VALUES (?, ?, ?, ?)
         """
-        cursor.execute(
-            insert_query, (user_id, job_url, job_summary, "Applied")
-        )
+        cursor.execute(insert_query, (user_id, job_url, job_summary, "Applied"))
         conn.commit()
 
         conn.close()
@@ -1922,16 +1920,13 @@ def get_tracked_jobs():
         conn = pyodbc.connect(connection_string)
 
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT job_summary, job_url FROM dbo.application_tracker"
-        )
+        cursor.execute("SELECT job_summary, job_url FROM dbo.application_tracker")
         rows = cursor.fetchall()
 
         conn.close()
 
         jobs = [
-            {"job_summary": row.job_summary, "job_url": row.job_url}
-            for row in rows
+            {"job_summary": row.job_summary, "job_url": row.job_url} for row in rows
         ]
 
         return jsonify(jobs), 200
