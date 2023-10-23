@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener(function() {
     contexts: ['selection']
   });
 
-    chrome.contextMenus.create({
+  chrome.contextMenus.create({
     id: 'autofillFromHighlightedText',
     title: 'Autofill from highlighted text',
     parentId: 'magicMaxCopilot',
@@ -59,6 +59,13 @@ chrome.runtime.onInstalled.addListener(function() {
     title: 'Custom prompt',
     parentId: 'magicMaxCopilot',
     contexts: ['all']
+  });
+
+    chrome.contextMenus.create({
+    id: 'dontTrack',
+    title: "Don't Track",
+    parentId: 'setJobDescription',
+    contexts: ['selection']
   });
 
   console.log("Context menus created");
@@ -130,29 +137,33 @@ fetch('https://mycareermax.azurewebsites.net/api/add_job', {
       });
     }
 
-    if (info.menuItemId === 'setJobDescription') {
-      console.log("setJobDescription selected, sending job description to summarize");
-      // Send the job description to Flask server for summarizing
-      fetch('https://mycareermax.azurewebsites.net/summarize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ job_description: info.selectionText }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Received summarized job description:", data.summarized_description);
-        // Save the summarized job description in local storage
-        chrome.storage.local.set({ job_description: data.summarized_description }, function() {
-          console.log('Summarized job description saved in local storage.');
-          notifyUser("Job Description Set. You can view the active job description in the Extension popup");
-        });
-      })
-      .catch(error => {
-        console.error('Error:', error);
+  if (info.menuItemId === 'setJobDescription') {
+    // Summarize the selected job description and save it in local storage
+    fetch('https://mycareermax.azurewebsites.net/summarize', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ job_description: info.selectionText }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      chrome.storage.local.set({ job_description: data.summarized_description }, function() {
+        notifyUser("Job description set. You can now use it for other features.");
       });
-    }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  if (info.menuItemId === 'dontTrack') {
+    // Save the selected text as the job description without tracking it
+    chrome.storage.local.set({ job_description: info.selectionText }, function() {
+      notifyUser("Job description set without tracking. You can now use it for other features.");
+    });
+  }
+
 
     if (info.menuItemId === 'autofillFromHighlightedText' || info.menuItemId === 'generateCoverLetter' || info.menuItemId === 'customPrompt') {
       console.log("Selected:", info.menuItemId, "Sending highlighted text for processing");
@@ -203,13 +214,5 @@ fetch('https://mycareermax.azurewebsites.net/api/add_job', {
     }
   });
 });
-// Listen for manual triggers from the test page
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.type === "manualTrigger") {
-    const info = { menuItemId: request.action, selectionText: request.selectionText };
-    const tab = {}; // Empty tab object as it's not really needed here
-    console.log("Manually triggering action:", request.action);
-    chrome.contextMenus.onClicked.dispatch(info, tab);
-  }
-});
+
 
