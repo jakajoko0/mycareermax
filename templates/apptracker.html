@@ -9,21 +9,30 @@
 <body>
     <h1>Application Tracker</h1>
 
-    <h2>Manually trigger actions</h2>
-    <button onclick="manualTrigger('addToTracker')">Add To Tracker</button>
-    <button onclick="manualTrigger('setJobDescription')">Set Job Description</button>
-    <button onclick="manualTrigger('autofillFromHighlightedText')">Autofill From Highlighted Text</button>
-    <button onclick="manualTrigger('generateCoverLetter')">Generate Cover Letter</button>
-    <button onclick="manualTrigger('customPrompt')">Custom Prompt</button>
+    <h2>Tracked Jobs</h2>
+    <div id="trackedJobs">
+        <!-- Jobs will be populated here -->
+    </div>
 
     <script>
-        function manualTrigger(action) {
-            chrome.runtime.sendMessage({
-                type: "manualTrigger",
-                action: action,
-                selectionText: "This is a test job description."
-            });
+        // Function to fetch and display tracked jobs
+        function fetchTrackedJobs() {
+            fetch('https://mycareermax.azurewebsites.net/api/get_tracked_jobs')  // Replace with your actual API endpoint
+                .then(response => response.json())
+                .then(data => {
+                    let jobList = '';
+                    for (const job of data) {
+                        jobList += `<p>${job.job_summary} - ${job.application_url}</p>`;
+                    }
+                    document.getElementById('trackedJobs').innerHTML = jobList;
+                })
+                .catch(error => {
+                    console.error('Error fetching tracked jobs:', error);
+                });
         }
+
+        // Call the function to fetch and display jobs
+        fetchTrackedJobs();
     </script>
 </body>
 

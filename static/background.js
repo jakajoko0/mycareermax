@@ -30,34 +30,13 @@ chrome.runtime.onInstalled.addListener(function() {
     id: 'setJobDescription',
     title: 'Set Job Description',
     parentId: 'magicMaxCopilot',
-    contexts: ['selection']
+    contexts: ['all']
   });
 
   chrome.contextMenus.create({
     id: 'addToTracker',
     title: 'Add to Tracker',
     parentId: 'setJobDescription',
-    contexts: ['selection']
-  });
-
-    chrome.contextMenus.create({
-    id: 'autofillFromHighlightedText',
-    title: 'Autofill from highlighted text',
-    parentId: 'magicMaxCopilot',
-    contexts: ['selection']
-  });
-
-  chrome.contextMenus.create({
-    id: 'generateCoverLetter',
-    title: 'Generate Cover Letter',
-    parentId: 'magicMaxCopilot',
-    contexts: ['all']
-  });
-
-  chrome.contextMenus.create({
-    id: 'customPrompt',
-    title: 'Custom prompt',
-    parentId: 'magicMaxCopilot',
     contexts: ['all']
   });
 

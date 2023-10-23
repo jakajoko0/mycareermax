@@ -1868,8 +1868,8 @@ def add_job():
     try:
         # Extract the required data from the request payload
         pin = request.json.get("pin")
-        summarized_description = request.json.get("summarized_description")
-        job_url = request.json.get("job_url")
+        summarized_description = request.json.get("job_summary")
+        job_url = request.json.get("application_url")
 
         if not all([pin, summarized_description, job_url]):
             return jsonify({"error": "All fields are required"}), 400
@@ -1906,6 +1906,40 @@ def add_job():
         conn.close()
 
         return jsonify({"message": "Job added to tracker successfully"}), 200
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred"}), 500
+
+
+@app.route("/api/get_tracked_jobs", methods=["GET"])
+def get_tracked_jobs():
+    try:
+        # Establish a database connection
+        connection_string = (
+            f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+            f"SERVER={os.getenv('DB_SERVER')};DATABASE={os.getenv('DB_NAME')};"
+            f"UID={os.getenv('DB_USERNAME')};PWD={os.getenv('DB_PASSWORD')}"
+        )
+        conn = pyodbc.connect(connection_string)
+
+        # Query the database to get the tracked jobs
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT job_summary, application_url FROM dbo.application_tracker"
+        )
+        rows = cursor.fetchall()
+
+        # Close the database connection
+        conn.close()
+
+        # Convert rows to a list of dictionaries for JSON serialization
+        jobs = [
+            {"job_summary": row.job_summary, "application_url": row.application_url}
+            for row in rows
+        ]
+
+        return jsonify(jobs), 200
 
     except Exception as e:
         print(f"An error occurred: {e}")
