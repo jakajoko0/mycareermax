@@ -3,7 +3,6 @@
 
 <head>
     <title>Application Tracker</title>
-    <script src="background.js"></script>
 </head>
 
 <body>
@@ -22,7 +21,7 @@
                 .then(data => {
                     let jobList = '';
                     for (const job of data) {
-                        jobList += `<p>${job.job_summary} - ${job.application_url}</p>`;
+                        jobList += `<p>${job.job_summary} - ${job.job_url}</p>`;  // Changed from job.application_url to job.job_url
                     }
                     document.getElementById('trackedJobs').innerHTML = jobList;
                 })

@@ -1867,10 +1867,10 @@ import os
 def add_job():
     try:
         pin = request.json.get("pin")
-        job_summary = request.json.get("job_summary")
-        job_url = request.json.get("application_url")
+        job_summary = request.json.get("job_summary")  
+        job_url = request.json.get("job_url")
 
-        if not all([pin, summarized_description, job_url]):
+        if not all([pin, job_summary, job_url]):
             return jsonify({"error": "All fields are required"}), 400
 
         connection_string = (
@@ -1892,11 +1892,11 @@ def add_job():
         user_id = user_id_result[0]
 
         insert_query = """
-        INSERT INTO dbo.application_tracker (user_id, job_url, summarized_description, status)
+        INSERT INTO dbo.application_tracker (user_id, job_url, job_summary, status)
         VALUES (?, ?, ?, ?)
         """
         cursor.execute(
-            insert_query, (user_id, job_url, summarized_description, "Applied")
+            insert_query, (user_id, job_url, job_summary, "Applied")
         )
         conn.commit()
 
@@ -1923,14 +1923,14 @@ def get_tracked_jobs():
 
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT job_summary, application_url FROM dbo.application_tracker"
+            "SELECT job_summary, job_url FROM dbo.application_tracker"
         )
         rows = cursor.fetchall()
 
         conn.close()
 
         jobs = [
-            {"job_summary": row.job_summary, "application_url": row.application_url}
+            {"job_summary": row.job_summary, "job_url": row.job_url}
             for row in rows
         ]
 

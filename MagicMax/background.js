@@ -101,26 +101,26 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
               const storedPin = result.pin;
               console.log("Stored PIN:", storedPin);
 
-              fetch('https://mycareermax.azurewebsites.net/api/add_job', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  pin: storedPin,
-                  job_summary: data.summarized_description,
-                  application_url: url
-                }),
-              })
-              .then(response => response.json())
-              .then(data => {
-                console.log("Received response from /api/add_job:", data);
-                // Handle response from /api/add_job
-                notifyUser("Job added to tracker.");
-              })
-              .catch(error => {
-                console.error('Error:', error);
-              });
+fetch('https://mycareermax.azurewebsites.net/api/add_job', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    pin: storedPin,
+    job_summary: data.summarized_description,
+    job_url: url  // Changed from application_url to job_url
+  }),
+})
+.then(response => response.json())
+.then(data => {
+  console.log("Received response from /api/add_job:", data);
+  // Handle response from /api/add_job
+  notifyUser("Job added to tracker.");
+})
+.catch(error => {
+  console.error('Error:', error);
+});
             });
           });
         })
