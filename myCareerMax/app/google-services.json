@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "42162527856",
+    "project_id": "mycareermax-ce12a",
+    "storage_bucket": "mycareermax-ce12a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42162527856:android:2fa770c435d77e28f89eb5",
+        "android_client_info": {
+          "package_name": "com.mycareermax.mycareermax"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3pYt5omkvJ7-5IIc1rOSV2zhlrUyn-Qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

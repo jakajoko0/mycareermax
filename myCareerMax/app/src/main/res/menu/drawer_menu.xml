@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/baseline_login_24"
+            android:title="@string/title_login" />
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/baseline_dashboard_24"
+            android:title="@string/title_dashboard" />
+        <item
+            android:id="@+id/nav_careerclick"
+            android:icon="@drawable/baseline_saved_search_24"
+            android:title="@string/title_careerclick" />
+        <item
+            android:id="@+id/nav_max"
+            android:icon="@drawable/baseline_assistant_24"
+            android:title="@string/title_max" />
+        <item
+            android:id="@+id/nav_tools_create"
+            android:icon="@drawable/baseline_post_add_24"
+            android:title="@string/title_tools_create" />
+        <item
+            android:id="@+id/nav_resume_scanner"
+            android:icon="@drawable/baseline_document_scanner_24"
+            android:title="@string/title_resume_scanner" />
+        <item
+            android:id="@+id/nav_interview_prep"
+            android:icon="@drawable/outline_handshake_24"
+            android:title="@string/title_interview_prep" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/outline_logout_24"
+            android:title="@string/title_logout" />
+        <item
+            android:id="@+id/nav_delete_account"
+            android:icon="@drawable/outline_delete_forever_24"
+            android:title="@string/title_delete_account" />
+    </group>
+</menu>
