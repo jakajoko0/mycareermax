@@ -1921,15 +1921,15 @@ def update_status():
         data = request.json
         job_id = data.get("job_id", None)  # Use get to avoid KeyError
         new_status = data.get("new_status", None)
-        
+
         if job_id is None or new_status is None:
             logger.error("Missing job_id or new_status")
             return jsonify({"success": False, "error": "Missing job_id or new_status"})
-        
+
         # ... Existing database code
         logger.info(f"Successfully updated status for job_id: {job_id}")
         return jsonify({"success": True})
-        
+
     except Exception as e:
         logger.error(f"Error updating job status: {str(e)}")
         return jsonify({"success": False, "error": str(e)})
@@ -1938,6 +1938,8 @@ def update_status():
 # API endpoint to remove job from tracker
 @app.route("/api/remove_from_tracker", methods=["POST"])
 def remove_from_tracker():
+    # Print incoming JSON payload for debugging
+    print("Incoming request JSON:", request.json)
     try:
         logger.debug("Received request to remove job from tracker.")
 

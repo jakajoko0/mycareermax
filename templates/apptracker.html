@@ -84,6 +84,9 @@
 
         // Function to remove job from tracker
         function removeFromTracker(jobId) {
+            // Debug log to check if jobId is defined and has a value
+            console.log(`Attempting to remove job with ID: ${jobId}`);
+
             fetch(`https://mycareermax.azurewebsites.net/api/remove_from_tracker`, {
                 method: 'POST',
                 headers: {
@@ -93,8 +96,15 @@
                     job_id: jobId
                 })
             })
-                .then(response => response.json())
+                .then(response => {
+                    // Debug log to check the raw response
+                    console.log('Raw response:', response);
+                    return response.json();
+                })
                 .then(data => {
+                    // Debug log to check the data received
+                    console.log('Received data:', data);
+
                     if (data.success) {
                         document.getElementById(`job-box-${jobId}`).remove();
                     } else {
@@ -105,6 +115,7 @@
                     console.error('Error removing job:', error);
                 });
         }
+
 
 
         // Call the function to fetch and display jobs
