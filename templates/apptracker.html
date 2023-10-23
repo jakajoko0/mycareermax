@@ -27,11 +27,16 @@
             fetch('https://mycareermax.azurewebsites.net/api/get_tracked_jobs')
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);  // Log the data for debugging
                     let jobList = '';
                     for (const job of data) {
+                        const status = job.status || "Not Available";
+                        const createdAt = job.created_at || "Not Available";
+                        const updatedAt = job.updated_at || "Not Available";
+
                         jobList += `
-                            <div class="job-box" id="job-box-${job.id}">
-                            <p>Status: <span id="status-${job.id}">${job.status}</span></p>
+                        <div class="job-box" id="job-box-${job.id}">
+                            <p>Status: <span id="status-${job.id}">${status}</span></p>
                             <select onchange="updateStatus(${job.id}, this.value)">
                                 <option value="Applied">Applied</option>
                                 <option value="Interviewing">Interviewing</option>
@@ -39,8 +44,8 @@
                                 <option value="Accepted">Accepted</option>
                                 <option value="Declined">Declined</option>
                             </select>
-                            <p>Date Added: ${job.created_at}</p>
-                            <p>Last Updated: ${job.updated_at}</p>
+                            <p>Date Added: ${createdAt}</p>
+                            <p>Last Updated: ${updatedAt}</p>
                             <button onclick="removeFromTracker(${job.id})">Remove From Tracker</button>
                             <p>Job Summary: ${job.job_summary}</p>
                         </div>`;
