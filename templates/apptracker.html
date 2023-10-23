@@ -3,11 +3,19 @@
 
 <head>
     <title>Application Tracker</title>
+    <style>
+        .job-box {
+            border: 1px solid black;
+            width: 30%;
+            margin: 1%;
+            padding: 1%;
+            float: left;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Application Tracker</h1>
-
     <h2>Tracked Jobs</h2>
     <div id="trackedJobs">
         <!-- Jobs will be populated here -->
@@ -16,12 +24,26 @@
     <script>
         // Function to fetch and display tracked jobs
         function fetchTrackedJobs() {
-            fetch('https://mycareermax.azurewebsites.net/api/get_tracked_jobs')  // Replace with your actual API endpoint
+            fetch('https://mycareermax.azurewebsites.net/api/get_tracked_jobs')
                 .then(response => response.json())
                 .then(data => {
                     let jobList = '';
                     for (const job of data) {
-                        jobList += `<p>${job.job_summary} - ${job.job_url}</p>`;  // Changed from job.application_url to job.job_url
+                        jobList += `
+                            <div class="job-box" id="job-box-${job.id}">
+                            <p>Status: <span id="status-${job.id}">${job.status}</span></p>
+                            <select onchange="updateStatus(${job.id}, this.value)">
+                                <option value="Applied">Applied</option>
+                                <option value="Interviewing">Interviewing</option>
+                                <option value="Offer Received">Offer Received</option>
+                                <option value="Accepted">Accepted</option>
+                                <option value="Declined">Declined</option>
+                            </select>
+                            <p>Date Added: ${job.created_at}</p>
+                            <p>Last Updated: ${job.updated_at}</p>
+                            <button onclick="removeFromTracker(${job.id})">Remove From Tracker</button>
+                            <p>Job Summary: ${job.job_summary}</p>
+                        </div>`;
                     }
                     document.getElementById('trackedJobs').innerHTML = jobList;
                 })
@@ -29,6 +51,56 @@
                     console.error('Error fetching tracked jobs:', error);
                 });
         }
+
+        // Function to update job status
+        function updateStatus(jobId, newStatus) {
+            fetch(`https://mycareermax.azurewebsites.net/api/update_status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    job_id: jobId,
+                    new_status: newStatus
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`status-${jobId}`).textContent = newStatus;
+                    } else {
+                        console.error('Error updating status:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating status:', error);
+                });
+        }
+
+        // Function to remove job from tracker
+        function removeFromTracker(jobId) {
+            fetch(`https://mycareermax.azurewebsites.net/api/remove_from_tracker`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    job_id: jobId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`job-box-${jobId}`).remove();
+                    } else {
+                        console.error('Error removing job:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing job:', error);
+                });
+        }
+
 
         // Call the function to fetch and display jobs
         fetchTrackedJobs();

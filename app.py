@@ -1911,5 +1911,40 @@ def get_tracked_jobs():
         return jsonify({"error": str(e)}), 500  # Enhanced error message
 
 
+# API endpoint to update job status
+@app.route("/api/update_status", methods=["POST"])
+def update_status():
+    data = request.json
+    job_id = data["job_id"]
+    new_status = data["new_status"]
+
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = "UPDATE dbo.application_tracker SET status = ?, updated_at = GETDATE() WHERE id = ?"
+    cursor.execute(query, (new_status, job_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True})
+
+
+# API endpoint to remove job from tracker
+@app.route("/api/remove_from_tracker", methods=["POST"])
+def remove_from_tracker():
+    data = request.json
+    job_id = data["job_id"]
+
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = "DELETE FROM dbo.application_tracker WHERE id = ?"
+    cursor.execute(query, job_id)
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True})
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
