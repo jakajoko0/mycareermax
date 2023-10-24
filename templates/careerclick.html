@@ -247,10 +247,23 @@
             </ul>
         </div>
     </nav>
-
-    <div style="text-align:center;">
-        <img src="{{ url_for('static', filename='images/blue-mycareermax.png') }}" alt="Your Logo"
-            style="max-width:100%;" />
+    <!-- Adding the clickable, resizable, and responsive image here -->
+    <div style="text-align: center; color: white;">
+        <a
+            href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar">
+            <img src="/static/images/magicmaxbanner.png" alt="MagicMax Banner" class="img-fluid"
+                style="width: 500px; height: auto; border-radius: 15px;">
+        </a><br>
+        <a href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar"
+            class="btn btn-link" style="color: white;">⚡ Click here to add the MagicMax Chrome Extension Now & Put Your
+            Job
+            Applications On
+            AutoPilot </a>
+        <div style="height: 20px;"></div>
+        <div style="text-align:center;">
+            <img src="{{ url_for('static', filename='images/blue-mycareermax.png') }}" alt="Your Logo"
+                style="max-width:100%;" />
+        </div>
     </div>
     <div class="container mt-5">
         <!-- Job Search Section -->

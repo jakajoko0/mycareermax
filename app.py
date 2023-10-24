@@ -1675,7 +1675,7 @@ def autofill():
 
     # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
+        model="gpt-4", messages=messages, temperature=0.7, max_tokens=1000
     )
 
     # Extract the generated response from the OpenAI API
@@ -1832,11 +1832,6 @@ def get_resume_filename():
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({"error": "An error occurred"}), 500
-
-
-from flask import request, jsonify
-import pyodbc
-import os
 
 
 @app.route("/api/add_job", methods=["POST"])
