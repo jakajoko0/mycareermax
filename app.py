@@ -1891,20 +1891,29 @@ def get_tracked_jobs():
         conn = pyodbc.connect(connection_string)
 
         cursor = conn.cursor()
-        cursor.execute("SELECT job_summary, job_url FROM dbo.application_tracker")
+        # Include all required fields like 'status', 'created_at', 'updated_at' etc.
+        cursor.execute("SELECT id, job_summary, job_url, status, created_at, updated_at FROM dbo.application_tracker")
         rows = cursor.fetchall()
 
         conn.close()
 
         jobs = [
-            {"job_summary": row.job_summary, "job_url": row.job_url} for row in rows
+            {
+                "id": row.id,
+                "job_summary": row.job_summary,
+                "job_url": row.job_url,
+                "status": row.status,
+                "created_at": row.created_at,
+                "updated_at": row.updated_at
+            } 
+            for row in rows
         ]
 
         return jsonify(jobs), 200
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        return jsonify({"error": str(e)}), 500  # Enhanced error message
+        return jsonify({"error": str(e)}), 500 
 
 
 # API endpoint to update job status
