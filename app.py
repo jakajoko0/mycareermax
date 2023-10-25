@@ -611,6 +611,7 @@ def save_job():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+# GET SAVED JOBS
 @app.route("/get-saved-jobs", methods=["GET"])
 @login_required
 def get_saved_jobs():
@@ -635,6 +636,7 @@ def get_saved_jobs():
                 "company_name": job.company_name,
                 "link": job.link,
                 "employer_logo": job.employer_logo,
+                "status": job.status,  # Add the status field here
             }
             saved_jobs_list.append(job_dict)
 
@@ -866,6 +868,11 @@ def tools():
 @app.route("/apptracker")
 def apptracker():
     return render_template("apptracker.html")
+
+
+@app.route("/myjobs")
+def myjobs():
+    return render_template("myjobs.html")
 
 
 @app.route("/sitemap.xml", methods=["GET"])
@@ -1536,7 +1543,7 @@ def chat():
     return jsonify({"response": chat_response})
 
 
-################### AUTOMAX EXTENSION #######################
+################### MAGICMAX EXTENSION #######################
 
 
 @app.route("/api/message", methods=["GET"])
@@ -1834,128 +1841,24 @@ def get_resume_filename():
         return jsonify({"error": "An error occurred"}), 500
 
 
-@app.route("/api/add_job", methods=["POST"])
-def add_job():
+@app.route("/update-job-status", methods=["POST"])
+@login_required
+def update_job_status():
     try:
-        pin = request.json.get("pin")
-        job_summary = request.json.get("job_summary")
-        job_url = request.json.get("job_url")
+        data = request.get_json()
+        new_status = data.get("new_status")
+        job_id = data.get("job_id")
+        user_id = current_user.id
 
-        if not all([pin, job_summary, job_url]):
-            return jsonify({"error": "All fields are required"}), 400
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE saved_jobs SET status = ? WHERE id = ? AND user_id = ?",
+                (new_status, job_id, user_id),
+            )
+            conn.commit()
 
-        connection_string = (
-            f"DRIVER={{ODBC Driver 18 for SQL Server}};"
-            f"SERVER={os.getenv('DB_SERVER')};"
-            f"DATABASE={os.getenv('DB_NAME')};"
-            f"UID={os.getenv('DB_USERNAME')};"
-            f"PWD={os.getenv('DB_PASSWORD')}"
-        )
-        conn = pyodbc.connect(connection_string)
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM users WHERE access_token = ?", (pin,))
-        user_id_result = cursor.fetchone()
-
-        if not user_id_result:
-            return jsonify({"error": "Invalid PIN"}), 400
-
-        user_id = user_id_result[0]
-
-        insert_query = """
-        INSERT INTO dbo.application_tracker (user_id, job_url, job_summary, status)
-        VALUES (?, ?, ?, ?)
-        """
-        cursor.execute(insert_query, (user_id, job_url, job_summary, "Applied"))
-        conn.commit()
-
-        conn.close()
-
-        return jsonify({"message": "Job added to tracker successfully"}), 200
-
+        return jsonify({"success": True, "message": "Job status updated successfully!"})
     except Exception as e:
-        print(f"An error occurred: {e}")
-        return jsonify({"error": str(e)}), 500  # Enhanced error message
-
-
-@app.route("/api/get_tracked_jobs", methods=["GET"])
-def get_tracked_jobs():
-    try:
-        connection_string = (
-            f"DRIVER={{ODBC Driver 18 for SQL Server}};"
-            f"SERVER={os.getenv('DB_SERVER')};"
-            f"DATABASE={os.getenv('DB_NAME')};"
-            f"UID={os.getenv('DB_USERNAME')};"
-            f"PWD={os.getenv('DB_PASSWORD')}"
-        )
-        conn = pyodbc.connect(connection_string)
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT job_summary, job_url FROM dbo.application_tracker")
-        rows = cursor.fetchall()
-
-        conn.close()
-
-        jobs = [
-            {"job_summary": row.job_summary, "job_url": row.job_url} for row in rows
-        ]
-
-        return jsonify(jobs), 200
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return jsonify({"error": str(e)}), 500  # Enhanced error message
-
-
-# API endpoint to update job status
-@app.route("/api/update_status", methods=["POST"])
-@cross_origin(origin="https://app.mycareermax.com")
-def update_status():
-    try:
-        logger.info("Received request to update job status.")
-        data = request.json
-        job_id = data.get("job_id", None)  # Use get to avoid KeyError
-        new_status = data.get("new_status", None)
-
-        if job_id is None or new_status is None:
-            logger.error("Missing job_id or new_status")
-            return jsonify({"success": False, "error": "Missing job_id or new_status"})
-
-        # ... Existing database code
-        logger.info(f"Successfully updated status for job_id: {job_id}")
-        return jsonify({"success": True})
-
-    except Exception as e:
-        logger.error(f"Error updating job status: {str(e)}")
-        return jsonify({"success": False, "error": str(e)})
-
-
-# API endpoint to remove job from tracker
-@app.route("/api/remove_from_tracker", methods=["POST"])
-def remove_from_tracker():
-    # Print incoming JSON payload for debugging
-    print("Incoming request JSON:", request.json)
-    try:
-        logger.debug("Received request to remove job from tracker.")
-
-        data = request.json
-        job_id = data["job_id"]
-
-        logger.info(f"Removing job ID {job_id} from tracker")
-
-        conn = create_connection()
-        cursor = conn.cursor()
-
-        query = "DELETE FROM dbo.application_tracker WHERE id = ?"
-        cursor.execute(query, job_id)
-        conn.commit()
-        conn.close()
-
-        logger.info(f"Successfully removed job ID {job_id} from tracker")
-        return jsonify({"success": True})
-
-    except Exception as e:
-        logger.error(f"Error removing job from tracker: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 

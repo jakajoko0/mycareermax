@@ -195,522 +195,517 @@
     gtag('config', 'G-71KL2GKNB6');
 </script>
 
-<body>
-    <!-- Your existing body content here -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <!-- Your existing scripts -->
+<script defer>
+    // Your existing JavaScript code
 
-    <script defer>
-        // Your existing JavaScript code
-
-        $(document).ready(function () {
-            console.log("Fetching username...");
-            $.get("/get-username", function (response) {
-                console.log("Username response:", response);
-                if (response.success) {
-                    const usernamePlaceholder = document.getElementById("username-placeholder");
-                    usernamePlaceholder.textContent = "Hello, " + response.username;
-                } else {
-                    console.error('Error fetching username:', response.error);
-                }
-            });
-
-            // Rest of your existing JavaScript code...
+    $(document).ready(function () {
+        console.log("Fetching username...");
+        $.get("/get-username", function (response) {
+            console.log("Username response:", response);
+            if (response.success) {
+                const usernamePlaceholder = document.getElementById("username-placeholder");
+                usernamePlaceholder.textContent = "Hello, " + response.username;
+            } else {
+                console.error('Error fetching username:', response.error);
+            }
         });
-    </script>
 
-    <body>
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
-            <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+        // Rest of your existing JavaScript code...
+    });
+</script>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                </li>
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <!-- Adding the clickable, resizable, and responsive image here -->
+    <div style="text-align: center">
+        <a
+            href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar">
+            <img src="/static/images/magicmaxbanner.png" alt="MagicMax Banner" class="img-fluid"
+                style="width: 500px; height: auto; border-radius: 15px;">
+        </a><br>
+        <a href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar"
+            class="btn btn-link" style="color: white;">⚡ Click here to add the MagicMax Chrome Extension Now & Put
+            Your
+            Job
+            Applications On
+            AutoPilot </a>
+        <div style="text-align:center;">
+            <img src="{{ url_for('static', filename='images/white-mycareermax.png') }}" alt="Your Logo"
+                style="max-width:100%;" />
+        </div>
+
+        <!-- My Resume Button to Trigger Modal -->
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resumeModal">
+                📄 Manage My Resume
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
-                    </li>
-                    <!-- Tools Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
-                            Tools
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="toolsDropdown">
-                            <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
-                            <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+            <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="resumeModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="resumeModalLabel">My Resume</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Save Resume -->
+                        <div class="container text-black">
+                            <form id="uploadButtonOrForm" action="/upload_dashresume" method="post"
+                                enctype="multipart/form-data">
+                                <input type="file" name="resume" accept=".docx" required>
+                                <button type="submit" class="btn btn-success">💾 Save Resume</button>
+                            </form>
+                            <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
+                            <button id="delete-resume-button" class="btn btn-danger">🗑️ Delete Resume</button>
                         </div>
-                    </li>
-                    <!-- New link for CareerBot -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
-                    </li>
-                    <!-- Existing dropdown for the username -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
-                            <span id="username-placeholder">Login Here</span>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
-                            <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
-                            <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
-                        </div>
-                    </li>
-                    <!-- End of Dropdown for username -->
-                </ul>
-            </div>
-        </nav>
-
-
-
-        <!-- Adding the clickable, resizable, and responsive image here -->
-        <div style="text-align: center">
-            <a
-                href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar">
-                <img src="/static/images/magicmaxbanner.png" alt="MagicMax Banner" class="img-fluid"
-                    style="width: 500px; height: auto; border-radius: 15px;">
-            </a><br>
-            <a href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar"
-                class="btn btn-link" style="color: white;">⚡ Click here to add the MagicMax Chrome Extension Now & Put
-                Your
-                Job
-                Applications On
-                AutoPilot </a>
-            <div style="text-align:center;">
-                <img src="{{ url_for('static', filename='images/white-mycareermax.png') }}" alt="Your Logo"
-                    style="max-width:100%;" />
-            </div>
-
-            <!-- My Resume Button to Trigger Modal -->
-            <div class="text-center">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resumeModal">
-                    📄 Manage My Resume
-                </button>
-                <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
-            </div>
-
-
-            <!-- Modal -->
-            <div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="resumeModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="resumeModalLabel">My Resume</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Save Resume -->
-                            <div class="container text-black">
-                                <form id="uploadButtonOrForm" action="/upload_dashresume" method="post"
-                                    enctype="multipart/form-data">
-                                    <input type="file" name="resume" accept=".docx" required>
-                                    <button type="submit" class="btn btn-success">💾 Save Resume</button>
-                                </form>
-                                <div class="uploaded-resume-name" style="margin-top: 20px; margin-bottom: 40px;"></div>
-                                <button id="delete-resume-button" class="btn btn-danger">🗑️ Delete Resume</button>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
-            <!-- Tooltip Info Modal -->
-            <div class="modal fade" id="tooltipInfoModal" tabindex="-1" aria-labelledby="tooltipInfoModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="tooltipInfoModalLabel">Top Candidate Board</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Introducing the Top Candidate Feature -->
-                            <h2>🌟 Introducing the Top Candidate Feature! 🌟</h2>
-                            <p>Imagine you could know, without a shadow of a doubt, which job openings you stand the
-                                best
-                                chance at landing.
-                                That's exactly what our revolutionary Top Candidate Feature offers you.</p>
+        </div>
+        <!-- Tooltip Info Modal -->
+        <div class="modal fade" id="tooltipInfoModal" tabindex="-1" aria-labelledby="tooltipInfoModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tooltipInfoModalLabel">Top Candidate Board</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Introducing the Top Candidate Feature -->
+                        <h2>🌟 Introducing the Top Candidate Feature! 🌟</h2>
+                        <p>Imagine you could know, without a shadow of a doubt, which job openings you stand the
+                            best
+                            chance at landing.
+                            That's exactly what our revolutionary Top Candidate Feature offers you.</p>
 
-                            <h3>What It Does</h3>
-                            <p>The Top Candidate Feature is like having your own personal career adviser available 24/7.
-                                Utilizing the latest AI
-                                technology—powered by OpenAI's ChatGPT-4—we meticulously evaluate your resume and
-                                background
-                                to match you with
-                                job opportunities that align with your skills, experience, and aspirations.</p>
+                        <h3>What It Does</h3>
+                        <p>The Top Candidate Feature is like having your own personal career adviser available 24/7.
+                            Utilizing the latest AI
+                            technology—powered by OpenAI's ChatGPT-4—we meticulously evaluate your resume and
+                            background
+                            to match you with
+                            job opportunities that align with your skills, experience, and aspirations.</p>
 
-                            <h3>📊 How It Works</h3>
-                            <ul>
-                                <li>Deep Analysis: ChatGPT-4 reads through your uploaded resume to understand your
-                                    professional background and
-                                    competencies.</li>
-                                <li>Tailored Matches: It then scans all the job descriptions you've saved to your
-                                    dashboard,
-                                    comparing them
-                                    against your resume.</li>
-                                <li>Insightful Rankings: Finally, all saved jobs are rated and ranked, giving you a
-                                    crystal-clear insight, into
-                                    which jobs you'd be a top candidate for!</li>
-                            </ul>
+                        <h3>📊 How It Works</h3>
+                        <ul>
+                            <li>Deep Analysis: ChatGPT-4 reads through your uploaded resume to understand your
+                                professional background and
+                                competencies.</li>
+                            <li>Tailored Matches: It then scans all the job descriptions you've saved to your
+                                dashboard,
+                                comparing them
+                                against your resume.</li>
+                            <li>Insightful Rankings: Finally, all saved jobs are rated and ranked, giving you a
+                                crystal-clear insight, into
+                                which jobs you'd be a top candidate for!</li>
+                        </ul>
 
-                            <h3>📝 Get Started in Two Simple Steps</h3>
-                            <ol>
-                                <li>Upload Your Resume: Don't miss out on tailoring your job search. Let us understand
-                                    what
-                                    makes you unique! Don't have
-                                    a resume? No worries—use our <a href="/ai-builder">Resume Builder Tool</a> to create
-                                    a
-                                    polished resume in minutes.
-                                </li>
-                                <li>Save At Least One Job: Start by saving job listings you're interested in, so we can
-                                    do
-                                    the matchmaking.</li>
-                            </ol>
-                            <p><i>Note: If you don't complete these steps, the Top Candidate board will remain blank. We
-                                    need both ingredients
-                                    to cook up your success recipe!</i></p>
+                        <h3>📝 Get Started in Two Simple Steps</h3>
+                        <ol>
+                            <li>Upload Your Resume: Don't miss out on tailoring your job search. Let us understand
+                                what
+                                makes you unique! Don't have
+                                a resume? No worries—use our <a href="/ai-builder">Resume Builder Tool</a> to create
+                                a
+                                polished resume in minutes.
+                            </li>
+                            <li>Save At Least One Job: Start by saving job listings you're interested in, so we can
+                                do
+                                the matchmaking.</li>
+                        </ol>
+                        <p><i>Note: If you don't complete these steps, the Top Candidate board will remain blank. We
+                                need both ingredients
+                                to cook up your success recipe!</i></p>
 
-                            <h3>🥇 Why Use the Top Candidate Feature?</h3>
-                            <ul>
-                                <li>Save Time: No more endless scrolling through job listings. We bring your best
-                                    matches
-                                    right to your
-                                    fingertips.</li>
-                                <li>Boost Confidence: Knowing you're a top candidate will give you the extra push you
-                                    need
-                                    to apply and ace that
-                                    interview.</li>
-                                <li>Maximize Opportunities: Make sure you're not overlooking jobs that are a great fit
-                                    for
-                                    your skill set.</li>
-                            </ul>
-                            <p>Ready to take your job search to the next level? Don't miss out on this chance to be the
-                                top
-                                candidate you're
-                                meant to be! 🚀</p>
-                        </div>
+                        <h3>🥇 Why Use the Top Candidate Feature?</h3>
+                        <ul>
+                            <li>Save Time: No more endless scrolling through job listings. We bring your best
+                                matches
+                                right to your
+                                fingertips.</li>
+                            <li>Boost Confidence: Knowing you're a top candidate will give you the extra push you
+                                need
+                                to apply and ace that
+                                interview.</li>
+                            <li>Maximize Opportunities: Make sure you're not overlooking jobs that are a great fit
+                                for
+                                your skill set.</li>
+                        </ul>
+                        <p>Ready to take your job search to the next level? Don't miss out on this chance to be the
+                            top
+                            candidate you're
+                            meant to be! 🚀</p>
+                    </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
+        </div>
 
 
-            <!-- Adding a title for the leaderboard -->
-            <h2 class="satisfy-font" style="text-align:center; margin-top: 40px;"><span
-                    class="material-symbols-outlined" style="margin-right: 10px; cursor: pointer;" data-toggle="modal"
-                    data-target="#tooltipInfoModal">tooltip</span>Top Candidate <a href="/dashboard"><span
-                        class="material-symbols-outlined">refresh</span></a></h2>
+        <!-- Adding a title for the leaderboard -->
+        <h2 class="satisfy-font" style="text-align:center; margin-top: 40px;"><span class="material-symbols-outlined"
+                style="margin-right: 10px; cursor: pointer;" data-toggle="modal"
+                data-target="#tooltipInfoModal">tooltip</span>Top Candidate <a href="/dashboard"><span
+                    class="material-symbols-outlined">refresh</span></a></h2>
 
 
 
 
-            <div id="leaderboard-container" style="overflow-x: auto;">
-                <!-- The leaderboard table will be inserted here -->
+        <div id="leaderboard-container" style="overflow-x: auto;">
+            <!-- The leaderboard table will be inserted here -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mt-5 mb-5" style="color: white;">
+            <h2>My Saved Jobs</h2>
+            <div id="saved-jobs-container">
+                <!-- Saved jobs will be dynamically added here -->
             </div>
+        </div>
 
-            <!-- Main Content -->
-            <div class="container mt-5 mb-5" style="color: white;">
-                <h2>My Saved Jobs</h2>
-                <div id="saved-jobs-container">
-                    <!-- Saved jobs will be dynamically added here -->
-                </div>
-            </div>
+        <script>
+            $(document).ready(function () {
 
-            <script>
-                $(document).ready(function () {
+                // Handling resume upload via jQuery
+                $("#uploadButtonOrForm").on("submit", function () {
+                    let formData = new FormData(this);
 
-                    // Handling resume upload via jQuery
-                    $("#uploadButtonOrForm").on("submit", function () {
-                        let formData = new FormData(this);
-
-                        $.ajax({
-                            url: '/upload_dashresume',
-                            type: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                if (response.success) {
-                                    // Display the uploaded resume name in all elements with the class 'uploaded-resume-name'
-                                    $('.uploaded-resume-name').text('Saved Resume: ' + response.filename);
-                                } else {
-                                    console.error('Error uploading resume:', response.error);
-                                }
-                            }
-                        });
-
-                        return false;  // To prevent the form from actually submitting and refreshing the page
-                    });
-
-
-                    // Fetch the latest uploaded resume name for the user
-                    $.get("/get_latest_resume_name", function (response) {
-                        if (response.success) {
-                            // Display the resume name in all elements with the class 'uploaded-resume-name'
-                            $('.uploaded-resume-name').text('Current Resume: ' + response.filename);
-                        } else {
-                            console.error('Error fetching resume name:', response.error);
-                        }
-                    });
-
-
-                    // Handling resume deletion via jQuery
-                    $("#delete-resume-button").on("click", function () {
-                        $.ajax({
-                            url: '/delete_resume',  // Using your actual deletion URL
-                            type: 'POST',
-                            success: function (response) {
-                                if (response.success) {
-                                    // Remove the displayed resume name in all elements with the class 'uploaded-resume-name'
-                                    $('.uploaded-resume-name').text('No saved resume.');
-                                } else {
-                                    console.error('Error deleting resume:', response.error);
-                                }
-                            }
-                        });
-                    });
-
-
-                    // Fetch and display saved jobs
-                    fetch("/get-saved-jobs")
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const savedJobsContainer = document.getElementById("saved-jobs-container");
-                                data.saved_jobs.forEach(job => {
-                                    const jobCard = document.createElement("div");
-                                    jobCard.className = "card mb-3";
-                                    jobCard.style.width = "300px";
-
-                                    const cardBody = document.createElement("div");
-                                    cardBody.className = "card-body";
-                                    cardBody.style.height = "250px";
-                                    cardBody.style.overflowY = "auto";
-
-                                    // Append the employer logo if it exists
-                                    if (job.employer_logo) {
-                                        const logoImg = document.createElement('img');
-                                        logoImg.src = job.employer_logo;
-                                        logoImg.alt = job.company_name + ' logo';
-                                        logoImg.style.width = '100px';
-                                        cardBody.appendChild(logoImg);
-                                    }
-
-                                    const applyLink = document.createElement("a");
-                                    applyLink.href = job.job_link;
-                                    applyLink.target = "_blank";
-                                    applyLink.className = "btn btn-primary mr-2";
-                                    applyLink.textContent = "Apply Here";
-
-                                    const jobTitle = document.createElement("h5");
-                                    jobTitle.className = "card-title";
-                                    jobTitle.style.color = "blue";
-                                    jobTitle.textContent = job.job_title;
-
-                                    const companyName = document.createElement("h6");
-                                    companyName.className = "card-text";
-                                    companyName.style.color = "green";
-                                    companyName.textContent = job.company_name;
-
-                                    const jobDescription = document.createElement("p");
-                                    jobDescription.className = "card-text";
-                                    jobDescription.style.color = "blue";
-                                    jobDescription.textContent = job.job_description;
-
-                                    const removeButton = document.createElement("button");
-                                    removeButton.className = "btn btn-danger";
-                                    removeButton.textContent = "Remove";
-
-                                    removeButton.onclick = function () {
-                                        const jobId = job.id;
-
-                                        $.ajax({
-                                            url: "/remove-saved-job",
-                                            type: "POST",
-                                            contentType: "application/json",
-                                            data: JSON.stringify({ job_id: jobId }),
-                                            success: function (response) {
-                                                if (response.success) {
-                                                    console.log("Job removed successfully!");
-                                                    jobCard.remove();
-                                                } else {
-                                                    console.error("Failed to remove job:", response.error);
-                                                }
-                                            },
-                                            error: function (xhr, status, error) {
-                                                console.error("Failed to remove job:", error);
-                                            }
-                                        });
-                                    };
-
-
-                                    // Append buttons to cardBody
-                                    cardBody.appendChild(jobTitle);
-                                    cardBody.appendChild(companyName);
-                                    cardBody.appendChild(applyLink);
-                                    cardBody.appendChild(removeButton);
-                                    cardBody.appendChild(jobDescription);
-                                    jobCard.appendChild(cardBody);
-
-                                    savedJobsContainer.appendChild(jobCard);
-                                });
-                            } else {
-                                console.error("Failed to fetch saved jobs:", data.error);
-                            }
-                        });
-
-                });
-            </script>
-
-            <script defer>
-                // Ensure jQuery is loaded
-                if (typeof $ !== 'undefined') {
-                    $(document).ready(function () {
-                        // Fetch the user's documents and populate the list
-                        $.get("/get_user_documents", function (data) {
-                            data.forEach(function (doc) {
-                                $("#saved-documents-list").append(`<li class="list-group-item"><a href="/download_document/${doc.id}?format=docx">${doc.document_name} - DOCX</a> | <a href="/download_document/${doc.id}?format=pdf">${doc.document_name} - PDF</a></li>`);
-                            });
-                        });
-                    });
-                } else {
-                    console.error("jQuery is not loaded.");
-                }
-            </script>
-
-            <!-- Saved Documents Section -->
-
-            <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
-                <h2 style="color: #007BFF;">My Docs</h2> <!-- Changed color here -->
-                <div id="my-docs" class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Apply Link</th>
-                                <th>Document</th>
-                                <th>Job Title</th>
-                                <th>Company Name</th>
-                                <th>Interview Prep</th> <!-- Added this new header -->
-                                <th>Download DOCX</th>
-                                <th>Download PDF</th>
-                                <th>Delete</th>
-                                <th>Creation Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for doc in documents %}
-                            <tr>
-                                <td><a href="{{ doc.apply_link }}" target="_blank">Apply</a></td>
-                                <td>{{ doc.document_type }}</td>
-                                <td>{{ doc.job_title }}</td>
-                                <td>{{ doc.company_name }}</td>
-                                <td><a href="/interview-prep" target="_blank">IntervueME</a></td>
-                                <!-- Added this new cell -->
-                                <td><a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">Download
-                                        DOCX</a></td>
-                                <td><a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">Download
-                                        PDF</a>
-                                </td>
-                                <td><button onclick="deleteDocument({{ doc.id }})"
-                                        class="btn btn-danger">Delete</button>
-                                </td>
-                                <td>{{ doc.creation_date }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <script>
-                function deleteDocument(documentId) {
-                    if (confirm("Are you sure you want to delete this document?")) {
-                        $.ajax({
-                            url: '/delete_document/' + documentId,
-                            type: 'DELETE',
-                            success: function (response) {
-                                if (response.success) {
-                                    alert('Document deleted successfully!');
-                                    location.reload(); // Reload the page to update the table
-                                } else {
-                                    alert('Error deleting document. Please try again.');
-                                }
-                            }
-                        });
-                    }
-                }
-
-                // Function to fetch ranked jobs and populate the leaderboard
-                function fetchRankedJobs() {
                     $.ajax({
-                        url: "/get-ranked-jobs",
-                        type: "GET",
-                        dataType: "json",
+                        url: '/upload_dashresume',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
                         success: function (response) {
                             if (response.success) {
-                                let rankedJobs = response.ranked_jobs;
-                                let leaderboardHtml = '<table class="leaderboard"><thead><tr><th>Rank</th><th>Score (%)</th><th>Job Title</th><th>Company Name</th><th>Job Link</th></tr></thead><tbody>';
-
-                                // Populate the leaderboard
-                                rankedJobs.forEach((job, index) => {
-                                    let green = Math.floor((job.score / 100) * 255);
-                                    let red = Math.floor(255 - (job.score / 100) * 255);
-                                    let bgColor = `rgb(${red}, ${green}, 0)`;
-
-                                    leaderboardHtml += `<tr style="background-color:${bgColor};"><td>${index + 1}</td><td>${job.score}</td><td>${job.job_title}</td><td>${job.company_name}</td><td><a href="${job.job_link}" target="_blank" class="btn btn-primary">Apply</a></td></tr>`;
-                                });
-
-                                leaderboardHtml += '</tbody></table>';
-
-                                // Insert the leaderboard into the DOM
-                                $("#leaderboard-container").html(leaderboardHtml);
+                                // Display the uploaded resume name in all elements with the class 'uploaded-resume-name'
+                                $('.uploaded-resume-name').text('Saved Resume: ' + response.filename);
                             } else {
-                                console.error("Failed to fetch ranked jobs: ", response.error);
+                                console.error('Error uploading resume:', response.error);
                             }
-                        },
-                        error: function (error) {
-                            console.error("Error: ", error);
                         }
                     });
-                }
 
-                // Call the function when the dashboard page loads
-                $(document).ready(function () {
-                    fetchRankedJobs();
+                    return false;  // To prevent the form from actually submitting and refreshing the page
                 });
 
 
+                // Fetch the latest uploaded resume name for the user
+                $.get("/get_latest_resume_name", function (response) {
+                    if (response.success) {
+                        // Display the resume name in all elements with the class 'uploaded-resume-name'
+                        $('.uploaded-resume-name').text('Current Resume: ' + response.filename);
+                    } else {
+                        console.error('Error fetching resume name:', response.error);
+                    }
+                });
+
+
+                // Handling resume deletion via jQuery
+                $("#delete-resume-button").on("click", function () {
+                    $.ajax({
+                        url: '/delete_resume',  // Using your actual deletion URL
+                        type: 'POST',
+                        success: function (response) {
+                            if (response.success) {
+                                // Remove the displayed resume name in all elements with the class 'uploaded-resume-name'
+                                $('.uploaded-resume-name').text('No saved resume.');
+                            } else {
+                                console.error('Error deleting resume:', response.error);
+                            }
+                        }
+                    });
+                });
+
+
+                // Fetch and display saved jobs
+                fetch("/get-saved-jobs")
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const savedJobsContainer = document.getElementById("saved-jobs-container");
+                            data.saved_jobs.forEach(job => {
+                                const jobCard = document.createElement("div");
+                                jobCard.className = "card mb-3";
+                                jobCard.style.width = "300px";
+
+                                const cardBody = document.createElement("div");
+                                cardBody.className = "card-body";
+                                cardBody.style.height = "250px";
+                                cardBody.style.overflowY = "auto";
+
+                                // Append the employer logo if it exists
+                                if (job.employer_logo) {
+                                    const logoImg = document.createElement('img');
+                                    logoImg.src = job.employer_logo;
+                                    logoImg.alt = job.company_name + ' logo';
+                                    logoImg.style.width = '100px';
+                                    cardBody.appendChild(logoImg);
+                                }
+
+                                const applyLink = document.createElement("a");
+                                applyLink.href = job.job_link;
+                                applyLink.target = "_blank";
+                                applyLink.className = "btn btn-primary mr-2";
+                                applyLink.textContent = "Apply Here";
+
+                                const jobTitle = document.createElement("h5");
+                                jobTitle.className = "card-title";
+                                jobTitle.style.color = "blue";
+                                jobTitle.textContent = job.job_title;
+
+                                const companyName = document.createElement("h6");
+                                companyName.className = "card-text";
+                                companyName.style.color = "green";
+                                companyName.textContent = job.company_name;
+
+                                const jobDescription = document.createElement("p");
+                                jobDescription.className = "card-text";
+                                jobDescription.style.color = "blue";
+                                jobDescription.textContent = job.job_description;
+
+                                const removeButton = document.createElement("button");
+                                removeButton.className = "btn btn-danger";
+                                removeButton.textContent = "Remove";
+
+                                removeButton.onclick = function () {
+                                    const jobId = job.id;
+
+                                    $.ajax({
+                                        url: "/remove-saved-job",
+                                        type: "POST",
+                                        contentType: "application/json",
+                                        data: JSON.stringify({ job_id: jobId }),
+                                        success: function (response) {
+                                            if (response.success) {
+                                                console.log("Job removed successfully!");
+                                                jobCard.remove();
+                                            } else {
+                                                console.error("Failed to remove job:", response.error);
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error("Failed to remove job:", error);
+                                        }
+                                    });
+                                };
+
+
+                                // Append buttons to cardBody
+                                cardBody.appendChild(jobTitle);
+                                cardBody.appendChild(companyName);
+                                cardBody.appendChild(applyLink);
+                                cardBody.appendChild(removeButton);
+                                cardBody.appendChild(jobDescription);
+                                jobCard.appendChild(cardBody);
+
+                                savedJobsContainer.appendChild(jobCard);
+                            });
+                        } else {
+                            console.error("Failed to fetch saved jobs:", data.error);
+                        }
+                    });
+
+            });
+        </script>
+
+        <script defer>
+            // Ensure jQuery is loaded
+            if (typeof $ !== 'undefined') {
+                $(document).ready(function () {
+                    // Fetch the user's documents and populate the list
+                    $.get("/get_user_documents", function (data) {
+                        data.forEach(function (doc) {
+                            $("#saved-documents-list").append(`<li class="list-group-item"><a href="/download_document/${doc.id}?format=docx">${doc.document_name} - DOCX</a> | <a href="/download_document/${doc.id}?format=pdf">${doc.document_name} - PDF</a></li>`);
+                        });
+                    });
+                });
+            } else {
+                console.error("jQuery is not loaded.");
+            }
+        </script>
+
+        <!-- Saved Documents Section -->
+
+        <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #007BFF;">My Docs</h2> <!-- Changed color here -->
+            <div id="my-docs" class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Apply Link</th>
+                            <th>Document</th>
+                            <th>Job Title</th>
+                            <th>Company Name</th>
+                            <th>Interview Prep</th> <!-- Added this new header -->
+                            <th>Download DOCX</th>
+                            <th>Download PDF</th>
+                            <th>Delete</th>
+                            <th>Creation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documents %}
+                        <tr>
+                            <td><a href="{{ doc.apply_link }}" target="_blank">Apply</a></td>
+                            <td>{{ doc.document_type }}</td>
+                            <td>{{ doc.job_title }}</td>
+                            <td>{{ doc.company_name }}</td>
+                            <td><a href="/interview-prep" target="_blank">IntervueME</a></td>
+                            <!-- Added this new cell -->
+                            <td><a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">Download
+                                    DOCX</a></td>
+                            <td><a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">Download
+                                    PDF</a>
+                            </td>
+                            <td><button onclick="deleteDocument({{ doc.id }})" class="btn btn-danger">Delete</button>
+                            </td>
+                            <td>{{ doc.creation_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function deleteDocument(documentId) {
+                if (confirm("Are you sure you want to delete this document?")) {
+                    $.ajax({
+                        url: '/delete_document/' + documentId,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.success) {
+                                alert('Document deleted successfully!');
+                                location.reload(); // Reload the page to update the table
+                            } else {
+                                alert('Error deleting document. Please try again.');
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Function to fetch ranked jobs and populate the leaderboard
+            function fetchRankedJobs() {
+                $.ajax({
+                    url: "/get-ranked-jobs",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.success) {
+                            let rankedJobs = response.ranked_jobs;
+                            let leaderboardHtml = '<table class="leaderboard"><thead><tr><th>Rank</th><th>Score (%)</th><th>Job Title</th><th>Company Name</th><th>Job Link</th></tr></thead><tbody>';
+
+                            // Populate the leaderboard
+                            rankedJobs.forEach((job, index) => {
+                                let green = Math.floor((job.score / 100) * 255);
+                                let red = Math.floor(255 - (job.score / 100) * 255);
+                                let bgColor = `rgb(${red}, ${green}, 0)`;
+
+                                leaderboardHtml += `<tr style="background-color:${bgColor};"><td>${index + 1}</td><td>${job.score}</td><td>${job.job_title}</td><td>${job.company_name}</td><td><a href="${job.job_link}" target="_blank" class="btn btn-primary">Apply</a></td></tr>`;
+                            });
+
+                            leaderboardHtml += '</tbody></table>';
+
+                            // Insert the leaderboard into the DOM
+                            $("#leaderboard-container").html(leaderboardHtml);
+                        } else {
+                            console.error("Failed to fetch ranked jobs: ", response.error);
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error: ", error);
+                    }
+                });
+            }
+
+            // Call the function when the dashboard page loads
+            $(document).ready(function () {
+                fetchRankedJobs();
+            });
 
 
 
-            </script>
 
-            <!-- Add these script tags right before the closing </body> tag -->
-            <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    </body>
+
+        </script>
+
+        <!-- Add these script tags right before the closing </body> tag -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 
 </html>
