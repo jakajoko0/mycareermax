@@ -16,6 +16,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
 
     <style>
+        .compatibility-percentage {
+            font-size: 25px;
+            font-weight: bold;
+            color: #001aff;
+        }
+
         /* General styling */
         body {
             background: #ffffff;
@@ -440,10 +446,19 @@
         }
         // Existing JavaScript for fetching jobs and creating cards
         fetch("/get-saved-jobs")
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error(`Failed to fetch with status: ${response.status}`);
+                    throw new Error(`Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log("Received data:", data);  // Log the received data for debugging
                 if (data.success) {
+                    console.log(`Creating cards for ${data.saved_jobs.length} saved jobs.`);
                     data.saved_jobs.forEach(job => {
+                        console.log(`Processing job with id ${job.id}`);
                         const jobCard = document.createElement("div");
                         jobCard.className = "kanban-card";
                         jobCard.id = `job-${job.id}`;
@@ -498,6 +513,12 @@
                         });
                         actionIcons.appendChild(jobLink);
 
+                        // Add compatibility percentage span between jobLink and removeIcon
+                        const compatibilityPercentage = document.createElement("span");
+                        compatibilityPercentage.textContent = `${job.compatibility}%`;  // assuming the field name is 'compatibility' from the data
+                        compatibilityPercentage.className = "compatibility-percentage";
+                        actionIcons.appendChild(compatibilityPercentage);
+
                         const removeIcon = document.createElement("span");
                         removeIcon.innerHTML = "&#9940;";
                         removeIcon.className = "remove-icon";
@@ -507,6 +528,7 @@
                         actionIcons.appendChild(removeIcon);
 
                         jobCard.appendChild(actionIcons);
+
 
                         jobCard.addEventListener("dragstart", function (event) {
                             event.dataTransfer.setData("text", event.target.id);
@@ -518,6 +540,7 @@
                             if (appropriateColumn) {
                                 appropriateColumn.appendChild(jobCard);
                                 forceRedraw(jobCard);  // If you have a forceRedraw function
+                                console.log(`Added job card for job id ${job.id} to column ${job.status}`);
                             } else {
                                 console.error(`.kanban-drag-area not found in column ${job.status}`);
                             }
@@ -526,11 +549,16 @@
                         }
                     });
 
+                    console.log("Initializing kanban drag and drop functionality.");
                     initializeKanbanDragAndDrop();
                 } else {
                     console.error("Failed to fetch saved jobs:", data.error);
                 }
+            })
+            .catch(error => {
+                console.error("Error occurred while fetching saved jobs:", error);
             });
+
 
         // Delete the saved job from myJobs Tracker and dbo.saved_jobs
         function removeSavedJob(jobId) {

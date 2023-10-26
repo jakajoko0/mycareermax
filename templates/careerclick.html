@@ -19,6 +19,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
 
     <style>
+        /* Add this CSS to style the loading overlay and spinner */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .spinner {
+            border: 4px solid rgb(255, 0, 208);
+            border-radius: 50%;
+            border-top: 4px solid #4800ff;
+            width: 100px;
+            height: 100px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+
         .purple-border {
             border: 1px solid #ae00ff;
             /* Purple color */
@@ -180,7 +216,9 @@
 </script>
 
 <body>
-
+    <div class="overlay" id="overlay">
+        <div class="spinner"></div>
+    </div>
     <script defer>
 
         $(document).ready(function () {
@@ -673,7 +711,6 @@
                 jobPostedTimestamp.style.fontSize = '12px';  // You can adjust '12px' to your preferred size
                 jobBox.appendChild(jobPostedTimestamp);
 
-
                 // Create the "Save Job" heart-shaped button
                 const saveJobButton = document.createElement('i');
                 saveJobButton.className = 'fa fa-heart save-job-btn';
@@ -681,9 +718,15 @@
                 saveJobButton.style.cursor = 'pointer';
                 saveJobButton.style.marginRight = '10px';  // Adjusted the margin property name
                 saveJobButton.style.fontSize = '24px';
+                console.log("Created saveJobButton element.");
 
                 saveJobButton.onclick = function () {
+                    console.log("saveJobButton clicked.");
+
                     if (!this.classList.contains('saved')) {
+                        document.getElementById('overlay').style.display = 'block';
+
+                        console.log("Job not yet saved. Proceeding to save.");
                         this.classList.add('saved');
                         this.style.color = 'red';
 
@@ -698,31 +741,41 @@
                             link: '',  // You might need to capture this if available in your job object
                             employer_logo: job.employer_logo || ""  // Capture the employer logo URL
                         };
+                        console.log("Captured job details:", jobDetails);
 
                         // Send job details to backend using AJAX
+                        console.log("Initiating AJAX request to /save-job.");
                         $.ajax({
                             url: "/save-job",
                             type: "POST",
                             contentType: "application/json",  // Set the Content-Type header
                             data: JSON.stringify(jobDetails),
                             success: function (response) {
+                                // Hide the loading overlay
+                                document.getElementById('overlay').style.display = 'none';
+                                console.log("AJAX request succeeded. Response:", response);
                                 if (response.success) {
                                     console.log("Job saved successfully!");
                                 } else {
+                                    console.warn("Job save attempt not successful. Possible reason: Not logged in.");
                                     alert("You must be logged in to Save Jobs to your Dashboard.");
                                 }
                             },
                             error: function (xhr, status, error) {
-                                console.error("Failed to save job:", error);
+                                // Hide the loading overlay in case of an error
+                                document.getElementById('overlay').style.display = 'none';
+                                console.error(`Failed to save job. Status: ${xhr.status}, Error: ${error}, Response: ${xhr.responseText}`);
                             }
                         });
 
                     } else {
+                        console.log("Job already saved. Removing from saved list.");
                         this.classList.remove('saved');
                         this.style.color = '';
                         // TODO: Optionally send a request to backend to unsave the job
                     }
                 };
+
 
                 jobBox.appendChild(saveJobButton);
 
@@ -935,6 +988,8 @@
                     }
                 },
                 error: function (xhr, textStatus, error) {
+                    // Hide the loading overlay in case of an error
+                    document.getElementById('overlay').style.display = 'none';
                     console.error("Error while uploading the file:", error);
                     alert("An error occurred while uploading the file. Please try again later.");
                 }

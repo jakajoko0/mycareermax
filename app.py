@@ -258,21 +258,29 @@ def submitted():
     return render_template("submitted.html")
 
 
+def retrieve_latest_resume(user_id):
+    try:
+        with create_connection().cursor() as cursor:
+            query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
+            cursor.execute(query, (user_id,))
+            row = cursor.fetchone()
+            if row:
+                return row[0]
+            else:
+                return None
+    except Exception as e:
+        # In a production environment, consider logging the exception for debugging.
+        return None
+
 @app.route("/get_resume_max", methods=["GET"])
 def get_resume_max():
     if current_user.is_authenticated:
         user_id = current_user.get_id()
-        try:
-            with create_connection().cursor() as cursor:
-                query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
-                cursor.execute(query, user_id)
-                row = cursor.fetchone()
-                if row:
-                    return jsonify({"success": True, "resume_content": row[0]})
-                else:
-                    return jsonify({"success": False})
-        except Exception as e:
-            return jsonify({"success": False, "error": str(e)})
+        resume_content = retrieve_latest_resume(user_id)
+        if resume_content:
+            return jsonify({"success": True, "resume_content": resume_content})
+        else:
+            return jsonify({"success": False})
     else:
         return jsonify({"success": False})
 
@@ -569,29 +577,116 @@ def delete_document(document_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+def analyze_resume_compatibility(job_description, user_resume):
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an expert at analyzing resumes and job descriptions."
+            },
+            {
+                "role": "user",
+                "content": f"Given the job description: '{job_description}' and user resume: '{user_resume}', provide a compatibility score, a summarized job description, and an extracted list of keywords from the resume and job description in the following format:\n\n1. percentage: \"x\"%\n2. job_description: \"summarized job_description goes here...\"\n3. keywords_resume: \"keyword1\", \"keyword2\", \"keyword3\", etc...\"\n4. keywords_job: \"keyword1\", \"keyword2\", \"keyword3\", etc...\"\n\n\n"
+            }
+        ],
+        temperature=0.9,
+        max_tokens=3711,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    chatgpt_response = response.choices[0].message["content"]
+    logging.debug(f"ChatGPT Response: {chatgpt_response}")
+
+    return chatgpt_response
+
+# Example usage:
+job_description_input = "Your provided job description here..."
+user_resume_input = "Your provided resume here..."
+result = analyze_resume_compatibility(job_description_input, user_resume_input)
+print(result)
+
+
+def extract_compatibility(chatgpt_response):
+    """Extract the compatibility percentage from the ChatGPT response."""
+    percentage_match = re.search(r'1\. Percentage: (\d+)%', chatgpt_response)
+    if percentage_match:
+        return float(percentage_match.group(1))
+    return None
+
+def extract_summary(chatgpt_response):
+    """Extract the summarized job description from the ChatGPT response."""
+    description_match = re.search(r'2\. Job Description: (.+?)\n3\. Keywords_Resume:', chatgpt_response, re.DOTALL)
+    if description_match:
+        return description_match.group(1).strip()
+    return None
+
+def extract_keywords_resume(chatgpt_response):
+    """Extract keywords from the resume in the ChatGPT response."""
+    keywords_match = re.search(r'3\. Keywords_Resume: (.+?)\n4\. Keywords_Job:', chatgpt_response, re.DOTALL)
+    if keywords_match:
+        keywords_str = keywords_match.group(1)
+        return [keyword.strip('\"').strip() for keyword in keywords_str.split('", "')]
+    return []
+
+def extract_keywords_job(chatgpt_response):
+    """Extract keywords from the job in the ChatGPT response."""
+    keywords_match = re.search(r'4\. Keywords_Job: (.+?)$', chatgpt_response, re.DOTALL)
+    if keywords_match:
+        keywords_str = keywords_match.group(1)
+        return [keyword.strip('\"').strip() for keyword in keywords_str.split('", "')]
+    return []
+
+# Example usage:
+# compatibility_score = extract_compatibility(chatgpt_response)
+# job_description = extract_summary(chatgpt_response)
+# keywords_resume = extract_keywords_resume(chatgpt_response)
+# keywords_job = extract_keywords_job(chatgpt_response)
+
+
+
 @app.route("/save-job", methods=["POST"])
 @login_required
 def save_job():
+    logging.info("Received request to /save-job.")
     try:
-        data = request.get_json()  # Assuming you're sending JSON data from the frontend
-        print("Received JSON data:", data)  # Add this line
+        data = request.get_json()
+        logging.debug(f"Request data: {data}")
+        
         user_id = current_user.id
+        logging.debug(f"Current user ID: {user_id}")
+        
         job_id = data.get("job_id")
         job_title = data.get("job_title")
-        job_description = data.get("job_description")
+        original_job_description = data.get("job_description")
         job_link = data.get("job_link")
         job_loc = data.get("job_loc")
         company_name = data.get("company_name")
         link = data.get("link")
-        employer_logo = data.get(
-            "employer_logo"
-        )  # Capture employer logo from the incoming request
+        employer_logo = data.get("employer_logo")
 
-        print("Before executing query")
+        user_resume = retrieve_latest_resume(user_id)
+        logging.debug(f"Retrieved user resume: {user_resume}")
+
+        chatgpt_response = analyze_resume_compatibility(original_job_description, user_resume)
+        logging.debug(f"Received ChatGPT response: {chatgpt_response}")
+
+        compatibility_score = extract_compatibility(chatgpt_response)
+        keywords_resume = extract_keywords_resume(chatgpt_response)
+        keywords_job = extract_keywords_job(chatgpt_response)
+        job_description = extract_summary(chatgpt_response)  
+
+        logging.debug(f"Extracted values: compatibility_score={compatibility_score}, keywords_resume={keywords_resume}, keywords_job={keywords_job}, job_description={job_description}")
+
         with conn.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO saved_jobs (user_id, job_id, job_title, job_description, job_link, job_loc, company_name, link, employer_logo) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                """
+                INSERT INTO saved_jobs (user_id, job_id, job_title, job_description, job_link, job_loc, 
+                                        company_name, link, employer_logo, percentage, keywords_resume, keywords_job) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
                 (
                     user_id,
                     job_id,
@@ -602,26 +697,39 @@ def save_job():
                     company_name,
                     link,
                     employer_logo,
+                    compatibility_score,
+                    ",".join(keywords_resume),
+                    ",".join(keywords_job),
                 ),
             )
             conn.commit()
-        print("After executing query")
+            logging.info("Job saved successfully to the database.")
+
         return jsonify({"success": True, "message": "Job saved successfully!"})
+
     except Exception as e:
+        logging.error(f"Error encountered: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
+
 
 
 # GET SAVED JOBS
 @app.route("/get-saved-jobs", methods=["GET"])
 @login_required
 def get_saved_jobs():
+    logging.info("Received request to /get-saved-jobs.")
     try:
         user_id = current_user.id
+        logging.debug(f"Current user ID: {user_id}")
+        
         # Create a new connection for this route
         local_conn = create_connection()
+        logging.debug("Database connection established.")
+        
         with local_conn.cursor() as cursor:
             cursor.execute("SELECT * FROM saved_jobs WHERE user_id = ?", (user_id,))
             saved_jobs = cursor.fetchall()
+        logging.debug(f"Retrieved {len(saved_jobs)} saved jobs from the database.")
 
         # Convert the saved_jobs data to a list of dictionaries
         saved_jobs_list = []
@@ -637,15 +745,19 @@ def get_saved_jobs():
                 "link": job.link,
                 "employer_logo": job.employer_logo,
                 "status": job.status,  # Add the status field here
+                "compatibility": job.percentage  # Add the compatibility field here
             }
             saved_jobs_list.append(job_dict)
+        logging.debug(f"Converted saved jobs to a list of dictionaries.")
 
         local_conn.close()  # Close the local connection
+        logging.info("Database connection closed.")
+        
         return jsonify({"success": True, "saved_jobs": saved_jobs_list})
 
     except Exception as e:
+        logging.error(f"Error encountered: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-
 
 @app.route("/remove-saved-job", methods=["POST"])
 @login_required
