@@ -591,7 +591,7 @@ def analyze_resume_compatibility(job_description, user_resume):
             }
         ],
         temperature=0.9,
-        max_tokens=3711,
+      # max_tokens=3711,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
@@ -1854,7 +1854,7 @@ def summarize_text(text):
                 },
             ],
             temperature=1,
-            max_tokens=2154,
+  #         max_tokens=2154,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
