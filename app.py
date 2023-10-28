@@ -579,7 +579,7 @@ def delete_document(document_id):
 
 def analyze_resume_compatibility(job_description, user_resume):
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             {
                 "role": "system",
@@ -1794,7 +1794,7 @@ def autofill():
 
     # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
     response = openai.ChatCompletion.create(
-        model="gpt-4", messages=messages, temperature=0.7, max_tokens=1000
+        model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
     )
 
     # Extract the generated response from the OpenAI API
@@ -1831,7 +1831,7 @@ def generate_cover_letter_ext():
     ]
 
     response = openai.ChatCompletion.create(
-        model="gpt-4", messages=messages, temperature=0.7, max_tokens=1000
+        model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
     )
 
     api_response = response.choices[0].message["content"]
@@ -1842,7 +1842,7 @@ def generate_cover_letter_ext():
 def summarize_text(text):
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
