@@ -587,10 +587,11 @@ def analyze_resume_compatibility(job_description, user_resume):
             },
             {
                 "role": "user",
-                "content": f"Given the job description: '{job_description}' and user resume: '{user_resume}', provide a compatibility score, a summarized job description, and an extracted list of keywords from the resume and job description in the following format:\n\n1. percentage: \"x\"%\n2. job_description: \"summarized job_description goes here...\"\n3. keywords_resume: \"keyword1\", \"keyword2\", \"keyword3\", etc...\"\n4. keywords_job: \"keyword1\", \"keyword2\", \"keyword3\", etc...\"\n\n\n"
+"content": f"Given the job description: '{job_description}' and user resume: '{user_resume}', provide a summarized job description, a job compatibility percentage, and an extracted list of keywords from the resume and job description in the following format:\n\n1. keywords_job: list keywords extracted separated by comma's.\n\n2. Compatibility %: x%\n\n3. Job Summary: write your brief summary of the job description here.\n\n4. keyword_resume: list keyword extracted from resume here.\"\n\n\n"
+
             }
         ],
-        temperature=0.9,
+        temperature=0.6,
       # max_tokens=3711,
         top_p=1,
         frequency_penalty=0,
@@ -603,47 +604,37 @@ def analyze_resume_compatibility(job_description, user_resume):
     return chatgpt_response
 
 # Example usage:
-job_description_input = "Your provided job description here..."
-user_resume_input = "Your provided resume here..."
-result = analyze_resume_compatibility(job_description_input, user_resume_input)
-print(result)
-
+#job_description_input = "Your provided job description here..."
+#user_resume_input = "Your provided resume here..."
+#result = analyze_resume_compatibility(job_description_input, user_resume_input)
+#print(result)
 
 def extract_compatibility(chatgpt_response):
-    """Extract the compatibility percentage from the ChatGPT response."""
-    percentage_match = re.search(r'1\. Percentage: (\d+)%', chatgpt_response)
-    if percentage_match:
-        return float(percentage_match.group(1))
+    compatibility_match = re.search(r'(compatibility|percentage).*?(\d+)%', chatgpt_response, re.IGNORECASE)
+    if compatibility_match:
+        return float(compatibility_match.group(2))
     return None
 
 def extract_summary(chatgpt_response):
-    """Extract the summarized job description from the ChatGPT response."""
-    description_match = re.search(r'2\. Job Description: (.+?)\n3\. Keywords_Resume:', chatgpt_response, re.DOTALL)
+    description_match = re.search(r'Job Summary: (.*?)(4\. keyword_resume|$)', chatgpt_response, re.IGNORECASE | re.DOTALL)
     if description_match:
         return description_match.group(1).strip()
     return None
 
 def extract_keywords_resume(chatgpt_response):
-    """Extract keywords from the resume in the ChatGPT response."""
-    keywords_match = re.search(r'3\. Keywords_Resume: (.+?)\n4\. Keywords_Job:', chatgpt_response, re.DOTALL)
+    keywords_match = re.search(r'(\b\w*resume\w*\b).*?:\s*(.+?)(?=\b\w*job\w*\b|\b\w*sum\w*\b|compatibility|$)', chatgpt_response, re.IGNORECASE | re.DOTALL)
     if keywords_match:
-        keywords_str = keywords_match.group(1)
-        return [keyword.strip('\"').strip() for keyword in keywords_str.split('", "')]
+        keywords_str = keywords_match.group(2)
+        return [keyword.strip() for keyword in re.split(',|\n', keywords_str)]
     return []
 
 def extract_keywords_job(chatgpt_response):
-    """Extract keywords from the job in the ChatGPT response."""
-    keywords_match = re.search(r'4\. Keywords_Job: (.+?)$', chatgpt_response, re.DOTALL)
+    keywords_match = re.search(r'(\b\w*job\w*\b).*?:\s*(.+?)(?=\b\w*resume\w*\b|\b\w*sum\w*\b|compatibility|$)', chatgpt_response, re.IGNORECASE | re.DOTALL)
     if keywords_match:
-        keywords_str = keywords_match.group(1)
-        return [keyword.strip('\"').strip() for keyword in keywords_str.split('", "')]
+        keywords_str = keywords_match.group(2)
+        return [keyword.strip() for keyword in re.split(',|\n', keywords_str)]
     return []
 
-# Example usage:
-# compatibility_score = extract_compatibility(chatgpt_response)
-# job_description = extract_summary(chatgpt_response)
-# keywords_resume = extract_keywords_resume(chatgpt_response)
-# keywords_job = extract_keywords_job(chatgpt_response)
 
 
 
