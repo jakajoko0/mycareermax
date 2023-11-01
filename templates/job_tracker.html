@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Job Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ultra&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-image: linear-gradient(120deg, #4e27ff, #a929ff);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .percentage {
+            font-family: 'Ultra', serif;
+            color: #24c700;
+            font-size: 20px;
+        }
+
+        .percentage {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+        }
+
+        .job-title {
+            font-family: 'Varela Round', sans-serif;
+            font-size: x-large;
+            color: blue;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            /* Center vertically */
+            justify-content: center;
+            /* Center horizontally */
+            width: 100%;
+            /* Ensure it takes full width */
+        }
+
+        .company-name {
+            font-family: 'Kanit', sans-serif;
+            font-size: larger;
+            /* changed from 'large' to 'smaller' */
+            color: rgb(0, 0, 174);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            /* Center vertically */
+            justify-content: center;
+            /* Center horizontally */
+            width: 100%;
+            /* Full width to capture overflow */
+        }
+
+        .status select {
+            font-size: 18px;
+            padding: 4px;
+        }
+
+
+        .status {
+            margin-bottom: 10px;
+            /* Add some space below the dropdown */
+        }
+
+        .status-row-header {
+            font-size: 20px;
+            font-family: 'Noto Sans', sans-serif;
+            margin-bottom: 10px
+        }
+
+        .status-row-header {
+            color: #4000ff;
+            text-align: center;
+        }
+
+        .job-cards-row {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            /* Remove fixed height */
+        }
+
+        .job-card {
+            flex: 0 0 auto;
+            /* add this line */
+            width: 400px;
+            padding: 15px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgb(0, 0, 0);
+            cursor: pointer;
+        }
+
+        .job-card {
+            position: relative;
+        }
+
+
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            margin: 15% auto;
+            padding: 20px;
+            width: 50%;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .employer-logo {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 35px;
+            height: 35px;
+        }
+
+        .job-card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100%;
+            /* Change to min-height */
+        }
+    </style>
+    <script>
+        console.log("Head section loaded.");
+    </script>
+</head>
+
+<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer>
+        $(document).ready(function () {
+            console.log("Fetching username...");
+            $.get("/get-username", function (response) {
+                console.log("Username response:", response);
+                if (response.success) {
+                    const usernamePlaceholder = document.getElementById("username-placeholder");
+                    usernamePlaceholder.textContent = "Hello, " + response.username;
+                } else {
+                    console.error('Error fetching username:', response.error);
+                }
+            });
+        });
+    </script>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+            <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #ffffff;">myCareerMax.com</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard" style="color: #ffffff;">myDashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/careerclick" style="color: #ffffff;">AI Job Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/tools" style="color: #ffffff;">Create✨</a>
+                    </li>
+                    <!-- Tools Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ffffff;">
+                            Tools
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+                            <a class="dropdown-item" href="/resume-enhancer" style="color: #ffffff;">Resume Scanner</a>
+                            <a class="dropdown-item" href="/interview-prep" style="color: #ffffff;">Interview Prep</a>
+                        </div>
+                    </li>
+                    <!-- New link for CareerBot -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/careerbot" style="color: #ffffff;">Max</a>
+                    </li>
+                    <!-- Existing dropdown for the username -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ffffff;">
+                            <span id="username-placeholder">Login Here</span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/dashboard#my-docs" style="color: #ffffff;">My AI Docs</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                            <a class="dropdown-item" href="/logout" style="color: #ffffff;">Logout</a>
+                            <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                        </div>
+                    </li>
+                    <!-- End of Dropdown for username -->
+                </ul>
+            </div>
+        </nav>
+        <script>
+            console.log("Body section starting to load.");
+        </script>
+
+        {% for status, jobs in saved_jobs_by_status.items() %}
+        <!-- <h2>{{ status }}</h2>   -->
+        <div class="status-row-header" id="status-header">
+            <h2>{{ status }}</h2>
+        </div>
+
+        <div class="job-cards-row">
+            {% for job in jobs %}
+            <!-- Debug: Print out the job variable -->
+            <script>
+                console.log("Current job in loop:", {{ job | tojson | safe }});
+            </script>
+            <!-- End Debug -->
+
+            <!-- Using data-job attribute to store job data -->
+            <!--    <div class="job-card" data-job='{{ job|tojson|safe }}' onclick="showModal(this)">
+            <div class="employer-logo">
+                {% if job.employer_logo != 'N/A' %}
+                <img src="{{ job.employer_logo }}" alt="Employer Logo" width="50" height="50"
+                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default_logo.png') }}';">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo" width="50"
+                    height="50">
+                {% endif %}
+            </div> -->
+            <div class="job-card" data-job='{{ job|tojson|safe }}' onclick="showModal(this)">
+                <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo"
+                    class="employer-logo">
+                <div class="job-card-content"> <!-- New wrapper div -->
+                    <div class="status">
+                        <select data-job-id="{{ job.id }}" onchange="updateStatus(this);"
+                            onclick="stopPropagation(event);">
+                            <option value="Saved" {% if job.status=='Saved' %}selected{% endif %}>Saved</option>
+                            <option value="Applied" {% if job.status=='Applied' %}selected{% endif %}>Applied</option>
+                            <option value="Interviewing" {% if job.status=='Interviewing' %}selected{% endif %}>
+                                Interviewing
+                            </option>
+                            <option value="Offered" {% if job.status=='Offered' %}selected{% endif %}>Offered</option>
+                            <option value="Rejected" {% if job.status=='Rejected' %}selected{% endif %}>Rejected
+                            </option>
+                        </select>
+                    </div>
+                    <div class="job-title">{{ job.job_title }}</div>
+                    <div class="company-name">{{ job.company_name }}</div>
+                </div>
+                <div class="percentage">{{ job.percentage }}%</div>
+            </div>
+
+
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <script>
+            var currentUserId = "{{ current_user.id }}";
+        </script>
+
+        <script>
+            function stopPropagation(e) {
+                e.stopPropagation();
+            }
+        </script>
+        <script>
+            console.log("Job cards loaded.");
+        </script>
+        <!-- Modal -->
+        <div id="jobModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div id="modalData"></div>
+            </div>
+        </div>
+        <script>
+            console.log("Modal section loaded.");
+        </script>
+        <script>
+            // Modified showModal function with debugging lines
+            function showModal(element) {
+                console.log("showModal function called.");
+
+                const rawData = element.getAttribute('data-job').trim();
+                console.log("Raw data-job attribute:", rawData);
+
+                let jobData;
+                try {
+                    jobData = JSON.parse(rawData);
+                } catch (e) {
+                    console.error("Error parsing job data:", e);
+                    return;
+                }
+
+                console.log("Parsed job data:", jobData);
+
+                let modal = document.getElementById("jobModal");
+                let modalData = document.getElementById("modalData");
+
+                let employerLogoHtml = jobData.employer_logo !== 'N/A'
+                    ? `<img src="${jobData.employer_logo}" alt="Employer Logo" width="100" height="100">`
+                    : 'N/A';
+
+                modalData.innerHTML = `
+                <div>${jobData.percentage}%</div>        
+                <div>${jobData.status}</div>
+                <div>${jobData.job_title}</div>
+                <div>${jobData.company_name}</div>
+                <div>${jobData.job_description}</div>
+                <div><a href="${jobData.job_link}">${jobData.job_link}</a></div>
+                <!-- <div>Keywords Extracted From Your Resume: ${jobData.keywords_job}</div> -->
+                <div></div>
+                <div>Keywords Extracted From Job Description: ${jobData.keywords_resume}</div>
+            `;
+                modal.style.display = "block";
+                console.log("Modal displayed.");
+            }
+
+            function closeModal() {
+                console.log("closeModal function called.");
+                let modal = document.getElementById("jobModal");
+                modal.style.display = "none";
+                console.log("Modal closed.");
+            }
+        </script>
+        <script>
+            console.log("All scripts loaded.");
+        </script>
+        <script>
+            function updateStatus(selectElement) {
+                // Stop propagation to prevent showModal
+                event.stopPropagation();
+
+                const jobId = selectElement.getAttribute('data-job-id');
+                const newStatus = selectElement.value;
+                const userId = currentUserId;
+
+                // Perform AJAX request to update the job status
+                fetch('/update-job-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        new_status: newStatus,
+                        job_id: jobId,
+                        user_id: userId  // This is usually not needed if you can identify the user on the server
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Refresh the page to reflect the new status
+                            location.reload();
+                        } else {
+                            alert('Failed to update job status: ' + data.error);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            }
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

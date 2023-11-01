@@ -78,10 +78,6 @@
             border-radius: 0;
         }
 
-        .gradient-bg {
-            background: linear-gradient(to bottom, #0022ff, #ae00ff);
-        }
-
         .text-white {
             color: white !important;
         }
@@ -91,7 +87,7 @@
         }
 
         body {
-            background-color: #b778ff;
+            background-image: linear-gradient(120deg, #4400ffd4, #5d00ffac);
         }
 
         body {
@@ -107,14 +103,17 @@
         }
 
         .job-box {
-            background-color: #d2e3ff;
-            border: 1px solid #ccc;
-            padding: 15px;
+            background-color: #ffffff;
             margin: 10px;
             position: relative;
             overflow: hidden;
             max-height: 300px;
+            max-width: 75%;
             overflow-y: auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgb(0, 0, 0);
         }
 
         .job-box:hover {
@@ -127,7 +126,7 @@
         }
 
         .navbar {
-            background-image: linear-gradient(120deg, #ff7f0f, #ff7f0f);
+            background-image: linear-gradient(120deg, #ffffff, #ffffff);
             background-size: cover;
             background-attachment: fixed;
         }
@@ -237,8 +236,8 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
         <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+            data-target="#navbarNav" data-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -254,11 +253,11 @@
                 </li>
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
                         Tools
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+                    <div aria-labelledby="toolsDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
                         <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
                     </div>
@@ -269,11 +268,11 @@
                 </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
                         <span id="username-placeholder">Login Here</span>
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div aria-labelledby="navbarDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
@@ -285,23 +284,9 @@
             </ul>
         </div>
     </nav>
-    <!-- Adding the clickable, resizable, and responsive image here -->
-    <div style="text-align: center; color: white;">
-        <a
-            href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar">
-            <img src="/static/images/magicmaxbanner.png" alt="MagicMax Banner" class="img-fluid"
-                style="width: 500px; height: auto; border-radius: 15px;">
-        </a><br>
-        <a href="https://chromewebstore.google.com/detail/magicmax-job-application/ebofcmfjbdjfnofjbhippeiaoabmdppn?hl=en-US&utm_source=ext_sidebar"
-            class="btn btn-link" style="color: white;">⚡ Click here to add the MagicMax Chrome Extension Now & Put Your
-            Job
-            Applications On
-            AutoPilot </a>
-        <div style="height: 20px;"></div>
-        <div style="text-align:center;">
-            <img src="{{ url_for('static', filename='images/blue-mycareermax.png') }}" alt="Your Logo"
-                style="max-width:100%;" />
-        </div>
+    <div style="text-align:center;">
+        <img alt="Your Logo" src="{{ url_for('static', filename='images/white-mycareermax.png') }}"
+            style="max-width:100%;" />
     </div>
     <div class="container mt-5">
         <!-- Job Search Section -->
@@ -316,60 +301,63 @@
                         type="text" />
                 </div>
                 <div class="col">
-                    <button class="btn gradient-button" onclick="fetchJobListings()">Search</button>
+                    <button class="btn gradient-button" onclick="fetchJobListings()"
+                        style="border: 1px solid white; padding: 10px 20px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">Search</button>
                 </div>
             </div>
         </div>
         <!-- Resume box -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
         <div class="mb-4">
-            <p>💡 If you have already uploaded your resume to the Dashboard, you do not need to add it again here</p>
-            <label for="resume-upload">Upload your resume (.docx format) or <a href="#" id="toggle-textarea">manually
-                    enter
-                </a>:</label>
+            <p style="color: white;">💡 If you have already uploaded your resume to the Dashboard, you do not need to
+                add it
+                again here</p>
+            <label style="color: white;" for="resume-upload">Upload your resume (.docx format) or <a
+                    style="color: white;" href="#" id="toggle-textarea">manually enter</a>:</label>
             <input id="upload" type="file" />
-            <textarea class="form-control mt-2" id="resume-text" rows="10" style="display: none;"></textarea>
-            <script>
-                document.getElementById('toggle-textarea').addEventListener('click', function (e) {
-                    e.preventDefault();
-                    var textarea = document.getElementById('resume-text');
-                    if (textarea.style.display === 'none') {
-                        textarea.style.display = 'block';
-                    } else {
-                        textarea.style.display = 'none';
-                    }
-                });
-
-                document.getElementById('upload').addEventListener('change', function (event) {
-                    var reader = new FileReader();
-                    reader.onload = function (event) {
-                        mammoth.extractRawText({ arrayBuffer: event.target.result })
-                            .then(displayResult)
-                            .catch(handleError);
-                    };
-                    reader.readAsArrayBuffer(this.files[0]);
-                }, false);
-
-                function displayResult(result) {
-                    document.getElementById('resume-text').value = result.value;
-                }
-
-                function handleError(err) {
-                    console.log(err);
-                    alert('Error processing document.');
-                }
-            </script>
-            <div id="loading-overlay"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
-                <div
-                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(to bottom, #0022ff, #ae00ff); color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
-                    ✨ Hold please. Doing AI things. Your generated content will be available at the top of the page
-                    when
-                    I'm finished. 🪄
-                </div>
-            </div>
-
         </div>
+        <textarea class="form-control mt-2" id="resume-text" rows="10" style="display: none;"></textarea>
+        <script>
+            document.getElementById('toggle-textarea').addEventListener('click', function (e) {
+                e.preventDefault();
+                var textarea = document.getElementById('resume-text');
+                if (textarea.style.display === 'none') {
+                    textarea.style.display = 'block';
+                } else {
+                    textarea.style.display = 'none';
+                }
+            });
+
+            document.getElementById('upload').addEventListener('change', function (event) {
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    mammoth.extractRawText({ arrayBuffer: event.target.result })
+                        .then(displayResult)
+                        .catch(handleError);
+                };
+                reader.readAsArrayBuffer(this.files[0]);
+            }, false);
+
+            function displayResult(result) {
+                document.getElementById('resume-text').value = result.value;
+            }
+
+            function handleError(err) {
+                console.log(err);
+                alert('Error processing document.');
+            }
+        </script>
+        <div id="loading-overlay"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+            <div
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(to bottom, #0022ff, #ae00ff); color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
+                ✨ Hold please. Doing AI things. Your generated content will be available at the top of the page
+                when
+                I'm finished. 🪄
+            </div>
+        </div>
+
+    </div>
 
     </div>
     <!-- Collapsible Section -->
@@ -377,8 +365,9 @@
         <div class="accordion-item">
             <h2 class="accordion-header" id="howItWorksHeading">
                 <div style="text-align: center;">
-                    <a href="#" style="font-size: 18px;" class="collapsed" id="howDoesThisWork" data-toggle="collapse"
-                        data-target="#howItWorksCollapse" aria-expanded="false" aria-controls="howItWorksCollapse">
+                    <a href="#" style="font-size: 18px; color: white;" class="collapsed" id="howDoesThisWork"
+                        data-toggle="collapse" data-target="#howItWorksCollapse" aria-expanded="false"
+                        aria-controls="howItWorksCollapse">
                         🔮 How does this work?
                     </a>
                 </div>

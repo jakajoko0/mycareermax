@@ -40,7 +40,7 @@ from flask_login import (
     current_user,
 )
 import urllib.parse
-
+import json
 # noqa: F401
 from flask import flash, get_flashed_messages
 
@@ -898,8 +898,9 @@ def download_document(document_id):
 @login_required  # Only logged-in users can access this route
 def dashboard():
     user_id = current_user.id
+    
+    # Fetch user documents
     user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
-
     documents_list = [
         {
             "id": doc.id,
@@ -907,14 +908,73 @@ def dashboard():
             "document_content": doc.document_content,
             "document_type": doc.document_type,
             "creation_date": doc.creation_date,
-            "job_title": doc.job_title,  # Include job title
-            "company_name": doc.company_name,  # Include company name
-            "apply_link": doc.apply_link,  # Include apply link
+            "job_title": doc.job_title,
+            "company_name": doc.company_name,
+            "apply_link": doc.apply_link,
         }
         for doc in user_documents
     ]
 
-    return render_template("dashboard.html", documents=documents_list)
+    # Fetch saved jobs by status
+    saved_jobs_by_status = get_saved_jobs_by_status(user_id)
+    
+    return render_template("dashboard.html", documents=documents_list, saved_jobs_by_status=saved_jobs_by_status)
+
+
+
+
+def get_saved_jobs_by_status(user_id):
+    print("Starting function get_saved_jobs_by_status.")
+    
+    print("Creating database connection.")
+    conn = create_connection()
+    
+    print("Creating cursor.")
+    cursor = conn.cursor()
+    
+    print("Executing SQL query.")
+    query = "SELECT * FROM [dbo].[saved_jobs] WHERE user_id = ?"
+    cursor.execute(query, [user_id])
+    
+    print("Fetching all rows.")
+    rows = cursor.fetchall()
+    
+    print("Closing database connection.")
+    conn.close()
+
+    print("Initializing saved_jobs_by_status dictionary.")
+    status_categories = ["Saved", "Applied", "Interviewing", "Offered", "Rejected"]
+    saved_jobs_by_status = {status: [] for status in status_categories}
+
+    print("Iterating through each row to populate saved_jobs_by_status.")
+    for row in rows:
+        print(f"Current Job ID: {row.id}")  # Add this line to print the job ID
+        job_data = {
+            "id": row.id,  # Also add this line to include id in the job_data dictionary
+            "employer_logo": row.employer_logo or "N/A",
+            "job_title": row.job_title,
+            "job_link": row.job_link,
+            "company_name": row.company_name,
+            "status": row.status,
+            "percentage": row.percentage,
+            "job_description": row.job_description,
+            "keywords_job": row.keywords_job,
+            "keywords_resume": row.keywords_resume,
+        }
+        
+        # Check if job_data can be serialized to JSON and print it
+        try:
+            serialized_job_data = json.dumps(job_data)
+            print(f"Serialized job data: {serialized_job_data}")
+        except (TypeError, ValueError) as e:
+            print(f"Error serializing job_data: {e}")
+            continue
+
+        saved_jobs_by_status[row.status].append(job_data)
+
+    print("Returning saved_jobs_by_status.")
+    return saved_jobs_by_status
+
 
 
 @app.route("/logout")
@@ -939,6 +999,14 @@ def ai_builder():
 @app.route("/")
 def home():
     return redirect(url_for("login"))
+
+@app.route("/job_tracker", methods=["GET"])
+@login_required
+def job_tracker():
+    user_id = current_user.id
+    saved_jobs_by_status = get_saved_jobs_by_status(user_id)
+    return render_template("job_tracker.html", saved_jobs_by_status=saved_jobs_by_status)
+
 
 
 @app.route("/cover-letter-generator")
