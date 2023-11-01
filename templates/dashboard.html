@@ -571,9 +571,10 @@
     </script>
     <div class="job-card" data-job='{{ job|tojson|safe }}' onclick="showModal(this)">
         <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo" class="employer-logo">
-        <div class="job-card-content"> <!-- New wrapper div -->
+        <div class="job-card-content">
             <div class="status">
-                <select data-job-id="{{ job.id }}" onchange="updateStatus(this);" onclick="stopPropagation(event);">
+                <select data-job-id="{{ job.id }}" onchange="updateStatus(this, event);"
+                    onclick="stopPropagation(event);">
                     <option value="Saved" {% if job.status=='Saved' %}selected{% endif %}>Saved</option>
                     <option value="Applied" {% if job.status=='Applied' %}selected{% endif %}>Applied</option>
                     <option value="Interviewing" {% if job.status=='Interviewing' %}selected{% endif %}>
@@ -582,6 +583,7 @@
                     <option value="Offered" {% if job.status=='Offered' %}selected{% endif %}>Offered</option>
                     <option value="Rejected" {% if job.status=='Rejected' %}selected{% endif %}>Rejected
                     </option>
+                    <option value="Delete" {% if job.status=='Delete' %}selected{% endif %}>Delete</option>
                 </select>
             </div>
             <div class="job-title">{{ job.job_title }}</div>
@@ -668,39 +670,68 @@
     console.log("All scripts loaded.");
 </script>
 <script>
-    function updateStatus(selectElement) {
+    function updateStatus(selectElement, event) {
         // Stop propagation to prevent showModal
         event.stopPropagation();
 
         const jobId = selectElement.getAttribute('data-job-id');
         const newStatus = selectElement.value;
-        const userId = currentUserId;
+        const userId = currentUserId;  // Assuming currentUserId is globally available
 
-        // Perform AJAX request to update the job status
-        fetch('/update-job-status', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                new_status: newStatus,
-                job_id: jobId,
-                user_id: userId  // This is usually not needed if you can identify the user on the server
-            }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Refresh the page to reflect the new status
-                    location.reload();
-                } else {
-                    alert('Failed to update job status: ' + data.error);
-                }
+        console.log(`Job ID: ${jobId}, New Status: ${newStatus}`);  // Debugging line
+
+        if (newStatus === 'Delete') {
+            console.log('Attempting to delete job');  // Debugging line
+
+            if (window.confirm('Are you sure you want to delete this job?')) {
+                fetch('/remove-saved-job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        job_id: jobId,
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Job successfully deleted');  // Debugging line
+                            selectElement.closest('.job-card').remove();
+                        } else {
+                            alert('Failed to delete job: ' + data.error);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            }
+        } else {
+            fetch('/update-job-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    new_status: newStatus,
+                    job_id: jobId,
+                    user_id: userId  // This is usually not needed if you can identify the user on the server
+                }),
             })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to update job status: ' + data.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
     }
+
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
