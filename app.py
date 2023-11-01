@@ -1357,14 +1357,27 @@ headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 def fetch_job_listings():
     query = request.json.get("query")
     location = request.json.get("location")
+
+    # Validation
+    if not query or not location:
+        return jsonify({"error": "Invalid query or location"}), 400
+    
     # Construct the API URL
     url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        data = response.json()
-        # Print the first job listing for debugging
-        print(data.get("data", [{}])[0])
-        return jsonify(data)
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logging.error(f"Request failed: {e}")
+        return jsonify({"error": "Failed to fetch data"}), 500
+
+    data = response.json()
+    
+    # Log the first job listing for debugging
+    logging.debug(data.get("data", [{}])[0])
+    
+    return jsonify(data)
 
 
 # AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS

@@ -813,6 +813,11 @@
                 employerName.style.color = '#007BFF';
                 jobBox.appendChild(employerName);
 
+                // Append the job city
+                const jobCity = document.createElement('p');
+                jobCity.innerText = 'City: ' + (job.job_city || 'N/A');
+                jobBox.appendChild(jobCity);
+
                 // Create the "Generate Cover Letter" button first
                 const generateButton = document.createElement('button');
                 generateButton.className = 'btn btn-secondary ml-2 job-box-btn';
