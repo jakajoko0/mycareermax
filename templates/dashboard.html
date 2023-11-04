@@ -356,7 +356,6 @@
         }
     </style>
 </head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script defer>
     $(document).ready(function () {
         console.log("Fetching username...");
@@ -523,7 +522,10 @@
     </div>
 
     <script>
+        console.log("Script is executing!");
         $(document).ready(function () {
+            console.log("jQuery is ready!");
+
             // Handling resume upload via jQuery
             $("#uploadButtonOrForm").on("submit", function (e) {
                 e.preventDefault();
@@ -537,10 +539,14 @@
                     success: function (response) {
                         if (response.success) {
                             $('.uploaded-resume-name').text('Saved Resume: ' + response.filename).addClass('white-text');
+                            console.log('Resume uploaded successfully:', response.filename); // Debugging line
                         } else {
                             console.error('Error fetching resume name:', response.error);
                         }
-
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Debugging line: log AJAX request errors
+                        console.error('AJAX error:', textStatus, 'Details:', errorThrown);
                     }
                 });
             });
@@ -829,6 +835,36 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Debugging for when the modal is shown
+        $('#resumeModal').on('shown.bs.modal', function () {
+            console.log('Modal is displayed');
+
+            // Check if there's more than one backdrop present
+            if ($('.modal-backdrop').length > 1) {
+                console.log('Multiple backdrops detected!');
+                // Remove any extra backdrops, if necessary
+                $('.modal-backdrop').not(':first').remove();
+            }
+
+            // Check z-index of the modal
+            var modalZIndex = $(this).css('z-index');
+            console.log('Modal z-index:', modalZIndex);
+
+            // Check z-index of the backdrop
+            var backdropZIndex = $('.modal-backdrop').css('z-index');
+            console.log('Backdrop z-index:', backdropZIndex);
+
+            // Ensure the modal z-index is higher than the backdrop's
+            if (parseInt(modalZIndex) <= parseInt(backdropZIndex)) {
+                console.log('Adjusting modal z-index to be on top of the backdrop');
+                $(this).css('z-index', parseInt(backdropZIndex) + 10);
+            }
+        });
+    });
+</script>
+
 </body>
 
 </html>
