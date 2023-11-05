@@ -1363,7 +1363,7 @@ def fetch_job_listings():
         return jsonify({"error": "Invalid query or location"}), 400
     
     # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=5"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages="5"
     
     try:
         response = requests.get(url, headers=headers)
