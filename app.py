@@ -1353,17 +1353,16 @@ RAPIDAPI_BASE_URL = "https://jsearch.p.rapidapi.com"
 headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
 
-@app.route("/fetch-job-listings", methods=["POST"])
+@app.route("/fetch-job-listings", methods=["GET"])
 def fetch_job_listings():
-    query = request.json.get("query")
-    location = request.json.get("location")
+    query = request.args.get("query", '')  # Default to empty string if not specified
+    location = request.args.get("location", '')  # Default to empty string if not specified
+    page = request.args.get("page", 1)  # Default to page 1 if not specified
 
-    # Validation
-    if not query or not location:
-        return jsonify({"error": "Invalid query or location"}), 400
+    # Construct the API URL with the page parameter
+    # You may want to handle cases where query or location is empty differently
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
     
-    # Construct the API URL
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&num_pages=1"    
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
@@ -1377,6 +1376,7 @@ def fetch_job_listings():
     logging.debug(data.get("data", [{}])[0])
     
     return jsonify(data)
+
 
 
 # AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS
