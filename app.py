@@ -560,7 +560,6 @@ def save_document():
 
 # return render_template("dashboard.html", documents=documents_list)
 
-
 @app.route("/delete_document/<int:document_id>", methods=["DELETE"])
 @login_required
 def delete_document(document_id):
@@ -1353,14 +1352,39 @@ RAPIDAPI_BASE_URL = "https://jsearch.p.rapidapi.com"
 headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
 
-@app.route("/fetch-job-listings", methods=["GET"])
-def fetch_job_listings():
-    query = request.args.get("query", '')  # Default to empty string if not specified
-    location = request.args.get("location", '')  # Default to empty string if not specified
-    page = request.args.get("page", 1)  # Default to page 1 if not specified
+#@app.route("/fetch-job-listings", methods=["GET"])
+#def fetch_job_listings():
+ #   query = request.args.get("query", '')  # Default to empty string if not specified
+  #  location = request.args.get("location", '')  # Default to empty string if not specified
+   # page = request.args.get("page", 1)  # Default to page 1 if not specified
 
     # Construct the API URL with the page parameter
     # You may want to handle cases where query or location is empty differently
+#    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
+    
+#    try:
+#        response = requests.get(url, headers=headers)
+#        response.raise_for_status()
+#    except requests.RequestException as e:
+#        logging.error(f"Request failed: {e}")
+#        return jsonify({"error": "Failed to fetch data"}), 500
+
+ #   data = response.json()
+    
+    # Log the first job listing for debugging
+  #  logging.debug(data.get("data", [{}])[0])
+    
+  #  return jsonify(data)
+
+@app.route("/fetch-job-listings", methods=["POST"])
+def fetch_job_listings():
+    # Get JSON data sent with POST request
+    data = request.get_json()
+    query = data.get("query", '')  # Default to empty string if not specified
+    location = data.get("location", '')  # Default to empty string if not specified
+    page = data.get("page", 1)  # Default to page 1 if not specified
+
+    # Construct the API URL with the page parameter
     url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
     
     try:
@@ -1376,8 +1400,6 @@ def fetch_job_listings():
     logging.debug(data.get("data", [{}])[0])
     
     return jsonify(data)
-
-
 
 # AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS
 @app.route("/career_click", methods=["POST"])

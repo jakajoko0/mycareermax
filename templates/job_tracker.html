@@ -13,6 +13,18 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
     <style>
+        hr {
+            border: none;
+            height: 1px;
+            /* sets the thickness of the line */
+            background-color: #dddddd;
+            /* sets the color of the line */
+            margin-top: 20px;
+            /* adds space above the line */
+            margin-bottom: 20px;
+            /* adds space below the line */
+        }
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -30,7 +42,7 @@
         #jobs-list {
             width: 100%;
             /* background-color: #7300ff;
-            /* Change this to the color you want for the container */
+    /* Change this to the color you want for the container */
             height: calc(100vh - 150px);
             overflow-y: auto;
             padding: 20px;
@@ -72,7 +84,7 @@
             justify-content: center;
             align-items: center;
             padding: 10px;
-            /*  border-bottom: 1px solid #ccc; */
+            /* border-bottom: 1px solid #ccc; */
         }
 
         #search-container input[type="text"] {
@@ -99,7 +111,7 @@
             padding-top: 150px;
             width: 100%;
             background-image: radial-gradient(circle, #b700ff, #3776ff);
-            /*  background-image: linear-gradient(120deg, #b700ff, #3776ff); */
+            /* background-image: linear-gradient(120deg, #b700ff, #3776ff); */
             /* Change this to your desired background color */
             display: flex;
             justify-content: center;
@@ -206,6 +218,8 @@
             align-items: center;
         }
 
+
+
         .job-header-bottom {
             flex-basis: 100%;
             margin-top: 10px;
@@ -217,12 +231,26 @@
             align-items: center;
         }
 
+        .logo-date-container {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            flex-grow: 1;
+        }
+
         .posted-at {
-            margin-left: auto;
             padding: 5px;
             border-radius: 5px;
             background-color: #f8f8f8;
             font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .save-icon {
+            margin-left: auto;
+            margin-right: 10px;
+            cursor: pointer;
+            padding: 8px;
         }
 
         .employer-logo {
@@ -260,6 +288,7 @@
 
         .salary-remote-type-info {
             display: flex;
+            flex-wrap: wrap;
             justify-content: start;
             align-items: center;
             margin-top: 10px;
@@ -267,11 +296,13 @@
 
         .salary-range,
         .job-type-remote,
-        .employment-type {
+        .employment-type,
+        .job-benefit-tag {
             border: 1px solid #ccc;
             border-radius: 15px;
             padding: 10px;
             margin-right: 10px;
+            margin-bottom: 10px;
             background-color: #f8f8f8;
             display: inline-block;
         }
@@ -536,6 +567,20 @@
                 return jobTypeMap[jobType] || jobType;
             }
 
+            // Function to map benefit keys to user-friendly text
+            function mapBenefitToDisplayText(benefit) {
+                const benefitDisplayMap = {
+                    'paid_time_off': 'PTO',
+                    'health_insurance': 'Health',
+                    'retirement_savings': 'Retirement',
+                    'dental_coverage': 'Dental',
+                    'Part-time Benefit Eligible': 'PT Benefit Eligible',
+                };
+
+                // Return the display text if found, or default to the benefit as-is
+                return benefitDisplayMap[benefit] || benefit.replace(/_/g, ' ');
+            }
+
             // Function to format the date and time
             function formatDateTime(dateTimeString) {
                 // Create a Date object from the dateTimeString
@@ -559,8 +604,7 @@
                 }
 
 
-                jobs.forEach(job => {
-                    // Create a new div for the job card
+                jobs.forEach(job => {                    // Create a new div for the job card
                     const jobCard = document.createElement('div');
                     jobCard.className = 'job';
 
@@ -568,7 +612,7 @@
                     const jobHeaderTop = document.createElement('div');
                     jobHeaderTop.className = 'job-header-top';
 
-                    // Logo container
+                    // Create logo container and logo image
                     const logoContainer = document.createElement('div');
                     logoContainer.className = 'logo-container';
                     const logoImg = document.createElement('img');
@@ -580,16 +624,103 @@
                     };
                     logoContainer.appendChild(logoImg);
 
-                    // Append the logo container to the job header top
-                    jobHeaderTop.appendChild(logoContainer);
-
-                    // Date container
+                    // Date text
                     const postedAtDiv = document.createElement('div');
                     postedAtDiv.className = 'posted-at';
-                    postedAtDiv.innerText = formatDateTime(job.job_posted_at_datetime_utc); // Use the correct field for the job posted date
+                    postedAtDiv.innerText = formatDateTime(job.job_posted_at_datetime_utc);
 
-                    // Append the date next to the logo container, not inside it
+                    jobCard.setAttribute('data-job-id', job.job_id);
+
+                    // Save icon
+                    const saveIcon = document.createElement('span');
+                    saveIcon.className = 'material-symbols-outlined save-icon';
+                    saveIcon.textContent = 'format_list_bulleted_add';
+
+                    // This function is called when the save icon is clicked.
+                    saveIcon.onclick = function (event) {
+                        // Prevent the default action to avoid any unwanted behavior like page navigation
+                        event.preventDefault();
+
+                        // Get the closest job card to the clicked element
+                        const jobCard = event.target.closest('.job');
+
+                        // Extract the job ID from the data attribute
+                        const jobId = jobCard.getAttribute('data-job-id');
+
+                        // Check if the job is already saved or not
+                        if (saveIcon.textContent.includes('format_list_bulleted_add')) {
+                            // If not saved, save the job
+                            const jobData = {
+                                job_id: job.job_id,
+                                job_title: job.job_title,
+                                job_description: job.job_description,
+                                job_link: job.job_apply_link,
+                                job_loc: job.job_city,
+                                company_name: job.employer_name,
+                                link: window.location.href,
+                                employer_logo: job.employer_logo
+                            };
+
+                            fetch('/save-job', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(jobData)
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        console.log('Job saved successfully');
+                                        // Change the icon to 'heart_minus' and add a new onclick event to remove the job
+                                        saveIcon.innerHTML = '<span class="material-symbols-outlined">add_task</span>';
+                                        saveIcon.onclick = removeSavedJob; // Assign the remove function
+                                        saveIcon.classList.add('saved');
+                                    } else {
+                                        console.error('Failed to save job:', data.error);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error saving job:', error);
+                                });
+                        } else {
+                            // If already saved, remove the job
+                            removeSavedJob(jobId);
+                        }
+                    };
+
+                    function removeSavedJob(jobId) {
+                        // Ensure that jobId is a string or number here
+                        fetch('/remove-saved-job', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ job_id: jobId }) // Correct payload
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    console.log('Job removed successfully');
+                                    // Handle UI updates here, such as changing the save icon back to 'heart_plus'
+                                    // and updating the onclick event handler to save the job again.
+                                } else {
+                                    console.error('Failed to remove job:', data.error);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error removing job:', error);
+                            });
+                    }
+
+
+                    // Append the logo container and date to the jobHeaderTop
+                    jobHeaderTop.appendChild(logoContainer);
                     jobHeaderTop.appendChild(postedAtDiv);
+
+                    // Append the save icon to the jobHeaderTop
+                    jobHeaderTop.appendChild(saveIcon);
+
 
                     // Create a new div for the job title, which will be below the logo and date
                     const jobHeaderBottom = document.createElement('div');
@@ -631,10 +762,10 @@
                     // Publisher name
                     const publisherDiv = document.createElement('div');
                     publisherDiv.className = 'publisher-name';
-                    publisherDiv.innerText = `via: ${job.job_publisher || 'Not specified'}`;
+                    publisherDiv.innerText = `via ${job.job_publisher || 'Not specified'}`;
                     jobCard.appendChild(publisherDiv);
 
-                    // Create a container for the salary, remote information, and employment type
+                    // Create a container for the salary, remote information, employment type, and benefits
                     const salaryRemoteTypeContainer = document.createElement('div');
                     salaryRemoteTypeContainer.className = 'salary-remote-type-info';
 
@@ -664,6 +795,29 @@
                     // Append the employment type to the right
                     salaryRemoteTypeContainer.appendChild(employmentTypeDiv);
 
+                    // Add job benefits if available
+                    if (job.job_benefits && job.job_benefits.length > 0) {
+                        job.job_benefits.forEach(benefit => {
+                            const benefitText = mapBenefitToDisplayText(benefit); // Get the display text for each benefit
+                            const benefitTag = createBenefitTag(benefitText); // Create the benefit tag
+                            salaryRemoteTypeContainer.appendChild(benefitTag); // Append the benefit tag to the container
+                        });
+                    }
+
+                    // Function to create a benefit tag
+                    function createBenefitTag(benefitText) {
+                        const benefitDiv = document.createElement('div');
+                        benefitDiv.className = 'job-benefit-tag';
+                        benefitDiv.innerText = benefitText; // Set the innerText to the benefitText passed in
+                        benefitDiv.style.border = '1px solid #ccc';
+                        benefitDiv.style.borderRadius = '15px';
+                        benefitDiv.style.padding = '10px';
+                        benefitDiv.style.marginRight = '10px';
+                        benefitDiv.style.backgroundColor = '#f8f8f8';
+                        benefitDiv.style.display = 'inline-block';
+                        return benefitDiv;
+                    }
+
                     // Append the salary, remote, and type container to the job card
                     jobCard.appendChild(salaryRemoteTypeContainer);
 
@@ -674,23 +828,39 @@
 
                         // Populate the selectedJobDetails with detailed information
                         selectedJobDetails.innerHTML = `
-            <span class="material-symbols-outlined close-button">close</span>
-            <div class="job-details">
-                <h2>${job.job_title}</h2>
-                <p><strong>Employer:</strong> ${job.employer_name}</p>
-                <p><strong>Employment Type:</strong> ${formatJobType(job.job_employment_type) || 'Not specified'}</p>
-                <p><strong>Location:</strong> ${job.job_city || 'Not specified'}</p>
-                <p><strong>Description:</strong> ${job.job_description}</p>
-                <p><strong>Apply Link:</strong> ${job.job_apply_link ? `<a href="${job.job_apply_link}" target="_blank">Apply Here</a>` : 'Not provided'}</p>
-                <div class="job-highlights">
-                    <h3>Highlights</h3>
-                    ${Object.entries(job.job_highlights).map(([key, value]) => `
-                        <strong>${key}:</strong>
-                        <ul>${value.map(item => `<li>${item}</li>`).join('')}</ul>
-                    `).join('')}
-                </div>
+        <span class="material-symbols-outlined close-button">close</span>
+        <div class="job-details">
+            <h2><strong>${job.job_title}</strong></h2>
+            <div class="employer-and-location-container">
+                <p style="margin-bottom: 1px; color: gray;">${job.employer_name}</p> 
+                <p style="margin-top: 1px; color: gray;">${job.job_city || 'Not specified'}</p>
             </div>
-        `;
+            <hr>
+            <div class="job-employment-salary-benefits">
+                <p><strong>Employment Type:</strong> ${formatJobType(job.job_employment_type) || 'Not specified'}</p>
+                <p><strong>Work Environment:</strong> ${job.job_is_remote ? 'Remote' : 'In-Person'}</p>
+                <p><strong>Salary:</strong> ${job.job_salary ? `$${job.job_salary}` : 'Not specified'}</p>
+                <p><strong>Benefits:</strong> ${job.job_benefits && job.job_benefits.length > 0
+                                ? job.job_benefits.map(benefit => mapBenefitToDisplayText(benefit)).join(', ')
+                                : 'Not specified'
+                            }</p>
+            </div>
+            <hr>
+            <p>${job.job_apply_link ? `<a href="${job.job_apply_link}" target="_blank" style="display: inline-block; padding: 5px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Apply Here</a>` : 'Not provided'}</p>
+            <hr>
+            <div class="highlights-title-subtitle-container">
+                <p style="margin-bottom: 1px; color: black; font-size: 18px;"><strong>Job highlights</strong></p>
+                <p style="margin-top: 1px; color: gray; font-size: 14px;">Identified from the original job post</p>
+            </div>
+            ${Object.entries(job.job_highlights).map(([key, value]) => `
+                <strong>${key}:</strong>
+                <ul>${value.map(item => `<li>${item}</li>`).join('')}</ul>
+            `).join('')}
+            <hr>
+            <p><strong>Job Description</strong></p>
+            <p>${job.job_description}</p>
+        </div>
+    `;
                         selectedJobDetails.style.display = 'block';
                         toggleCloseButton(true);
                         bindCloseButton();
@@ -700,6 +870,7 @@
                     // Append the job card to the jobsList container
                     jobsList.appendChild(jobCard);
                 });
+
                 if (append) {
                     // Use setTimeout to delay the scroll restoration
                     setTimeout(() => {
@@ -707,8 +878,10 @@
                     }, 0); // A timeout of 0 ms still pushes the execution to the end of the call stack
                 }
             }
-            setupInfiniteScroll();
 
+
+
+            setupInfiniteScroll();
             checkScreenSize();
             window.addEventListener('resize', checkScreenSize);
 
