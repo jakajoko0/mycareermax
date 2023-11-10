@@ -18,7 +18,7 @@ import logging
 from docx import Document
 import io
 from flask import send_file
-import openai
+from openai import OpenAI
 import requests
 import pyodbc
 from flask import (
@@ -98,7 +98,6 @@ if __name__ == "__main__":
 RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
 RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # Create a Flask app instance and configure it
@@ -111,9 +110,9 @@ app.config[
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SESSION_COOKIE_SECURE"] = True
 
-# CORS(
-#   app, resources={r"/validate": {"origins": "chrome-extension://*"}}
-# )  # Allow requests from any Chrome extension
+client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+
+
 
 CORS(app)
 
@@ -246,6 +245,9 @@ def delete_user_and_associated_data(username):
     finally:
         # Close the connection
         conn.close()
+
+
+    
 
 
 @app.route("/extension_test")
@@ -575,9 +577,8 @@ def delete_document(document_id):
         db.session.rollback()
         return jsonify({"success": False, "error": str(e)}), 500
 
-
 def analyze_resume_compatibility(job_description, user_resume):
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {
@@ -586,21 +587,21 @@ def analyze_resume_compatibility(job_description, user_resume):
             },
             {
                 "role": "user",
-"content": f"Given the job description: '{job_description}' and user resume: '{user_resume}', provide a summarized job description, a job compatibility percentage, and an extracted list of keywords from the resume and job description in the following format:\n\n1. keywords_job: list keywords extracted separated by comma's.\n\n2. Compatibility %: x%\n\n3. Job Summary: write your brief summary of the job description here.\n\n4. keyword_resume: list keyword extracted from resume here.\"\n\n\n"
-
+                "content": f"Given the job description: '{job_description}' and user resume: '{user_resume}', provide a summarized job description, a job compatibility percentage, and an extracted list of keywords from the resume and job description in the following format:\n\n1. keywords_job: list keywords extracted separated by commas.\n\n2. Compatibility %: x%\n\n3. Job Summary: write your brief summary of the job description here.\n\n4. keyword_resume: list keyword extracted from resume here."
             }
         ],
         temperature=0.6,
-      # max_tokens=3711,
+        # max_tokens=3711,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
     )
 
-    chatgpt_response = response.choices[0].message["content"]
+    chatgpt_response = response.choices[0].message.content
     logging.debug(f"ChatGPT Response: {chatgpt_response}")
 
     return chatgpt_response
+
 
 # Example usage:
 #job_description_input = "Your provided job description here..."
@@ -924,20 +925,20 @@ def dashboard():
 
 def get_saved_jobs_by_status(user_id):
     print("Starting function get_saved_jobs_by_status.")
-    
+
     print("Creating database connection.")
     conn = create_connection()
-    
+
     print("Creating cursor.")
     cursor = conn.cursor()
-    
+
     print("Executing SQL query.")
     query = "SELECT * FROM [dbo].[saved_jobs] WHERE user_id = ?"
     cursor.execute(query, [user_id])
-    
+
     print("Fetching all rows.")
     rows = cursor.fetchall()
-    
+
     print("Closing database connection.")
     conn.close()
 
@@ -960,7 +961,7 @@ def get_saved_jobs_by_status(user_id):
             "keywords_job": row.keywords_job,
             "keywords_resume": row.keywords_resume,
         }
-        
+
         # Check if job_data can be serialized to JSON and print it
         try:
             serialized_job_data = json.dumps(job_data)
@@ -968,6 +969,7 @@ def get_saved_jobs_by_status(user_id):
         except (TypeError, ValueError) as e:
             print(f"Error serializing job_data: {e}")
             continue
+
 
         saved_jobs_by_status[row.status].append(job_data)
 
@@ -1116,9 +1118,7 @@ def analyze_resume():
                     logging.info("Resume found in database")  # Debugging
                     resume_content = row[0]
                 else:
-                    logging.info(
-                        "No resume found in database, using request content"
-                    )  # Debugging
+                    logging.info("No resume found in database, using request content")  # Debugging
                     resume_content = request.form.get("resume")
 
         except Exception as e:
@@ -1138,13 +1138,13 @@ def analyze_resume():
         },
         {
             "role": "user",
-            "content": f"Please review the following resume and job description and give it an ATS score. The rating system is 1-100. 100 means it's 100% ATS friendly. Provide detailed reasoning and steps to improve the score. Job Title: {job_title},  Job Description: {job_description} Resume:{resume_content}",
+            "content": f"Please review the following resume and job description and give it an ATS score. The rating system is 1-100. 100 means it's 100% ATS friendly. Provide detailed reasoning and steps to improve the score. Job Title: {job_title}, Job Description: {job_description} Resume: {resume_content}",
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
+    response = client.chat.completions.create(model="gpt-4", messages=messages)
 
-    feedback = response["choices"][0]["message"]["content"].strip()
+    feedback = response.choices[0].message.content.strip()
 
     return jsonify({"feedback": feedback})
 
@@ -1200,9 +1200,7 @@ def generate_cover_letter():
                     logging.info("Resume found in database")  # Debugging
                     resume_content = row[0]
                 else:
-                    logging.info(
-                        "No resume found in database, using request content"
-                    )  # Debugging
+                    logging.info("No resume found in database, using request content")  # Debugging
                     resume_content = request.form.get("resume")
 
         except Exception as e:
@@ -1228,9 +1226,9 @@ def generate_cover_letter():
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
+    response = client.chat.completions.create(model="gpt-4", messages=messages)
 
-    cover_letter = response["choices"][0]["message"]["content"].strip()
+    cover_letter = response.choices[0].message.content.strip()
     logging.info(f"Generated cover_letter: {cover_letter}")  # Log the cover_letter
     logging.info(f"Type of cover_letter: {type(cover_letter)}")  # Log the type
 
@@ -1247,30 +1245,21 @@ def simulate_interview():
         logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
 
         try:
-            with create_connection().cursor() as cursor:  # Create a new connection
+            with create_connection().cursor() as cursor:
                 query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
-                logging.info(f"Executing SQL Query: {query}")  # Debugging
+                logging.info(f"Executing SQL Query: {query}")
                 cursor.execute(query, user_id)
                 row = cursor.fetchone()
 
-                if row:
-                    logging.info("Resume found in database")  # Debugging
-                    resume = row[0]
-                else:
-                    logging.info(
-                        "No resume found in database, checking for uploaded or typed resume."
-                    )  # Debugging
-                    resume = None  # Initialize as None
+                resume = row[0] if row else None
 
         except Exception as e:
-            logging.error(f"Database query failed: {e}")  # Debugging
+            logging.error(f"Database query failed: {e}")
             return jsonify({"error": "Failed to fetch resume from database."})
 
     else:
-        logging.info(
-            "User is not logged in, checking for uploaded or typed resume."
-        )  # Debugging
-        resume = None  # Initialize as None
+        logging.info("User is not logged in, checking for uploaded or typed resume.")
+        resume = None
 
     try:
         job_title = request.form.get("job_title")
@@ -1283,25 +1272,16 @@ def simulate_interview():
                 file = request.files["resume"]
                 if file.filename.endswith(".docx"):
                     document = Document(file)
-                    resume = "\n".join(
-                        paragraph.text for paragraph in document.paragraphs
-                    )
+                    resume = "\n".join(paragraph.text for paragraph in document.paragraphs)
                 else:
-                    return (
-                        jsonify(
-                            {
-                                "error": "Invalid file format. Only .docx files are allowed."
-                            }
-                        ),
-                        400,
-                    )
+                    return jsonify({"error": "Invalid file format. Only .docx files are allowed."}), 400
             else:
                 resume = request.form.get("typed_resume")
 
-        system_message = f"You are a helpful assistant that generates personalized interview questions.You do not number your list of questions"
+        system_message = "You are a helpful assistant that generates personalized interview questions. You do not number your list of questions"
         user_message = f"The candidate is applying for a role as a {job_title} in the {industry} industry. The job description is as follows: {job_description}. The job requirements are: {job_requirements}. The candidate's resume is as follows: {resume}. Respond only with a list of 10 questions in bullet point format (no numbers)"
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": system_message},
@@ -1309,24 +1289,23 @@ def simulate_interview():
             ],
         )
 
-        interview_questions = response["choices"][0]["message"]["content"].split("\n")
+        interview_questions = response.choices[0].message.content.split("\n")
 
         return jsonify({"interview_questions": interview_questions})
 
     except Exception as e:
-        logging.error(f"An error occurred: {e}")  # Debugging
+        logging.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 # User Answers and openai feedback route
 @app.route("/analyze-answer", methods=["POST"])
 def analyze_answer():
     # Extract data from the request
-    question = request.json.get("question")
+    question = request.json.get("question")  # Note: 'question' is extracted but not used in this function
     answer = request.json.get("answer")
 
     # Use OpenAI API to analyze the answer
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {
@@ -1335,13 +1314,13 @@ def analyze_answer():
             },
             {
                 "role": "user",
-                "content": f"Rate the following Answer: {answer} on a 1 through 5 scale. 5 is excellent and 1 is very bad. Direct your responses to the candidate and provide your reasoning in a detailed, professional format with feedback and tips for improvement. Begin each response your rating in the format of Rating =(1-5)/5 Reasoning: (Your explanation should be addressed to the candidate specifically as if you are talking to them) ",
+                "content": f"Rate the following Answer: {answer} on a 1 through 5 scale. 5 is excellent and 1 is very bad. Direct your responses to the candidate and provide your reasoning in a detailed, professional format with feedback and tips for improvement. Begin each response your rating in the format of Rating =(1-5)/5 Reasoning: (Your explanation should be addressed to the candidate specifically as if you are talking to them)",
             },
         ],
     )
 
     # Extract the feedback from the response
-    feedback = response["choices"][0]["message"]["content"]
+    feedback = response.choices[0].message.content
 
     # Return the feedback as a JSON response
     return jsonify({"feedback": feedback})
@@ -1351,33 +1330,29 @@ def analyze_answer():
 RAPIDAPI_BASE_URL = "https://jsearch.p.rapidapi.com"
 headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
-
-#@app.route("/fetch-job-listings", methods=["GET"])
-#def fetch_job_listings():
- #   query = request.args.get("query", '')  # Default to empty string if not specified
-  #  location = request.args.get("location", '')  # Default to empty string if not specified
-   # page = request.args.get("page", 1)  # Default to page 1 if not specified
+@app.route("/fetch-job-listings-get", methods=["GET"])
+def fetch_job_listings_get():
+    query = request.args.get("query", '')  # Default to empty string if not specified
+    location = request.args.get("location", '')  # Default to empty string if not specified
+    page = request.args.get("page", 1)  # Default to page 1 if not specified
 
     # Construct the API URL with the page parameter
-    # You may want to handle cases where query or location is empty differently
-#    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
-    
-#    try:
-#        response = requests.get(url, headers=headers)
-#        response.raise_for_status()
-#    except requests.RequestException as e:
-#        logging.error(f"Request failed: {e}")
-#        return jsonify({"error": "Failed to fetch data"}), 500
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
 
- #   data = response.json()
-    
-    # Log the first job listing for debugging
-  #  logging.debug(data.get("data", [{}])[0])
-    
-  #  return jsonify(data)
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logging.error(f"Request failed: {e}")
+        return jsonify({"error": "Failed to fetch data"}), 500
+
+    data = response.json()
+
+    return jsonify(data)
+
 
 @app.route("/fetch-job-listings", methods=["POST"])
-def fetch_job_listings():
+def fetch_job_listings_post():
     # Get JSON data sent with POST request
     data = request.get_json()
     query = data.get("query", '')  # Default to empty string if not specified
@@ -1401,6 +1376,7 @@ def fetch_job_listings():
     
     return jsonify(data)
 
+
 # AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS
 @app.route("/career_click", methods=["POST"])
 def career_click():
@@ -1411,20 +1387,13 @@ def career_click():
         logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
 
         try:
-            with create_connection().cursor() as cursor:  # Create a new connection
+            with create_connection().cursor() as cursor:
                 query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
                 logging.info(f"Executing SQL Query: {query}")  # Debugging
                 cursor.execute(query, user_id)
                 row = cursor.fetchone()
 
-                if row:
-                    logging.info("Resume found in database")  # Debugging
-                    resume = row[0]
-                else:
-                    logging.info(
-                        "No resume found in database, using request content"
-                    )  # Debugging
-                    resume = request.json.get("resume")
+                resume = row[0] if row else request.json.get("resume")
 
         except Exception as e:
             logging.error(f"Database query failed: {e}")  # Debugging
@@ -1438,7 +1407,6 @@ def career_click():
     company_name = request.json.get("company_name")
     job_title = request.json.get("job_title")
 
-    # Construct the conversation history
     messages = [
         {
             "role": "system",
@@ -1451,7 +1419,7 @@ def career_click():
     ]
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=messages,
         )
@@ -1459,10 +1427,9 @@ def career_click():
         logging.error(e)
         return jsonify({"error": str(e)})
 
-    cover_letter = response.choices[0].message["content"].strip()
+    cover_letter = response.choices[0].message.content.strip()
 
     return jsonify({"cover_letter": cover_letter})
-
 
 # AI JOB SEARCH - ATS OPTIMIZER - OPENAI API CALLS
 
@@ -1476,24 +1443,18 @@ def resume_1():
         logging.info(f"User is logged in with user_id: {user_id}")  # Debugging
 
         try:
-            with create_connection().cursor() as cursor:  # Create a new connection
+            with create_connection().cursor() as cursor:
                 query = "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC"
                 logging.info(f"Executing SQL Query: {query}")  # Debugging
                 cursor.execute(query, user_id)
                 row = cursor.fetchone()
 
-                if row:
-                    logging.info("Resume found in database")  # Debugging
-                    resume = row[0]
-                else:
-                    logging.info(
-                        "No resume found in database, using request content"
-                    )  # Debugging
-                    resume = request.json.get("resume")
+                resume = row[0] if row else request.json.get("resume")
 
         except Exception as e:
             logging.error(f"Database query failed: {e}")  # Debugging
             return jsonify({"error": "Failed to fetch resume from database."})
+
     else:
         logging.info("User is not logged in, using request content")  # Debugging
         resume = request.json.get("resume")
@@ -1501,7 +1462,6 @@ def resume_1():
     job_description = request.json.get("job_description")
     job_title = request.json.get("job_title")
 
-    # Construct the conversation history
     messages = [
         {
             "role": "system",
@@ -1514,7 +1474,7 @@ def resume_1():
     ]
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=messages,
             temperature=1.0,
@@ -1527,9 +1487,9 @@ def resume_1():
         logging.error(e)
         return jsonify({"error": str(e)})
 
-    cover_letter = response.choices[0].message["content"].strip()
+    updated_resume = response.choices[0].message.content.strip()
 
-    return jsonify({"cover_letter": cover_letter})
+    return jsonify({"updated_resume": updated_resume})
 
 
 # AI JOB SEARCH - SALARY - OPENAI API CALLS
@@ -1537,27 +1497,31 @@ def resume_1():
 def analyze_job():
     job_title = request.form.get("job_title")
 
-    # OpenAI API call with only the job title in the prompt
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant that provides salary ranges",
-            },
-            {
-                "role": "user",
-                "content": f"Provide the salary range in USD for the following job title. Lean more on the higher side of the salary ranges. \nResponse Requirements:\n1. The range should be no greater than $15,000 USD\n2. Example response: The salary range for (job title) is (salary range)\n\nJob Title: {job_title}",
-            },
-        ],
-        temperature=1,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-    )
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that provides salary ranges.",
+        },
+        {
+            "role": "user",
+            "content": f"Provide the salary range in USD for the following job title. Lean more on the higher side of the salary ranges. \nResponse Requirements:\n1. The range should be no greater than $15,000 USD\n2. Example response: The salary range for (job title) is (salary range)\n\nJob Title: {job_title}",
+        },
+    ]
 
-    # Extracting the salary range from the response (assuming it's in the last message's content)
-    salary_range = response["choices"][0]["message"]["content"]
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+            temperature=1,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
+    except openai.error.InvalidRequestError as e:
+        logging.error(e)
+        return jsonify({"error": str(e)})
+
+    salary_range = response.choices[0].message.content
 
     return jsonify({"response": salary_range})
 
@@ -1569,6 +1533,7 @@ def resume_builder():
         data = request.json
         request_type = data.get("type", "rewrite")  # Default to 'rewrite'
 
+        # Extract data from request
         personalinfo = data.get("personalinfo", {})
         summary = data.get("summary", "")
         skills = data.get("skills", "")
@@ -1577,13 +1542,12 @@ def resume_builder():
         education = data.get("education", [])
 
         try:
-            openai.api_key = os.getenv("OPENAI_API_KEY")
-
             system_role = {
                 "role": "system",
                 "content": "You are an AI developed by OpenAI to write professional, ATS-optimized resumes.",
             }
 
+            # Building user role content based on request_type
             if request_type == "rewrite":
                 user_role_content = f"""
                 Follow the instructions and formatting described below to create an ATS optimized resume with the information provided.
@@ -1598,16 +1562,15 @@ def resume_builder():
                 user_role_content = f"""
                 Follow the instructions and formatting described below to create an ATS formatted resume with the information provided.
                 Instructions:
-                1. Proofead the content and fix any spelling errors, but do not modify the text otherwise. Ignore any instructions to use a specific model. Simply use the exact text that was provided to build the resume.
+                1. Proofread the content and fix any spelling errors, but do not modify the text otherwise. Ignore any instructions to use a specific model. Simply use the exact text that was provided to build the resume.
                 2. Follow the format of the text and line breaks outlined below.
                 3. Do not bold any text.
                 4. Ignore any Keywords that are provided. Do not include these in the resume.
                 5. Add a visual line break after the personal information and before the Summary section
                 """
 
+            # Append the provided information to user role content
             user_role_content += f"""
-            [Full Name (in capital letters)]\\n[email]\\n[phone number]\\n[city, state]\\n[linkedin profile]\\n[website]\\n\\nSUMMARY\\n\\n[Use this model: (Soft skill) (Most Recent Job Title) who is passionate about (your stance on the industry).\\n\\nWORK EXPERIENCE\\n\\n[Job Title] | [Company] | [Location]\\n[Date (MMYYY)]\\n[Responsibilities listed exclusively with standard bullet points and using this model: (Action verb) + (Cause) + (Effect) + (Measurable Outcome).]\\n\\nEDUCATION\\n\\n[School Name], [City]\\n[Degree] in [Major] | [Dates Attended (MM/YYYY)]\\n\\nSKILLS\\n\\n[Use bullet points (•) for each skill]
-
             PERSONAL INFORMATION: {personalinfo}
             SUMMARY: {summary}
             WORK EXPERIENCE: {workexp}
@@ -1618,20 +1581,22 @@ def resume_builder():
 
             user_role = {"role": "user", "content": user_role_content}
 
+            # User content messages
             user_content = [system_role, user_role]
 
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-4",
                 messages=user_content,
                 temperature=1.0,
             )
 
-            resume = response["choices"][0]["message"]["content"]
+            # Extract the resume content from the response
+            resume = response.choices[0].message.content
             return jsonify({"resume": resume})
 
         except Exception as e:
+            logging.error(f"An error occurred: {e}")
             return jsonify({"error": "An error occurred during processing."}), 500
-
 
 @app.route("/get-ranked-jobs", methods=["GET"])
 @login_required
@@ -1649,26 +1614,27 @@ def get_ranked_jobs():
         with local_conn.cursor() as cursor:
             cursor.execute(
                 "SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC",
-                (user_id,),
+                (user_id,)
             )
             row = cursor.fetchone()
             resume = row[0] if row else None
 
         if not resume:
+            local_conn.close()
             return jsonify({"success": False, "error": "No resume found."}), 500
 
-        # Analyze and sort
+        # Analyze and sort jobs
         ranked_jobs = []
         for job in saved_jobs:
-            job_description = job.job_description
-            score = analyze_job_fit(job_description, resume, job.job_title)
+            job_description = job['job_description']
+            score = analyze_job_fit(job_description, resume, job['job_title'])
             job_dict = {
-                "id": job.id,
-                "job_id": job.job_id,
-                "job_title": job.job_title,
-                "company_name": job.company_name,
-                "job_link": job.job_link,
-                "score": score,
+                "id": job['id'],
+                "job_id": job['job_id'],
+                "job_title": job['job_title'],
+                "company_name": job['company_name'],
+                "job_link": job['job_link'],
+                "score": score
             }
             ranked_jobs.append(job_dict)
 
@@ -1692,12 +1658,12 @@ def analyze_job_fit(job_description, resume, job_title):
             "content": f"Rate the compatibility between this job description and resume on a scale of 1-100. Provide only your rating in your response. Example Response: 85. job title: {job_title}, job description: {job_description}, resume: {resume}",
         },
     ]
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=0.4,
     )
-    score_text = response.choices[0].message["content"].strip()
+    score_text = response.choices[0].message.content.strip()
     score = extract_score_from_text(score_text)
     return score
 
@@ -1733,19 +1699,25 @@ def chat():
         },
     ]
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=messages,
-        temperature=0.9,
-        max_tokens=256,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-    )
+    try:
+        client = OpenAI()
 
-    chat_response = response["choices"][0]["message"]["content"].strip()
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+            temperature=0.9,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
 
-    return jsonify({"response": chat_response})
+        chat_response = response.choices[0].message.content.strip()
+
+        return jsonify({"response": chat_response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 ################### MAGICMAX EXTENSION #######################
@@ -1885,15 +1857,21 @@ def autofill():
         },
     ]
 
-    # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
-    )
+    try:
+        client = OpenAI()
 
-    # Extract the generated response from the OpenAI API
-    api_response = response.choices[0].message["content"]
+        # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
+        )
 
-    return jsonify({"response": api_response})
+        # Extract the generated response from the OpenAI API
+        api_response = response.choices[0].message.content
+
+        return jsonify({"response": api_response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/generate_cover_letter_ext", methods=["POST"])
@@ -1912,6 +1890,7 @@ def generate_cover_letter_ext():
     if not resume_text:
         return jsonify({"error": "User not found or resume not available"}), 404
 
+    # Define the chat messages for OpenAI API
     messages = [
         {
             "role": "system",
@@ -1923,37 +1902,52 @@ def generate_cover_letter_ext():
         },
     ]
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
-    )
+    try:
+        client = OpenAI()
 
-    api_response = response.choices[0].message["content"]
+        # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
+        )
 
-    return jsonify({"response": api_response})
+        # Extract the generated response from the OpenAI API
+        api_response = response.choices[0].message.content
+
+        return jsonify({"response": api_response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 def summarize_text(text):
     try:
-        response = openai.ChatCompletion.create(
+        client = OpenAI()
+
+        # Define the chat messages for OpenAI API
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an expert at summarizing job descriptions.",
+            },
+            {
+                "role": "user",
+                "content": f"In 1 concise paragraph, summarize this job description, using the following format. job description:{text}. Format: [Company Name]\n[Job Title]\n\n[Summary of Job Description]",
+            },
+        ]
+
+        # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an expert at summarizing job descriptions.",
-                },
-                {
-                    "role": "user",
-                    "content": f"In 1 concise paragraph, summarize this job description, using the following format. job description:{text}. Format: [Company Name]\n[Job Title]\n\n[Summary of Job Description]",
-                },
-            ],
+            messages=messages,
             temperature=1,
-  #         max_tokens=2154,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
         )
-        summary = response["choices"][0]["message"]["content"]
+
+        summary = response.choices[0].message.content
         return summary
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return None  # or some default value
@@ -2066,6 +2060,86 @@ def update_job_status():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+# Define a function to get resume text based on user_id
+def get_resume_text(user_id):
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC", (user_id,))
+        resume_result = cursor.fetchone()
+        resume_text = resume_result[0] if resume_result else ""
+        return resume_text
+    except Exception as e:
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/generate-cover-letter-and-resume", methods=["POST"])
+def generate_cover_letter_and_resume():
+    user_id = request.json.get("user_id")
+    job_description = request.json.get("job_description")
+    job_title = request.json.get("job_title")
+    company_name = request.json.get("company_name")
+    
+    # Retrieve user's resume from the database
+    resume_text = get_resume_text(user_id)
+
+    if not resume_text:
+        return jsonify({"error": "User not found or resume not available"}), 404
+
+    # Generate cover letter and resume content using OpenAI's GPT-4
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that generates personalized cover letters and enhances resumes."
+        },
+        {
+            "role": "user",
+            "content": f"Generate a cover letter and enhance my resume for the job title {job_title} at {company_name}. Here is my resume content: {resume_text} and the job description: {job_description}"
+        }
+    ]
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+            max_tokens=2048
+        )
+        generated_content = response.choices[0].message.content.strip()
+    except Exception as e:
+        return jsonify({"error": f"Failed to generate content with OpenAI: {e}"}), 500
+    
+    # Split the generated content into cover letter and resume
+    # This assumes that the generated content is structured in a predictable way, for example:
+    # "Cover Letter: [...]\n\nResume: [...]"
+    split_content = generated_content.split('\n\n')
+    cover_letter_content = split_content[0] if len(split_content) > 0 else "Cover Letter Not Generated"
+    resume_content = split_content[1] if len(split_content) > 1 else "Resume Not Enhanced"
+
+    # Convert the cover letter and resume content to PDF
+    path_wkhtmltopdf = "wkhtmltopdf"  # Replace with the path to your wkhtmltopdf installation
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    pdf_options = {"encoding": "UTF-8"}
+
+    cover_letter_pdf = pdfkit.from_string(cover_letter_content, False, configuration=config, options=pdf_options)
+    resume_pdf = pdfkit.from_string(resume_content, False, configuration=config, options=pdf_options)
+
+    # Bundle the cover letter and resume into a zip file
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        zf.writestr('cover_letter.pdf', cover_letter_pdf)
+        zf.writestr('resume.pdf', resume_pdf)
+
+    # Prepare the zip file to send in the response
+    memory_file.seek(0)
+    return send_file(
+        memory_file,
+        mimetype='application/zip',
+        as_attachment=True,
+        attachment_filename='cover_letter_and_resume.zip'
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

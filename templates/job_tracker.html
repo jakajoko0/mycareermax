@@ -472,7 +472,7 @@
                 isFetchingJobs = true;
                 page++;
 
-                fetch(`/fetch-job-listings?page=${page}`, {
+                fetch(`/fetch-job-listings-get?page=${page}`, {
                     method: 'GET',
                 })
                     .then(response => response.json())
@@ -515,7 +515,7 @@
                     page: page
                 });
 
-                fetch(`/fetch-job-listings?${queryParams.toString()}`, {
+                fetch(`/fetch-job-listings-get?${queryParams.toString()}`, {
                     method: 'GET'
                 })
                     .then(response => response.json())
