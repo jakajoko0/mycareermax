@@ -1786,8 +1786,12 @@ def validate_pin():
         return jsonify({"status": "fail", "message": "Email not found."}), 404
 
 
+
 def get_resume_text(pin):
     try:
+        # Convert pin to string in case it's not
+        pin = str(pin)
+
         # Establish a database connection
         connection_string = (
             f"DRIVER={{ODBC Driver 18 for SQL Server}};"
@@ -1798,7 +1802,7 @@ def get_resume_text(pin):
 
         # Query the database to retrieve the user_id based on the provided access_token (pin)
         cursor = conn.cursor()
-        cursor.execute("SELECT id FROM users WHERE access_token = ?", (pin,))
+        cursor.execute("SELECT id FROM users WHERE access_token = ?", pin)
         user_id_result = cursor.fetchone()
 
         if not user_id_result:
@@ -1807,9 +1811,7 @@ def get_resume_text(pin):
         user_id = user_id_result[0]
 
         # Now that we have the user_id, retrieve the resume_text from user_resumes
-        cursor.execute(
-            "SELECT resume_text FROM user_resumes WHERE user_id = ?", (user_id,)
-        )
+        cursor.execute("SELECT resume_text FROM user_resumes WHERE user_id = ?", user_id)
         result = cursor.fetchone()
         resume_text = result[0] if result else None
 
@@ -1821,57 +1823,53 @@ def get_resume_text(pin):
         print(f"An error occurred: {e}")
         return None
 
+# Example usage
+#test_pin = '8429'  # This can be any pin, ensure it's a string
+#resume_text = get_resume_text(test_pin)
+#print(f"Resume Text for PIN {test_pin}: {resume_text}")
 
-@app.route("/api/autofill", methods=["POST"])
+
+
+@app.route('/api/autofill', methods=['POST'])
 def autofill():
-    # Parse JSON request data
-    data = request.json
-    pin = data.get("pin")
-    highlighted_text = data.get("highlighted_text")
-    job_description = data.get("job_description")  # New parameter
-
-    # Check if PIN, highlighted text, and job description are provided
-    if not pin or not highlighted_text or not job_description:
-        return (
-            jsonify(
-                {"error": "PIN, highlighted_text, and job_description are required"}
-            ),
-            400,
-        )
-
-    # Retrieve the user's resume text based on the PIN
-    resume_text = get_resume_text(pin)
-
-    if not resume_text:
-        return jsonify({"error": "User not found or resume not available"}), 404
-
-    # Define the chat messages for OpenAI API
-    messages = [
-        {
-            "role": "system",
-            "content": "You are an AI developed by Open AI and are trained to be an expert at completing job application forms. Your response should only contain the actual answer to the question or request and nothing more. All responses should be provided as if you were the one actually completing the application.",
-        },
-        {
-            "role": "user",
-            "content": f"Pretend you are the job applicant described in the resume_text and you are applying to the job_description below. Provide a response to the highlighted_text as if you were the applicant responding.\n\nresume_text:\n{resume_text}\njob_description:\n{job_description}\nhighlighted_text:\n{highlighted_text}",
-        },
-    ]
-
     try:
-        client = OpenAI()
+        data = request.json
+        pin = data.get('pin', '')  # Retrieve the pin from the request
+        job_description = data.get('job_description', '')  # Retrieve the job description
+        highlighted_text = data.get('highlighted_text', '')  # Retrieve the highlighted text
 
-        # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
+        # Get the resume text based on the pin
+        resume_text = get_resume_text(pin)
+        if resume_text is None:
+            return jsonify({"error": "User not found or resume not available"}), 404
+
+        # Prepare the message for the OpenAI model
+        system_message = "You are an AI developed by Open AI and are trained to be an expert at completing job application forms. Your response should only contain the actual answer to the question or request and nothing more. All responses should be provided as if you were the one actually completing the application."
+        user_message = f"Pretend you are the job applicant described in the resume_text and you are applying to the job_description below. Provide a response to the highlighted_text as if you were the applicant responding.\n\nresume_text:\n{resume_text}\njob_description:\n{job_description}\nhighlighted_text:\n{highlighted_text}"
+
+        # Call OpenAI's chat completion
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",  # Replace with your desired model
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
+            ]
         )
 
-        # Extract the generated response from the OpenAI API
-        api_response = response.choices[0].message.content
+        # Extract the response text from the completion
+        response_text = completion.model_dump_json()
 
-        return jsonify({"response": api_response})
+        # Since model_dump_json() returns a string of JSON, parse this JSON to extract the specific response
+        response_data = json.loads(response_text)
+        final_response = response_data['choices'][0]['message']['content']
+
+        # Return the response from OpenAI as part of the JSON response
+        return jsonify({"response": final_response})
 
     except Exception as e:
+        # Handle any exceptions that may occur
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route("/api/generate_cover_letter_ext", methods=["POST"])
@@ -1883,47 +1881,38 @@ def generate_cover_letter_ext():
     if not pin or not job_description:
         return jsonify({"error": "PIN and job_description are required"}), 400
 
-    resume_text = get_resume_text(
-        pin
-    )  # Assuming you have a function to get the resume text based on the PIN
-
+    resume_text = get_resume_text(pin)  # Define this function accordingly
     if not resume_text:
         return jsonify({"error": "User not found or resume not available"}), 404
 
-    # Define the chat messages for OpenAI API
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a helpful assistant trained to generate cover letters. Your response should be a fully formed cover letter based on the provided resume and job description.",
-        },
-        {
-            "role": "user",
-            "content": f"Generate a cover letter for the following job description based on the resume:\n\nJob Description:\n{job_description}\n\nResume:\n{resume_text}",
-        },
-    ]
-
     try:
-        client = OpenAI()
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant trained to generate cover letters. Your response should be a fully formed cover letter based on the provided resume and job description.",
+            },
+            {
+                "role": "user",
+                "content": f"Generate a cover letter for the following job description based on the resume:\n\nJob Description:\n{job_description}\n\nResume:\n{resume_text}",
+            },
+        ]
 
-        # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
         response = client.chat.completions.create(
             model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
         )
 
         # Extract the generated response from the OpenAI API
-        api_response = response.choices[0].message.content
+        response_json = response.model_dump_json()
+        response_data = json.loads(response_json)
+        api_response = response_data['choices'][0]['message']['content']
 
         return jsonify({"response": api_response})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 def summarize_text(text):
     try:
-        client = OpenAI()
-
-        # Define the chat messages for OpenAI API
         messages = [
             {
                 "role": "system",
@@ -1935,7 +1924,6 @@ def summarize_text(text):
             },
         ]
 
-        # Call the OpenAI API with the messages and the "gpt-3.5-turbo" model
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
@@ -1945,12 +1933,17 @@ def summarize_text(text):
             presence_penalty=0,
         )
 
-        summary = response.choices[0].message.content
+        # Extract the summary
+        response_json = response.model_dump_json()
+        response_data = json.loads(response_json)
+        summary = response_data['choices'][0]['message']['content']
+
         return summary
 
     except Exception as e:
         print(f"An error occurred: {e}")
         return None  # or some default value
+
 
 
 @app.route("/summarize", methods=["POST"])
@@ -2059,87 +2052,6 @@ def update_job_status():
         return jsonify({"success": True, "message": "Job status updated successfully!"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
-
-
-# Define a function to get resume text based on user_id
-def get_resume_text(user_id):
-    try:
-        conn = create_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT TOP 1 resume_text FROM user_resumes WHERE user_id = ? ORDER BY uploaded_at DESC", (user_id,))
-        resume_result = cursor.fetchone()
-        resume_text = resume_result[0] if resume_result else ""
-        return resume_text
-    except Exception as e:
-        return None
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route("/generate-cover-letter-and-resume", methods=["POST"])
-def generate_cover_letter_and_resume():
-    user_id = request.json.get("user_id")
-    job_description = request.json.get("job_description")
-    job_title = request.json.get("job_title")
-    company_name = request.json.get("company_name")
-    
-    # Retrieve user's resume from the database
-    resume_text = get_resume_text(user_id)
-
-    if not resume_text:
-        return jsonify({"error": "User not found or resume not available"}), 404
-
-    # Generate cover letter and resume content using OpenAI's GPT-4
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a helpful assistant that generates personalized cover letters and enhances resumes."
-        },
-        {
-            "role": "user",
-            "content": f"Generate a cover letter and enhance my resume for the job title {job_title} at {company_name}. Here is my resume content: {resume_text} and the job description: {job_description}"
-        }
-    ]
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=messages,
-            max_tokens=2048
-        )
-        generated_content = response.choices[0].message.content.strip()
-    except Exception as e:
-        return jsonify({"error": f"Failed to generate content with OpenAI: {e}"}), 500
-    
-    # Split the generated content into cover letter and resume
-    # This assumes that the generated content is structured in a predictable way, for example:
-    # "Cover Letter: [...]\n\nResume: [...]"
-    split_content = generated_content.split('\n\n')
-    cover_letter_content = split_content[0] if len(split_content) > 0 else "Cover Letter Not Generated"
-    resume_content = split_content[1] if len(split_content) > 1 else "Resume Not Enhanced"
-
-    # Convert the cover letter and resume content to PDF
-    path_wkhtmltopdf = "wkhtmltopdf"  # Replace with the path to your wkhtmltopdf installation
-    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
-    pdf_options = {"encoding": "UTF-8"}
-
-    cover_letter_pdf = pdfkit.from_string(cover_letter_content, False, configuration=config, options=pdf_options)
-    resume_pdf = pdfkit.from_string(resume_content, False, configuration=config, options=pdf_options)
-
-    # Bundle the cover letter and resume into a zip file
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, 'w') as zf:
-        zf.writestr('cover_letter.pdf', cover_letter_pdf)
-        zf.writestr('resume.pdf', resume_pdf)
-
-    # Prepare the zip file to send in the response
-    memory_file.seek(0)
-    return send_file(
-        memory_file,
-        mimetype='application/zip',
-        as_attachment=True,
-        attachment_filename='cover_letter_and_resume.zip'
-    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
