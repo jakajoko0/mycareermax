@@ -133,18 +133,13 @@ mail = Mail(app)
 
 s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 node_process = None
-
-
 if os.name == "nt":  # Windows
-    path_wkhtmltopdf = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"
-else:  # Linux/Docker
+    path_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+else:  # Assuming this is meant for non-Windows environments, such as Linux in Docker
     path_wkhtmltopdf = "/usr/bin/wkhtmltopdf"
 
 config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
-
-pdf_options = {
-    "encoding": "UTF-8",
-}
+pdf_options = {"encoding": "UTF-8"}
 
 
 # if os.name == "nt":  # Windows
@@ -471,6 +466,7 @@ class UserDocuments(db.Model):
     job_title = db.Column(db.String(255), nullable=True)  # Add job title
     company_name = db.Column(db.String(255), nullable=True)  # Add company name
     apply_link = db.Column(db.String(255), nullable=True)  # Add apply link
+    job_id = db.Column(db.Integer, nullable=True)  # or nullable=False based on your requirements
 
     user = db.relationship("User", backref=db.backref("documents", lazy=True))
 
@@ -882,12 +878,10 @@ def download_document(document_id):
             html_content, False, configuration=config, options=pdf_options
         )
 
-        # Stream the PDF back to the user
+        # Stream the PDF back to the user without a specific filename
         response = Response(stream_with_context(io.BytesIO(pdf_content)))
         response.headers["Content-Type"] = "application/pdf"
-        response.headers[
-            "Content-Disposition"
-        ] = f"inline; filename={doc.document_name}.pdf"
+        response.headers["Content-Disposition"] = "inline"
         return response
 
     else:
@@ -946,11 +940,10 @@ def get_saved_jobs_by_status(user_id):
     status_categories = ["Saved", "Applied", "Interviewing", "Offered", "Rejected"]
     saved_jobs_by_status = {status: [] for status in status_categories}
 
-    print("Iterating through each row to populate saved_jobs_by_status.")
     for row in rows:
-        print(f"Current Job ID: {row.id}")  # Add this line to print the job ID
+        print(f"Current Job ID: {row.id}")
         job_data = {
-            "id": row.id,  # Also add this line to include id in the job_data dictionary
+            "id": row.id,
             "employer_logo": row.employer_logo or "N/A",
             "job_title": row.job_title,
             "job_link": row.job_link,
@@ -962,7 +955,12 @@ def get_saved_jobs_by_status(user_id):
             "keywords_resume": row.keywords_resume,
         }
 
-        # Check if job_data can be serialized to JSON and print it
+        # Skip jobs with an unknown status
+        if row.status not in saved_jobs_by_status:
+            print(f"Skipping job with unknown status: {row.status}")
+            continue
+
+        # Try to serialize job_data to JSON
         try:
             serialized_job_data = json.dumps(job_data)
             print(f"Serialized job data: {serialized_job_data}")
@@ -970,7 +968,7 @@ def get_saved_jobs_by_status(user_id):
             print(f"Error serializing job_data: {e}")
             continue
 
-
+        # Append job_data to the correct status category
         saved_jobs_by_status[row.status].append(job_data)
 
     print("Returning saved_jobs_by_status.")
@@ -1006,7 +1004,9 @@ def home():
 def job_tracker():
     user_id = current_user.id
     saved_jobs_by_status = get_saved_jobs_by_status(user_id)
-    return render_template("job_tracker.html", saved_jobs_by_status=saved_jobs_by_status)
+    return render_template("job_tracker.html", 
+                           saved_jobs_by_status=saved_jobs_by_status, 
+                           user_id=user_id)
 
 
 
@@ -1074,9 +1074,7 @@ def sitemap():
         # List of routes to explicitly exclude from the sitemap
         exclude_routes = [
             "/get_resume_max",
-            "/googleba8e248f290d00cf.html",
-            "/app-ads.txt",
-            "/get-username",
+
             "/get-saved-jobs",
             "/get_latest_resume_name",
             "/sitemap.xml",
@@ -1332,23 +1330,25 @@ headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
 @app.route("/fetch-job-listings-get", methods=["GET"])
 def fetch_job_listings_get():
-    query = request.args.get("query", '')  # Default to empty string if not specified
-    location = request.args.get("location", '')  # Default to empty string if not specified
-    page = request.args.get("page", 1)  # Default to page 1 if not specified
+    user_id = current_user.id  # Assuming user authentication is in place
+    query = request.args.get("query", '')
+    location = request.args.get("location", '')
+    page = request.args.get("page", 1)
 
-    # Construct the API URL with the page parameter
     url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
 
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
+        data = response.json()
+        logging.info(f"API Response: {data}")  # Log the entire response
+
+        # Directly return the jobs data without any additional processing
+        return jsonify(data)
+
     except requests.RequestException as e:
         logging.error(f"Request failed: {e}")
         return jsonify({"error": "Failed to fetch data"}), 500
-
-    data = response.json()
-
-    return jsonify(data)
 
 
 @app.route("/fetch-job-listings", methods=["POST"])
@@ -2053,5 +2053,153 @@ def update_job_status():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/job-details-coverletter", methods=["POST"])
+def job_details_coverletter():
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        data = request.json
+        job_id = data.get("jobId")
+        job_title = data.get("job_title")
+        company_name = data.get("employer_name")
+        job_description = data.get("job_description")
+        apply_link = data.get("apply_link")
+
+    logging.info("Received request to generate cover letter for user_id: %s", user_id)
+
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT resume_text FROM dbo.user_resumes WHERE user_id = ?", user_id)
+        result = cursor.fetchone()
+        resume_text = result[0] if result else None
+
+        if not resume_text:
+            logging.warning("Resume not found for user_id: %s", user_id)
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "User not found or resume not available"}), 404
+
+        response = client.completions.create(
+            model="text-davinci-003",
+            prompt=f"Write a cover letter for the position of {job_title} at {company_name}. Here's the job description: {job_description}\n\nHere's my resume:\n{resume_text}\n",
+            max_tokens=500
+        )
+        cover_letter = response.choices[0].text.strip()
+
+        insert_query = """
+            INSERT INTO dbo.UserDocuments (user_id, job_id, document_name, document_content, job_title, company_name, apply_link, document_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        document_name = f"Custom Cover Letter for {job_title} at {company_name}"
+        document_type = "Custom Cover Letter"
+
+        cursor.execute(insert_query, (user_id, job_id, document_name, cover_letter, job_title, company_name, apply_link, document_type))
+        conn.commit()
+        new_document_id = cursor.execute("SELECT @@IDENTITY").fetchval()
+        logging.info("Cover letter saved successfully for user_id %s with document_id %s", user_id, new_document_id)
+
+    except Exception as e:
+        logging.error("Error during processing: %s", e)
+        cursor.close()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Cover letter generated and saved successfully", "documentId": new_document_id})
+
+
+@app.route("/job-details-resume", methods=["POST"])
+def job_details_resume():
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        data = request.json
+        job_id = data.get("jobId")
+        job_title = data.get("job_title")
+        company_name = data.get("employer_name")
+        job_description = data.get("job_description")
+        apply_link = data.get("apply_link")
+
+    logging.info("Received request to generate resume for user_id: %s", user_id)
+
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT resume_text FROM dbo.user_resumes WHERE user_id = ?", user_id)
+        result = cursor.fetchone()
+        resume_text = result[0] if result else None
+
+        if not resume_text:
+            logging.warning("Resume not found for user_id: %s", user_id)
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "User not found or resume not available"}), 404
+
+        response = client.completions.create(
+            model="text-davinci-003",  # or "gpt-4" if available
+            prompt=f"Tailor this resume for the position of {job_title} at {company_name}. Here's the job description: {job_description}. Make sure to include keywords from the job description.\n\n{resume_text}",
+            max_tokens=500
+        )
+        enhanced_resume = response.choices[0].text.strip()
+
+        insert_query = """
+            INSERT INTO dbo.UserDocuments (user_id, job_id, document_name, document_content, job_title, company_name, apply_link, document_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        document_name = f"Tailored Resume for {job_title} at {company_name}"
+        document_type = "Tailored Resume"
+
+        cursor.execute(insert_query, (user_id, job_id, document_name, enhanced_resume, job_title, company_name, apply_link, document_type))
+        conn.commit()
+        new_document_id = cursor.execute("SELECT @@IDENTITY").fetchval()
+        logging.info("Resume saved successfully for user_id %s with document_id %s", user_id, new_document_id)
+
+    except Exception as e:
+        logging.error("Error during processing: %s", e)
+        cursor.close()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Resume generated and saved successfully", "documentId": new_document_id})
+
+
+@app.route("/get_user_documents", methods=["GET"])
+@login_required
+def get_user_documents():
+    user_id = current_user.id
+    job_title = request.args.get('jobTitle')
+    company_name = request.args.get('companyName')
+
+    # Ensure that all required parameters are provided
+    if not all([job_title, company_name]):
+        return jsonify({"error": "Missing required parameters"}), 400
+
+    # Fetch user documents that match the user_id, job_title, and company_name
+    user_documents = UserDocuments.query.filter_by(
+        user_id=user_id, 
+        job_title=job_title, 
+        company_name=company_name
+    ).all()
+
+    documents_list = [
+        {
+            "id": doc.id,
+            "document_name": doc.document_name,
+            "document_type": doc.document_type,
+            "creation_date": doc.creation_date.strftime("%Y-%m-%d")  # Format the date
+            # Add other fields if necessary
+        }
+        for doc in user_documents
+    ]
+
+    return jsonify(documents_list)
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+

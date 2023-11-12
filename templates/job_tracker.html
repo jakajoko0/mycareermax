@@ -332,15 +332,47 @@
             margin-top: 5px;
             /* Adjust the spacing as needed */
         }
+
+        .gradient-button {
+            background-image: linear-gradient(to right, #b700ff, #3776ff);
+            color: white;
+            /* You can change text color if needed */
+            border: none;
+            border-radius: 10px;
+            /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
+            /* Add any additional styling as needed */
+        }
     </style>
 
 </head>
 
 <body>
+
     <input type="hidden" id="userId" value="{{ user_id }}">
 
     <script>
+        // Define the deleteDocument function in the global scope
+        function deleteDocument(documentId) {
+            if (!confirm('Are you sure you want to delete this document?')) {
+                return;
+            }
+
+            $.ajax({
+                url: `/delete_document/${documentId}`,
+                type: 'DELETE',
+                success: function (result) {
+                    // Remove the document row from the table
+                    $(`#doc-row-${documentId}`).remove();
+                },
+                error: function (error) {
+                    alert('Error: ' + error.responseText);
+                }
+            });
+        };
         $(document).ready(function () {
+            console.log("User ID:", $("#userId").val()); // Using jQuery to log the user ID
             console.log("Fetching username...");
             $.get("/get-username", function (response) {
                 console.log("Username response:", response);
@@ -419,15 +451,101 @@
             <!-- Job details will be dynamically inserted here including the close button -->
         </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
+
         document.addEventListener('DOMContentLoaded', function () {
             const searchButton = document.getElementById('search-button');
             const jobsList = document.getElementById('jobs-list');
             const selectedJobDetails = document.getElementById('selected-job-details');
-            let page = 1; // Initialize page counter
+            let page = 1;
             let isFetchingJobs = false;
+
+            function updateAllSaveIcons() {
+                const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '{}');
+
+                document.querySelectorAll('.job').forEach(jobCard => {
+                    const jobId = jobCard.getAttribute('data-job-id');
+                    const saveIcon = jobCard.querySelector('.save-icon');
+
+                    if (savedJobs[jobId]) {
+                        saveIcon.textContent = 'bookmark_added'; // Icon indicating the job is saved
+                    } else {
+                        saveIcon.textContent = 'bookmark'; // Icon indicating the job is not saved
+                    }
+                });
+            }
+
+
+            async function generateDocumentsAndResume(jobId, jobTitle, jobDescription, companyName, applyLink, jobTitleElement) {
+                const userId = getUserIdFromSession();
+                if (!userId) {
+                    console.error('User ID is not available');
+                    return;
+                }
+
+                // Data to send to the backend
+                const postData = {
+                    user_id: userId,
+                    jobId: jobId,
+                    job_title: jobTitle,
+                    employer_name: companyName,
+                    job_description: jobDescription,
+                    apply_link: applyLink
+                };
+
+                try {
+                    // Trigger both API calls simultaneously
+                    const coverLetterPromise = fetch('/job-details-coverletter', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(postData)
+                    });
+
+                    const resumePromise = fetch('/job-details-resume', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(postData)
+                    });
+
+                    // Await both promises
+                    const [coverLetterResponse, resumeResponse] = await Promise.all([coverLetterPromise, resumePromise]);
+
+                    // Process responses
+                    const coverLetterData = await coverLetterResponse.json();
+                    const resumeData = await resumeResponse.json();
+
+                    // Check if both cover letter and resume were generated successfully
+                    if (coverLetterData.message === "Cover letter generated and saved successfully" &&
+                        resumeData.message === "Resume generated and saved successfully") {
+                        // Store the successful document generation in local storage
+                        localStorage.setItem(`documentGenerated_${jobId}`, 'true');
+                        console.log('Document generation status stored in local storage for job ID:', jobId);
+
+                        // After generating the documents, trigger a click on the job title element
+                        if (jobTitleElement) {
+                            jobTitleElement.click();
+                        }
+                    } else {
+                        console.error('Failed to generate documents:', coverLetterData, resumeData);
+                    }
+                } catch (error) {
+                    console.error('Error generating documents:', error);
+                }
+            }
+
+            function getUserIdFromSession() {
+                const userIdElement = document.getElementById('userId');
+                if (!userIdElement) {
+                    console.error('User ID element not found');
+                    return null;
+                }
+                const userId = userIdElement.value;
+                console.log('Current user ID: ', userId);
+                return userId;
+            }
 
             function toggleCloseButton(show) {
                 const closeButton = document.querySelector('.close-button');
@@ -471,21 +589,21 @@
                 if (isFetchingJobs) return;
                 isFetchingJobs = true;
                 page++;
+                console.log('Fetching more job listings, Page:', page);
 
-                fetch(`/fetch-job-listings-get?page=${page}`, {
-                    method: 'GET',
-                })
+                fetch(`/fetch-job-listings-get?page=${page}`, { method: 'GET' })
                     .then(response => response.json())
                     .then(data => {
+                        console.log('More Job Listings Data:', data);
                         displayJobListings(data.data || [], true);
                         isFetchingJobs = false;
+                        updateAllSaveIcons(); // Update save icons here as well
                     })
                     .catch(error => {
-                        console.error('Error fetching job listings:', error);
+                        console.error('Error fetching more job listings:', error);
                         isFetchingJobs = false;
                     });
             }
-
 
             function resetAndFetchJobListings() {
                 page = 1; // Reset the page counter
@@ -505,7 +623,7 @@
             }
 
             function fetchJobListings() {
-                console.log('Fetching job listings');
+                console.log('Fetching initial job listings');
                 const jobQuery = document.getElementById('job-query').value;
                 const jobLocation = document.getElementById('job-location').value;
                 // Do not reset page here anymore
@@ -520,6 +638,7 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Response Data:', data);  // Add this logging
                         displayJobListings(data.data || [], false);
                         isFetchingJobs = false;
                         // Only select the first job if the screen is wider than 767px
@@ -597,14 +716,17 @@
             }
 
             function displayJobListings(jobs, append = false) {
+                console.log(`Displaying ${jobs.length} job listings, Append: ${append}`);
                 let oldScrollPosition = jobsList.scrollTop;
                 if (!append) {
                     jobsList.innerHTML = '';
                     selectedJobDetails.innerHTML = '';
                 }
 
+                const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '{}');
 
-                jobs.forEach(job => {                    // Create a new div for the job card
+                jobs.forEach(job => {
+                    console.log(`Processing job: ${job.job_title}, Documents Generated: ${job.documents_generated}`);
                     const jobCard = document.createElement('div');
                     jobCard.className = 'job';
 
@@ -634,85 +756,62 @@
                     // Save icon
                     const saveIcon = document.createElement('span');
                     saveIcon.className = 'material-symbols-outlined save-icon';
-                    saveIcon.textContent = 'format_list_bulleted_add';
+                    saveIcon.textContent = 'bookmark';
 
                     // This function is called when the save icon is clicked.
                     saveIcon.onclick = function (event) {
-                        // Prevent the default action to avoid any unwanted behavior like page navigation
                         event.preventDefault();
-
-                        // Get the closest job card to the clicked element
                         const jobCard = event.target.closest('.job');
-
-                        // Extract the job ID from the data attribute
                         const jobId = jobCard.getAttribute('data-job-id');
 
-                        // Check if the job is already saved or not
-                        if (saveIcon.textContent.includes('format_list_bulleted_add')) {
-                            // If not saved, save the job
-                            const jobData = {
-                                job_id: job.job_id,
-                                job_title: job.job_title,
-                                job_description: job.job_description,
-                                job_link: job.job_apply_link,
-                                job_loc: job.job_city,
-                                company_name: job.employer_name,
-                                link: window.location.href,
-                                employer_logo: job.employer_logo
-                            };
+                        const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '{}');
+                        const isCurrentlySaved = !!savedJobs[jobId];
 
-                            fetch('/save-job', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(jobData)
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        console.log('Job saved successfully');
-                                        // Change the icon to 'heart_minus' and add a new onclick event to remove the job
-                                        saveIcon.innerHTML = '<span class="material-symbols-outlined">add_task</span>';
-                                        saveIcon.onclick = removeSavedJob; // Assign the remove function
-                                        saveIcon.classList.add('saved');
-                                    } else {
-                                        console.error('Failed to save job:', data.error);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error saving job:', error);
-                                });
-                        } else {
-                            // If already saved, remove the job
-                            removeSavedJob(jobId);
-                        }
-                    };
+                        // Prepare job data for backend
+                        const jobData = {
+                            job_id: job.job_id,
+                            job_title: job.job_title,
+                            job_description: job.job_description,
+                            job_link: job.job_apply_link,
+                            job_loc: job.job_city,
+                            company_name: job.employer_name,
+                            link: window.location.href,
+                            employer_logo: job.employer_logo
+                        };
 
-                    function removeSavedJob(jobId) {
-                        // Ensure that jobId is a string or number here
-                        fetch('/remove-saved-job', {
+                        // Determine the appropriate endpoint based on current saved status
+                        const endpoint = isCurrentlySaved ? '/remove-saved-job' : '/save-job';
+
+                        fetch(endpoint, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ job_id: jobId }) // Correct payload
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(jobData)
                         })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    console.log('Job removed successfully');
-                                    // Handle UI updates here, such as changing the save icon back to 'heart_plus'
-                                    // and updating the onclick event handler to save the job again.
+                                    // Toggle saved status in local storage
+                                    if (isCurrentlySaved) {
+                                        delete savedJobs[jobId];
+                                    } else {
+                                        savedJobs[jobId] = true;
+                                    }
+                                    localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+
+                                    // Update UI to reflect new saved status
+                                    updateSaveIconUI(saveIcon, !isCurrentlySaved);
                                 } else {
-                                    console.error('Failed to remove job:', data.error);
+                                    console.error('Failed to update job save status:', data.error);
                                 }
                             })
                             .catch(error => {
-                                console.error('Error removing job:', error);
+                                console.error('Error updating job save status:', error);
                             });
-                    }
+                    };
 
+                    function updateSaveIconUI(iconElement, isSaved) {
+                        iconElement.textContent = isSaved ? 'bookmark_added' : 'bookmark'; // Update with appropriate icons
+                    }
 
                     // Append the logo container and date to the jobHeaderTop
                     jobHeaderTop.appendChild(logoContainer);
@@ -820,8 +919,35 @@
 
                     // Append the salary, remote, and type container to the job card
                     jobCard.appendChild(salaryRemoteTypeContainer);
+                    // Add "Custom Documents Generated" indicator if applicable
+                    if (localStorage.getItem(`documentGenerated_${job.job_id}`) === 'true') {
+                        const customDocsContainer = document.createElement('div');
+                        customDocsContainer.className = 'custom-docs-container';
 
-                    // Event listener for when a job title is clicked
+                        const customDocsIndicator = document.createElement('div');
+                        customDocsIndicator.className = 'custom-docs-indicator';
+
+                        // Create a span for the icon
+                        const iconSpan = document.createElement('span');
+                        iconSpan.className = 'material-symbols-outlined';
+                        iconSpan.textContent = 'task';
+
+                        // Append the icon span to the customDocsIndicator
+                        customDocsIndicator.appendChild(iconSpan);
+
+                        // Add a text node for the text
+                        const textNode = document.createTextNode(' Custom Documents Generated');
+                        customDocsIndicator.appendChild(textNode);
+
+                        // Append the customDocsIndicator to the customDocsContainer
+                        customDocsContainer.appendChild(customDocsIndicator);
+
+                        // Append the customDocsContainer to the jobCard
+                        jobCard.appendChild(customDocsContainer);
+                        console.log(`Added Custom Documents indicator for job: ${job.job_title}`);
+                    }
+
+                    // Inside the job title click event listener
                     jobTitle.addEventListener('click', function () {
                         clearSelectedJobCards();
                         jobCard.classList.add('selected'); // Highlight the selected job card
@@ -832,9 +958,11 @@
         <div class="job-details">
             <h2><strong>${job.job_title}</strong></h2>
             <div class="employer-and-location-container">
-                <p style="margin-bottom: 1px; color: gray;">${job.employer_name}</p> 
+                <p style="margin-bottom: 1px; color: gray;"><strong>${job.employer_name}</strong></p> 
                 <p style="margin-top: 1px; color: gray;">${job.job_city || 'Not specified'}</p>
             </div>
+            <hr>
+            <div id="generate-docs-button-container"></div>
             <hr>
             <div class="job-employment-salary-benefits">
                 <p><strong>Employment Type:</strong> ${formatJobType(job.job_employment_type) || 'Not specified'}</p>
@@ -858,37 +986,122 @@
             `).join('')}
             <hr>
             <p><strong>Job Description</strong></p>
-            <p>${job.job_description}</p>
+            <p class="job-description">${job.job_description}</p>
         </div>
     `;
+
+                        // Get the generate-docs-button-container and append the Generate Docs button
+                        const generateDocsButtonContainer = document.getElementById('generate-docs-button-container');
+                        const generateDocsButton = document.createElement('button');
+                        generateDocsButton.className = 'generate-docs-button btn btn-primary gradient-button'; // Added 'gradient-button' class
+                        generateDocsButton.textContent = '✨ Generate Custom Docs';
+                        generateDocsButton.dataset.jobId = job.job_id;
+                        generateDocsButtonContainer.appendChild(generateDocsButton);
+
+                        // Create a container for the documents right after the Generate Docs button
+                        const documentsContainer = document.createElement('div');
+                        documentsContainer.id = 'documentsContainer';
+                        generateDocsButtonContainer.appendChild(documentsContainer); // Append documentsContainer here
+
+                        // Fetch and display documents for this job
+                        fetchAndDisplayJobDocuments(job.job_title, job.employer_name);
+
                         selectedJobDetails.style.display = 'block';
                         toggleCloseButton(true);
                         bindCloseButton();
                     });
 
+                    function fetchAndDisplayJobDocuments(jobTitle, companyName) {
+                        let userId = $("#userId").val();
 
-                    // Append the job card to the jobsList container
+                        $.get(`/get_user_documents?jobTitle=${encodeURIComponent(jobTitle)}&companyName=${encodeURIComponent(companyName)}&userId=${userId}`, function (documents) {
+                            let tableHTML = '<table class="table table-bordered"><thead><tr><th>Document Type</th><th>Creation Date</th><th colspan="2">Download</th><th>Delete</th></tr></thead><tbody>';
+
+                            documents.forEach(doc => {
+                                tableHTML += `
+                <tr id="doc-row-${doc.id}">
+                    <td>${doc.document_type}</td>
+                    <td>${doc.creation_date}</td>
+                    <td>
+                        <a href="/download_document/${doc.id}?format=pdf">
+                            <img src="/static/images/pdf.svg" alt="PDF" width="24" height="24">
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/download_document/${doc.id}?format=docx">
+                            <img src="/static/images/docx.svg" alt="DOCX" width="24" height="24">
+                        </a>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteDocument(${doc.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+                            });
+
+                            tableHTML += '</tbody></table>';
+                            const documentsContainer = document.getElementById('documentsContainer');
+                            if (documentsContainer) {
+                                documentsContainer.innerHTML = tableHTML;
+                            }
+                        });
+                    }
+
+
+
                     jobsList.appendChild(jobCard);
+
                 });
 
                 if (append) {
-                    // Use setTimeout to delay the scroll restoration
-                    setTimeout(() => {
-                        jobsList.scrollTop = oldScrollPosition;
-                    }, 0); // A timeout of 0 ms still pushes the execution to the end of the call stack
+                    setTimeout(() => { jobsList.scrollTop = oldScrollPosition; }, 0);
                 }
+
+                updateAllSaveIcons();
             }
 
+            selectedJobDetails.addEventListener('click', function (event) {
+                if (event.target.classList.contains('generate-docs-button')) {
+                    // Retrieve the job title
+                    const jobTitle = selectedJobDetails.querySelector('.job-details h2').textContent;
 
+                    // Retrieve the company name (employer name)
+                    const companyName = selectedJobDetails.querySelector('.employer-and-location-container strong').textContent;
+
+                    // Retrieve the job description
+                    const jobDescriptionElement = selectedJobDetails.querySelector('.job-description');
+                    const jobDescription = jobDescriptionElement ? jobDescriptionElement.textContent : "";
+
+                    // Retrieve the apply link
+                    const applyLinkElement = selectedJobDetails.querySelector('.job-details a[href]');
+                    const applyLink = applyLinkElement ? applyLinkElement.href : "";
+
+                    // Retrieve the jobId from the selected job card
+                    const jobCard = document.querySelector('.job.selected');
+                    const jobId = jobCard.dataset.jobId;
+
+                    // Retrieve the job title element from the selected job card
+                    const jobTitleElement = jobCard ? jobCard.querySelector('.job-title') : null;
+
+                    // Pass the jobTitleElement to the generateDocumentsAndResume function
+                    generateDocumentsAndResume(jobId, jobTitle, jobDescription, companyName, applyLink, jobTitleElement);
+                }
+            });
+
+            // Bind click event to save icons
+            document.querySelectorAll('.save-icon').forEach(saveIcon => {
+                saveIcon.addEventListener('click', function () {
+                    const jobId = this.getAttribute('data-job-id');
+                    const isCurrentlySaved = localStorage.getItem(`jobSaved_${jobId}`) === 'true';
+                    saveJob(jobId, isCurrentlySaved);
+                });
+            });
 
             setupInfiniteScroll();
             checkScreenSize();
             window.addEventListener('resize', checkScreenSize);
-
         });
     </script>
-
-
 </body>
 
 </html>
