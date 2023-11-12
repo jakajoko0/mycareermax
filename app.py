@@ -2080,12 +2080,21 @@ def job_details_coverletter():
             conn.close()
             return jsonify({"error": "User not found or resume not available"}), 404
 
-        response = client.completions.create(
-            model="text-davinci-003",
-            prompt=f"Write a cover letter for the position of {job_title} at {company_name}. Here's the job description: {job_description}\n\nHere's my resume:\n{resume_text}\n",
-            max_tokens=500
+        # Prepare the message for the OpenAI model
+        system_message = "You are an AI developed by Open AI and are trained to be an expert at writing cover letters. Your response should only contain the cover letter text and nothing more."
+        user_message = f"Pretend you are writing a cover letter for the position of {job_title} at {company_name}. Here's the job description: {job_description}\n\nHere's my resume:\n{resume_text}"
+
+        # Call OpenAI's chat completion
+        completion = client.chat.completions.create(
+            model="gpt-4",  # Replace with your desired model
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
+            ]
         )
-        cover_letter = response.choices[0].text.strip()
+
+        # Extract the response text from the completion
+        cover_letter = completion.choices[0].message.content.strip()
 
         insert_query = """
             INSERT INTO dbo.UserDocuments (user_id, job_id, document_name, document_content, job_title, company_name, apply_link, document_type)
@@ -2108,6 +2117,7 @@ def job_details_coverletter():
     cursor.close()
     conn.close()
     return jsonify({"message": "Cover letter generated and saved successfully", "documentId": new_document_id})
+
 
 
 @app.route("/job-details-resume", methods=["POST"])
@@ -2137,12 +2147,21 @@ def job_details_resume():
             conn.close()
             return jsonify({"error": "User not found or resume not available"}), 404
 
-        response = client.completions.create(
-            model="text-davinci-003",  # or "gpt-4" if available
-            prompt=f"Tailor this resume for the position of {job_title} at {company_name}. Here's the job description: {job_description}. Make sure to include keywords from the job description.\n\n{resume_text}",
-            max_tokens=500
+        # Prepare the message for the OpenAI model
+        system_message = "You are an AI developed by Open AI and are trained to be an expert at optimizing resumes for ATS systems. Your response should only contain the tailored resume text and nothing more."
+        user_message = f"You are to optimize the provided {resume_text} for the role of {job_title} at {company_name}. Here's the job description: {job_description}. Make sure to include keywords from the job description.\n\nresume_text:\n{resume_text}"
+
+        # Call OpenAI's chat completion
+        completion = client.chat.completions.create(
+            model="gpt-4",  # Replace with your desired model
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
+            ]
         )
-        enhanced_resume = response.choices[0].text.strip()
+
+        # Extract the response text from the completion
+        enhanced_resume = completion.choices[0].message.content.strip()
 
         insert_query = """
             INSERT INTO dbo.UserDocuments (user_id, job_id, document_name, document_content, job_title, company_name, apply_link, document_type)
@@ -2165,6 +2184,7 @@ def job_details_resume():
     cursor.close()
     conn.close()
     return jsonify({"message": "Resume generated and saved successfully", "documentId": new_document_id})
+
 
 
 @app.route("/get_user_documents", methods=["GET"])
