@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>myCareerMax Job Search</title>
+    <title>myCareerMax | Job Search</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
@@ -442,7 +442,7 @@
                     <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerclick" style="color: #003c86;">AI Job Search</a>
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
@@ -514,14 +514,13 @@
                 const userId = getUserIdFromSession();
                 if (!userId) {
                     console.error('User ID is not available');
-                    // Hide spinner in case of early return
                     document.querySelector('.spinner').style.display = 'none';
+                    alert('You must be logged in to generate documents.');
                     return;
                 }
 
                 // Data to send to the backend
                 const postData = {
-                    user_id: userId,
                     jobId: jobId,
                     job_title: jobTitle,
                     employer_name: companyName,
@@ -530,7 +529,6 @@
                 };
 
                 try {
-                    // Trigger both API calls simultaneously
                     const coverLetterPromise = fetch('/job-details-coverletter', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -543,21 +541,29 @@
                         body: JSON.stringify(postData)
                     });
 
-                    // Await both promises
                     const [coverLetterResponse, resumeResponse] = await Promise.all([coverLetterPromise, resumePromise]);
 
-                    // Process responses
+                    if (coverLetterResponse.status === 401 || resumeResponse.status === 401) {
+                        alert("Your session has expired, please log in again.");
+                        return;
+                    }
+
+                    // Check if the response is OK and in JSON format
+                    const isJSON = (response) => response.headers.get('content-type')?.includes('application/json');
+                    if (!isJSON(coverLetterResponse) || !isJSON(resumeResponse)) {
+                        console.error('Response is not in JSON format');
+                        alert('Sign in to your myCareerMax account in order to generate custom documents.');
+                        return;
+                    }
+
                     const coverLetterData = await coverLetterResponse.json();
                     const resumeData = await resumeResponse.json();
 
-                    // Check if both cover letter and resume were generated successfully
                     if (coverLetterData.message === "Cover letter generated and saved successfully" &&
                         resumeData.message === "Resume generated and saved successfully") {
-                        // Store the successful document generation in local storage
                         localStorage.setItem(`documentGenerated_${jobId}`, 'true');
                         console.log('Document generation status stored in local storage for job ID:', jobId);
 
-                        // After generating the documents, trigger a click on the job title element
                         if (jobTitleElement) {
                             jobTitleElement.click();
                         }
@@ -566,11 +572,13 @@
                     }
                 } catch (error) {
                     console.error('Error generating documents:', error);
+                    alert('An error occurred while generating documents. Please check the console for more details.');
                 } finally {
-                    // Hide spinner regardless of success or failure
                     document.querySelector('.spinner').style.display = 'none';
                 }
             }
+
+
 
 
             function getUserIdFromSession() {

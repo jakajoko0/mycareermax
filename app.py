@@ -983,10 +983,7 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/careerclick")
-def careerclick():
-    user_id = current_user.id if current_user.is_authenticated else None
-    return render_template("careerclick.html", user_id=user_id)
+
 
 
 @app.route("/ai-builder")
@@ -999,14 +996,15 @@ def ai_builder():
 def home():
     return redirect(url_for("login"))
 
-@app.route("/job_tracker", methods=["GET"])
-@login_required
-def job_tracker():
-    user_id = current_user.id
-    saved_jobs_by_status = get_saved_jobs_by_status(user_id)
-    return render_template("job_tracker.html", 
-                           saved_jobs_by_status=saved_jobs_by_status, 
-                           user_id=user_id)
+@app.route("/search", methods=["GET"])
+def search():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("search.html", user_id=user_id)
+
+@app.route("/careerclick")
+def careerclick():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("careerclick.html", user_id=user_id)
 
 
 
@@ -1330,7 +1328,7 @@ headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
 @app.route("/fetch-job-listings-get", methods=["GET"])
 def fetch_job_listings_get():
-    user_id = current_user.id  # Assuming user authentication is in place
+   #user_id = current_user.id  # Assuming user authentication is in place
     query = request.args.get("query", '')
     location = request.args.get("location", '')
     page = request.args.get("page", 1)
@@ -2054,15 +2052,15 @@ def update_job_status():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/job-details-coverletter", methods=["POST"])
+@login_required
 def job_details_coverletter():
-    if current_user.is_authenticated:
-        user_id = current_user.get_id()
-        data = request.json
-        job_id = data.get("jobId")
-        job_title = data.get("job_title")
-        company_name = data.get("employer_name")
-        job_description = data.get("job_description")
-        apply_link = data.get("apply_link")
+    user_id = current_user.get_id()
+    data = request.json
+    job_id = data.get("jobId")
+    job_title = data.get("job_title")
+    company_name = data.get("employer_name")
+    job_description = data.get("job_description")
+    apply_link = data.get("apply_link")
 
     logging.info("Received request to generate cover letter for user_id: %s", user_id)
 
@@ -2121,15 +2119,15 @@ def job_details_coverletter():
 
 
 @app.route("/job-details-resume", methods=["POST"])
+@login_required
 def job_details_resume():
-    if current_user.is_authenticated:
-        user_id = current_user.get_id()
-        data = request.json
-        job_id = data.get("jobId")
-        job_title = data.get("job_title")
-        company_name = data.get("employer_name")
-        job_description = data.get("job_description")
-        apply_link = data.get("apply_link")
+    user_id = current_user.get_id()
+    data = request.json
+    job_id = data.get("jobId")
+    job_title = data.get("job_title")
+    company_name = data.get("employer_name")
+    job_description = data.get("job_description")
+    apply_link = data.get("apply_link")
 
     logging.info("Received request to generate resume for user_id: %s", user_id)
 
@@ -2149,7 +2147,7 @@ def job_details_resume():
 
         # Prepare the message for the OpenAI model
         system_message = "You are an AI developed by Open AI and are trained to be an expert at optimizing resumes for ATS systems. Your response should only contain the tailored resume text and nothing more."
-        user_message = f"You are to optimize the provided {resume_text} for the role of {job_title} at {company_name}. Here's the job description: {job_description}. Make sure to include keywords from the job description.\n\nresume_text:\n{resume_text}"
+        user_message = f"I need assistance in optimizing a resume for a specific job application. The job title is {job_title}, and the company is {company_name}. Below is the job description provided by the company:\n\n{job_description}\n\nBased on this job description, please identify key skills and qualifications that are relevant to the role. Then, review the following resume and suggest improvements. Specifically, incorporate relevant keywords and skills from the job description into the resume, ensuring they are naturally integrated. Please provide at least five enhanced bullet points for each job position listed on the resume.\n\nResume:\n{resume_text}\n\nRemember to maintain the professional tone and structure of the resume while optimizing it for the job role of {job_title} at {company_name}."
 
         # Call OpenAI's chat completion
         completion = client.chat.completions.create(
@@ -2157,7 +2155,8 @@ def job_details_resume():
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
-            ]
+            ],
+            temperature=0.7
         )
 
         # Extract the response text from the completion
