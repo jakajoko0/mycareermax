@@ -1063,26 +1063,49 @@
                             let tableHTML = '<table class="table table-bordered"><thead><tr><th>Document Type</th><th>Creation Date</th><th colspan="2">Download</th><th>Delete</th></tr></thead><tbody>';
 
                             documents.forEach(doc => {
+                                let downloadRoute;
+                                if (doc.document_type === 'Tailored Resume') {
+                                    downloadRoute = '/download_html2pdf';
+                                } else if (doc.document_type === 'Custom Cover Letter') {
+                                    downloadRoute = '/download_document';
+                                } else {
+                                    // Handle other document types or set a default route
+                                    downloadRoute = '/some_default_route';
+                                }
+
+                                let docxDownloadLink = '';
+                                if (doc.document_type !== 'Tailored Resume') {
+                                    docxDownloadLink = `
+            <td>
+                <a href="${downloadRoute}/${doc.id}?format=docx">
+                    <img src="/static/images/docx.svg" alt="DOCX" width="24" height="24">
+                </a>
+            </td>
+        `;
+                                } else {
+                                    // Add an empty cell when there is no DOCX link
+                                    docxDownloadLink = '<td></td>';
+                                }
+
                                 tableHTML += `
-                <tr id="doc-row-${doc.id}">
-                    <td>${doc.document_type}</td>
-                    <td>${doc.creation_date}</td>
-                    <td>
-                        <a href="/download_document/${doc.id}?format=pdf">
-                            <img src="/static/images/pdf.svg" alt="PDF" width="24" height="24">
-                        </a>
-                    </td>
-                    <td>
-                        <a href="/download_document/${doc.id}?format=docx">
-                            <img src="/static/images/docx.svg" alt="DOCX" width="24" height="24">
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger" onclick="deleteDocument(${doc.id})">Delete</button>
-                    </td>
-                </tr>
-            `;
+        <tr id="doc-row-${doc.id}">
+            <td>${doc.document_type}</td>
+            <td>${doc.creation_date}</td>
+            <td>
+                <a href="${downloadRoute}/${doc.id}?format=pdf">
+                    <img src="/static/images/pdf.svg" alt="PDF" width="24" height="24">
+                </a>
+            </td>
+            ${docxDownloadLink}
+            <td>
+                <button class="btn btn-danger" onclick="deleteDocument(${doc.id})">Delete</button>
+            </td>
+        </tr>
+    `;
                             });
+
+
+
 
                             tableHTML += '</tbody></table>';
                             const documentsContainer = document.getElementById('documentsContainer');

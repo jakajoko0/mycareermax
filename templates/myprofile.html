@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | myCareerMax</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Set the text color to white for the entire page */
+        body {
+            background-image: radial-gradient(circle, #b700ff, #3776ff);
+            color: white;
+        }
+
+        /* Style the specific container */
+        .container.mt-5 {
+            color: black;
+            /* Text color inside the container */
+            background-color: white;
+            /* Background color of the container */
+            border-radius: 10px;
+            /* Rounded corners */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            /* Box shadow */
+            padding: 20px;
+            /* Add some padding for spacing */
+        }
+
+        .form-control {
+            border-radius: 5px;
+            /* Adjust as needed */
+            /* Bootstrap already has a box-shadow class `shadow-sm`, but you can customize here if needed */
+        }
+
+        .btn-primary {
+            border-radius: 5px;
+            /* Rounded corners for the button */
+            /* Additional button styling if needed */
+        }
+
+        /* Center the file input button */
+        .custom-file-input {
+            text-align: center;
+        }
+
+        /* Style for the label */
+        .custom-file-label {
+            text-align: left;
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+            data-target="#navbarNav" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div aria-labelledby="navbarDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div aria-labelledby="toolsDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+    <!-- Add a hyperlinked text above the container with white color and cursor pointer on hover -->
+    <div class="text-center mt-3">
+        <a href="/dashboard" class="btn btn-link" style="color: white; cursor: pointer;">&lt; Back to Dashboard</a>
+    </div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <!-- First Form: Resume Upload -->
+                <form method="POST" enctype="multipart/form-data" action="/myprofile_resume_upload">
+                    <div class="form-group text-center"> <!-- Center the label -->
+                        <label for="docx_file" class="d-block">Upload a .DOCX File of your Resume</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input mx-auto" name="docx_file" id="docx_file"
+                                accept=".docx" required>
+                            <label class="custom-file-label" style="color: gray;" for="docx_file">Browse and Select Your
+                                File Here Before
+                                Clicking Upload</label>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+                <!-- Display Active Resume -->
+                <div class="text-center" style="color: green;">
+                    <p>Active Resume: {{ most_recent_filename or '' }}</p>
+                </div>
+                <hr>
+                <!-- Edit button
+                <button type="button" id="edit-button">Edit</button>-->
+
+                <!-- Delete button
+                <button type="button" id="delete-button">Delete</button> -->
+
+                <!-- Edit form (outside any other form) -->
+                <form id="edit-form" method="post" style="display: none;" class="mb-3">
+                    <!-- Hidden User ID Field -->
+                    <input type="hidden" id="userId" name="user_id" value=""> <!-- Add this line -->
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="full-name-edit">Full Name:</label>
+                        <input type="text" id="full-name-edit" name="full_name" class="form-control shadow-sm">
+                    </div>
+
+                    <!-- Most Recent Position Held -->
+                    <div class="form-group">
+                        <label for="full-name-edit">Full Name:</label>
+                        <input type="text" id="full-name-edit" name="full_name" class="form-control shadow-sm">
+                    </div>
+
+                    <!-- Desired Job Title -->
+                    <div class="form-group">
+                        <label for="desired-job-title-edit">Desired Job Title:</label>
+                        <input type="text" id="desired-job-title-edit" name="desired_job_title"
+                            class="form-control shadow-sm">
+                    </div>
+
+                    <!-- Desired Job Location -->
+                    <div class="form-group">
+                        <label for="desired-job-location-edit">Desired Job Location (Nearest Major City):</label>
+                        <input type="text" id="desired-job-location-edit" name="desired_job_location"
+                            class="form-control shadow-sm">
+                    </div>
+
+                    <!-- Desired Work Type -->
+                    <div class="form-group">
+                        <label for="desired-work-type-edit">Desired Work Type:</label>
+                        <select id="desired-work-type-edit" name="desired_work_type" class="form-control shadow-sm">
+                            <option value="Remote">Remote</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="In-Office">In-Office</option>
+                        </select>
+                    </div>
+
+                    <!-- Minimum Desired Compensation/Year -->
+                    <div class="form-group">
+                        <label for="desired-compensation-edit">Minimum Desired Compensation/Year:</label>
+                        <select id="desired-compensation-edit" name="desired_compensation"
+                            class="form-control shadow-sm">
+                            <option value="50000-75000">$50,000-$75,000</option>
+                            <option value="75000-100000">$75,000-$100,000</option>
+                            <option value="100000-125000">$100,000-$125,000</option>
+                            <option value=">125000">>$125,000</option>
+                        </select>
+                    </div>
+
+                    <!-- Job Alert Email Notifications -->
+                    <div class="form-group">
+                        <label>Job Alert Email Notifications:</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="job_alert_notifications"
+                                    id="jobAlertYes" value="Yes">
+                                <label class="form-check-label" for="jobAlertYes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="job_alert_notifications"
+                                    id="jobAlertNo" value="No">
+                                <label class="form-check-label" for="jobAlertNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group">
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        $(document).ready(function () {
+            const editButton = $("#edit-button");
+            const deleteButton = $("#delete-button");
+            const editForm = $("#edit-form");
+            const userIdInput = $("#userId"); // Input field for user ID
+
+            editForm.hide();
+
+            function fetchUserDetails() {
+                $.get("/get-user-details", function (response) {
+                    if (response.success) {
+                        const user = response.user;
+                        $("#full-name-edit").val(user.full_name);
+                        $("#recent-position-edit").val(user.recent_position);
+                        $("#desired-job-title-edit").val(user.desired_job_title);
+                        $("#desired-job-location-edit").val(user.desired_job_location);
+                        $("#desired-work-type-edit").val(user.desired_work_type);
+                        $("#desired-compensation-edit").val(user.desired_compensation);
+                        $("input[name='job_alert_notifications'][value='" + user.job_alert_notifications + "']").prop("checked", true);
+                    } else {
+                        console.error('Error fetching user details:', response.error);
+                    }
+                });
+            }
+
+            editButton.click(function () {
+                fetchUserDetails();
+                editForm.show();
+                editButton.hide();
+                deleteButton.hide();
+            });
+
+            editForm.submit(function (event) {
+                event.preventDefault();
+
+                let formData = $(this).serialize();
+                const url = userIdInput.val() ? "/update-user-details" : "/create_user_details";
+
+                $.post(url, formData, function (response) {
+                    if (response.success) {
+                        console.log("Operation successful.");
+                        editForm.hide();
+                        editButton.show();
+                        deleteButton.show();
+                    } else {
+                        console.error("Operation failed:", response.error);
+                    }
+                });
+            });
+
+            function deleteUserDetails() {
+                const userId = userIdInput.val(); // Retrieve the user ID
+
+                if (userId) {
+                    $.ajax({
+                        url: "/delete-user-details",
+                        type: 'DELETE',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ user_id: userId }),
+                        success: function (response) {
+                            if (response.success) {
+                                console.log("User details deleted successfully.");
+                                // Additional logic after successful deletion
+                            } else {
+                                console.error("Failed to delete user details:", response.error);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error in deletion request:", error);
+                        }
+                    });
+                } else {
+                    console.error("User ID is not available for the delete operation.");
+                }
+            }
+
+            deleteButton.click(function () {
+                if (confirm("Are you sure you want to delete your details?")) {
+                    deleteUserDetails();
+                }
+            });
+
+            fetchUserDetails();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script defer>
+        $(document).ready(function () {
+            const user_id = $("#userId").val(); // Get the user_id from the hidden input
+            $.get(`/get-username?user_id=${user_id}`, function (response) {
+                if (response.success) {
+                    const usernamePlaceholder = document.getElementById("username-placeholder");
+                    usernamePlaceholder.textContent = "Hello, " + response.username;
+                } else {
+                    console.error('Error fetching username:', response.error);
+                }
+            });
+        });
+    </script>
+
+
+
+    <!-- Include Bootstrap JavaScript and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Move your jQuery script to here -->
+    <script defer>
+        $(document).ready(function () {
+            console.log("Fetching username...");
+            const user_id = $("#userId").val(); // Get the user_id from the hidden input
+
+            $.get(`/get-username?user_id=${user_id}`, function (response) {
+                console.log("Username response:", response);
+                if (response.success) {
+                    const usernamePlaceholder = document.getElementById("username-placeholder");
+                    usernamePlaceholder.textContent = "Hello, " + response.username;
+                } else {
+                    console.error('Error fetching username:', response.error);
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 from flask import Response, stream_with_context
 import pdfkit
 import threading
+from io import BytesIO
 import re
 import time
 from flask_cors import CORS, cross_origin
 from flask import Flask, send_from_directory
 import random
-
 load_dotenv()
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -43,9 +43,13 @@ import urllib.parse
 import json
 # noqa: F401
 from flask import flash, get_flashed_messages
-
+from bs4 import BeautifulSoup
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+app = Flask(__name__)
+
+
+
 
 
 def create_connection(max_retries=5, wait_time_in_seconds=5):
@@ -176,7 +180,8 @@ class LoginUser(UserMixin):
 # Load the user for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
-    return LoginUser(user_id)
+    return User.query.get(int(user_id))
+
 
 
 DB_SERVER = os.getenv("DB_SERVER")
@@ -441,15 +446,67 @@ connection_string = (
 app.config["SQLALCHEMY_DATABASE_URI"] = connection_string
 db.init_app(app)
 
+from sqlalchemy import ForeignKey
+from sqlalchemy import desc
 
-class User(db.Model, UserMixin):
-    __tablename__ = "users"
+# Filter for "Month Year" format
+@app.template_filter('format_date_month_year')
+def format_date_month_year(d):
+    return d.strftime('%B %Y') if d else "Present"  # e.g., "May 2020" or "Present"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+# Filter for "MM/YYYY" format
+@app.template_filter('format_date_numeric')
+def format_date_numeric(d):
+    return d.strftime('%m/%Y') if d else "Present"  # e.g., "05/2020" or "Present"
+
+class UserResumes(db.Model):
+    __tablename__ = 'user_resumes'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    resume_text = db.Column(db.Text)
+    filename = db.Column(db.String(255))
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    questionnaire = db.Column(db.Text)
+
+    # Define the relationship
+    user = db.relationship('User', backref=db.backref('resumes', lazy=True))
+
+    def __init__(self, user_id, resume_text, filename=None, questionnaire=None):
+        self.user_id = user_id
+        self.resume_text = resume_text
+        self.filename = filename
+        self.uploaded_at = datetime.utcnow()
+        self.questionnaire = questionnaire
+
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.LargeBinary, nullable=False)
-    email = db.Column(db.String(255), nullable=True, unique=True)
+    email = db.Column(db.String(255), unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    access_token = db.Column(db.String(255))
+
+    @property
+    def is_authenticated(self):
+        # Always return True as all users are authenticated by default
+        return True
+
+    @property
+    def is_active(self):
+        # Return True if this is an active user
+        return True
+
+    @property
+    def is_anonymous(self):
+        # Return False as anonymous users aren't supported
+        return False
+
+    def get_id(self):
+        # Return the user id as a unicode string
+        return str(self.id)
 
 
 class UserDocuments(db.Model):
@@ -469,6 +526,108 @@ class UserDocuments(db.Model):
     job_id = db.Column(db.Integer, nullable=True)  # or nullable=False based on your requirements
 
     user = db.relationship("User", backref=db.backref("documents", lazy=True))
+
+
+
+
+class Summary(db.Model):
+    __tablename__ = 'summary'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    summary_text = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  # Add the created_at field
+
+
+
+class Education(db.Model):
+    __tablename__ = 'education'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    degree = db.Column(db.String(255))
+    institution = db.Column(db.String(255))
+    graduation_year = db.Column(db.Integer)
+
+
+
+class Skills(db.Model):
+    __tablename__ = 'skills'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    skill = db.Column(db.String(255))
+
+class Projects(db.Model):
+    __tablename__ = 'projects'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    project_name = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    url = db.Column(db.String(255))
+
+class ProjectBulletPoint(db.Model):
+    __tablename__ = 'projects_bullet_points'
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False) 
+    text = db.Column(db.String(255))
+
+    project = db.relationship('Projects', backref=db.backref('bullet_points', lazy=True)) 
+
+
+class PersonalInformation(db.Model):
+    __tablename__ = 'personal_information'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    full_name = db.Column(db.String(255))
+    email = db.Column(db.String(255))
+    contact_number = db.Column(db.String(50))
+    city_of_residence = db.Column(db.String(255))
+    state_of_residence = db.Column(db.String(255))
+    website = db.Column(db.String(255))
+    github = db.Column(db.String(255))
+    linkedin = db.Column(db.String(255))
+
+    # Define the relationship
+    user = db.relationship('User', backref=db.backref('personal_info', uselist=False, lazy=True))
+
+
+class Certifications(db.Model):
+    __tablename__ = 'certifications'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    certification_name = db.Column(db.String(255))
+    issued_by = db.Column(db.String(255))
+    issue_date = db.Column(db.Date)
+    expiration_date = db.Column(db.Date)
+    certification_url = db.Column(db.String(255))
+
+class WorkExperienceBulletPoint(db.Model):
+    __tablename__ = 'work_experience_bullet_points'
+    id = db.Column(db.Integer, primary_key=True)
+    work_experience_id = db.Column(db.Integer, db.ForeignKey('work_experience.id'), nullable=False)
+    text = db.Column(db.String(255))
+
+    work_experience = db.relationship('WorkExperience', backref=db.backref('bullet_points', lazy=True))
+
+class WorkExperience(db.Model):
+    __tablename__ = 'work_experience'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    job_title = db.Column(db.String(255))
+    company = db.Column(db.String(255))
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+
+class UserDetails(db.Model):
+    __tablename__ = 'UserDetails'  # Specify the actual table name here
+    UserID = db.Column(db.Integer, primary_key=True)
+    FullName = db.Column(db.String(255))
+    RecentPosition = db.Column(db.String(255))
+    DesiredJobTitle = db.Column(db.String(255))
+    DesiredJobLocation = db.Column(db.String(255))
+    DesiredWorkType = db.Column(db.String(50))
+    MinimumDesiredCompensation = db.Column(db.String(50))
+    JobAlertNotifications = db.Column(db.String(3))
+
+
 
 
 @app.route("/get-username")
@@ -575,7 +734,7 @@ def delete_document(document_id):
 
 def analyze_resume_compatibility(job_description, user_resume):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4-1106-preview",
         messages=[
             {
                 "role": "system",
@@ -887,6 +1046,43 @@ def download_document(document_id):
     else:
         return "Invalid format specified", 400
 
+@app.route("/download_html2pdf/<int:document_id>", methods=["GET"])
+def download_html2pdf(document_id):
+    # Fetch the document from the database
+    doc = UserDocuments.query.filter_by(id=document_id).first()
+    if not doc:
+        return "Document not found", 404
+
+    # Determine the format for download (default is docx)
+    download_format = request.args.get("format", "docx")
+
+    if download_format == "docx":
+        # Create a new Document
+        document = Document()
+        document.add_paragraph(doc.document_content)
+
+    elif download_format == "pdf":
+        # Since the document content is already HTML, use it directly
+        html_content = doc.document_content
+
+        # Use BeautifulSoup to parse and extract the content within <html> tags
+        soup = BeautifulSoup(html_content, "html.parser")
+        html_extract = str(soup.find('html')) if soup.find('html') else html_content
+
+        # Convert the extracted HTML to PDF using pdfkit
+        pdf_content = pdfkit.from_string(
+            html_extract, False, configuration=config, options=pdf_options
+        )
+
+        # Stream the PDF back to the user without a specific filename
+        response = Response(stream_with_context(io.BytesIO(pdf_content)))
+        response.headers["Content-Type"] = "application/pdf"
+        response.headers["Content-Disposition"] = "inline"
+        return response
+
+    else:
+        return "Invalid format specified", 400
+
 
 @app.route("/dashboard", methods=["GET"])
 @login_required  # Only logged-in users can access this route
@@ -995,6 +1191,8 @@ def ai_builder():
 @app.route("/")
 def home():
     return redirect(url_for("login"))
+
+
 
 @app.route("/search", methods=["GET"])
 def search():
@@ -2084,7 +2282,7 @@ def job_details_coverletter():
 
         # Call OpenAI's chat completion
         completion = client.chat.completions.create(
-            model="gpt-4",  # Replace with your desired model
+            model="gpt-4-1106-preview",  # Replace with your desired model
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
@@ -2116,7 +2314,11 @@ def job_details_coverletter():
     conn.close()
     return jsonify({"message": "Cover letter generated and saved successfully", "documentId": new_document_id})
 
-
+def read_html_template():
+    # Assuming 'templates' is a directory at the same level as 'app.py'
+    file_path = 'templates/resume.html'
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
 
 @app.route("/job-details-resume", methods=["POST"])
 @login_required
@@ -2146,22 +2348,35 @@ def job_details_resume():
             return jsonify({"error": "User not found or resume not available"}), 404
 
         # Prepare the message for the OpenAI model
-        system_message = "You are an AI developed by Open AI and are trained to be an expert at optimizing resumes for ATS systems. Your response should only contain the tailored resume text and nothing more."
-        user_message = f"I need assistance in optimizing a resume for a specific job application. The job title is {job_title}, and the company is {company_name}. Below is the job description provided by the company:\n\n{job_description}\n\nBased on this job description, please identify key skills and qualifications that are relevant to the role. Then, review the following resume and suggest improvements. Specifically, incorporate relevant keywords and skills from the job description into the resume, ensuring they are naturally integrated. Please provide at least five enhanced bullet points for each job position listed on the resume.\n\nResume:\n{resume_text}\n\nRemember to maintain the professional tone and structure of the resume while optimizing it for the job role of {job_title} at {company_name}."
+        html_template = read_html_template()
+        user_message = f"""Task 1 : Convert this resume to a new format by using the provided HTML Template.
+        Task 2: Once you have the HTML code for the converted resume, insert key words into the resume that you extract from the job description.
+
+        Rules: 
+        1.  Your response should include only the HTML code, beginning with <html> and ending with </html>, and nothing more. 
+        2. VERY IMPORTANT: Do not include any markdown formatting symbols like '```'. Exclude any additional text or explanations.
+        3. You must convert all of the resume content to the new format. Do not leave any details off when providing the html of the new format.
+        4. Do not delete any content while inserting key words. You can only edit or add from the content.
+        5. The HTML Template sections structure must be followed strictly. If you need to add a new section, please do so, using the same styling and formatting as the other sections.
+        Resume to convert:  {resume_text}
+        HTML Template: {html_template}
+        Job description: {job_description}
+        """
 
         # Call OpenAI's chat completion
         completion = client.chat.completions.create(
-            model="gpt-4",  # Replace with your desired model
+            model="gpt-4-1106-preview",  # Replace with your desired model
             messages=[
-                {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
             ],
-            temperature=0.7
+            temperature=0.7,  # Set temperature to 0.7
+            max_tokens=4095,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
         )
 
-        # Extract the response text from the completion
         enhanced_resume = completion.choices[0].message.content.strip()
-
         insert_query = """
             INSERT INTO dbo.UserDocuments (user_id, job_id, document_name, document_content, job_title, company_name, apply_link, document_type)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -2175,7 +2390,7 @@ def job_details_resume():
         logging.info("Resume saved successfully for user_id %s with document_id %s", user_id, new_document_id)
 
     except Exception as e:
-        logging.error("Error during processing: %s", e)
+        logging.error("Error during processing", exc_info=True)
         cursor.close()
         conn.close()
         return jsonify({"error": str(e)}), 500
@@ -2183,8 +2398,6 @@ def job_details_resume():
     cursor.close()
     conn.close()
     return jsonify({"message": "Resume generated and saved successfully", "documentId": new_document_id})
-
-
 
 @app.route("/get_user_documents", methods=["GET"])
 @login_required
@@ -2217,8 +2430,826 @@ def get_user_documents():
 
     return jsonify(documents_list)
 
+    ############ RESUME BUILDER #####################################################################
+
+    ################## VIEW RESUME ##########################
+
+@app.route('/resume/<int:user_id>')
+def resume(user_id):
+    # Query the database for each section
+    personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
+    summary = Summary.query.filter_by(user_id=user_id).first()
+
+    # For Work Experiences and their Bullet Points
+    work_experiences = WorkExperience.query.filter_by(user_id=user_id).all()
+    for experience in work_experiences:
+        experience.bullet_points = WorkExperienceBulletPoint.query.filter_by(work_experience_id=experience.id).all()
+
+    # For Projects and their Bullet Points
+    projects = Projects.query.filter_by(user_id=user_id).all()
+    for project in projects:
+        project.bullet_points = ProjectBulletPoint.query.filter_by(project_id=project.id).all()
+
+    educations = Education.query.filter_by(user_id=user_id).all()
+    certifications = Certifications.query.filter_by(user_id=user_id).all()
+    skills = Skills.query.filter_by(user_id=user_id).all()
+
+    # Render the resume template with the queried data
+    return render_template('resume.html', 
+                           personal_info=personal_info, 
+                           summary=summary,
+                           work_experiences=work_experiences,
+                           educations=educations,
+                           projects=projects,
+                           certifications=certifications,
+                           skills=skills)
+
+    ################## RESUME INPUT PAGE ##########################
+
+@app.route('/rbtemp1')
+def rbtemp1():
+    user_id = current_user.id if current_user.is_authenticated else None
+    projects = []
+    work_experiences = []
+    educations = []
+    certifications = []
+    skills = []  # Initialize skills
+    personal_info = None
+    summary = None
+
+    if user_id:
+        # Fetch data from respective tables
+        projects = Projects.query.filter_by(user_id=user_id).all()
+        work_experiences = WorkExperience.query.filter_by(user_id=user_id).all()
+        educations = Education.query.filter_by(user_id=user_id).all()
+        certifications = Certifications.query.filter_by(user_id=user_id).all()
+        skills = Skills.query.filter_by(user_id=user_id).all()  # Fetch skills
+
+        # Fetch personal information and summary
+        personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
+        summary = Summary.query.filter_by(user_id=user_id).order_by(desc(Summary.created_at)).first()
+
+    return render_template('rbtemp1.html', user_id=user_id, projects=projects, work_experiences=work_experiences, educations=educations, certifications=certifications, personal_info=personal_info, summary=summary, skills=skills)
+
+
+############ RESUME BUILDER - WORK EXPERIENCE ###############
+@app.route('/work-experience', methods=['GET', 'POST'])  # Include 'POST' in the methods list
+def work_experience():
+    if request.method == 'GET':
+        user_id = current_user.id if current_user.is_authenticated else None
+        if user_id is None:
+            return jsonify([])  # Return an empty list if the user is not authenticated
+
+        # Fetch work experiences specific to the logged-in user
+        experiences = WorkExperience.query.filter_by(user_id=user_id).all()
+        return jsonify([{
+            'id': exp.id,
+            'job_title': exp.job_title,
+            'company': exp.company,
+            'start_date': exp.start_date.strftime('%Y-%m-%d') if exp.start_date else None,
+            'end_date': exp.end_date.strftime('%Y-%m-%d') if exp.end_date else 'Present',
+            'bullet_points': [{'id': bp.id, 'text': bp.text} for bp in exp.bullet_points]
+        } for exp in experiences])
+
+    elif request.method == 'POST':
+        # Add new work experience logic here
+        data = request.json
+        end_date = None if data.get('end_date') == 'Present' else datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+
+        new_exp = WorkExperience(
+            user_id=data['user_id'],  # Ensure this is the ID of the logged-in user
+            job_title=data['job_title'],
+            company=data['company'],
+            start_date=datetime.strptime(data['start_date'], '%Y-%m-%d').date(),
+            end_date=end_date
+        )
+        db.session.add(new_exp)
+        db.session.commit()
+        return jsonify({'id': new_exp.id}), 201
+
+    else:
+        return jsonify({'message': 'Method not allowed'}), 405
+
+@app.route('/bullet-point', methods=['POST'])
+def add_bullet_point():
+    data = request.json
+    user_id = current_user.id if current_user.is_authenticated else None
+    
+    work_experience = WorkExperience.query.filter_by(id=data['work_experience_id'], user_id=user_id).first()
+    if not work_experience:
+        return jsonify({'message': 'Work experience not found or access denied'}), 404
+
+    new_bullet_point = WorkExperienceBulletPoint(
+        work_experience_id=data['work_experience_id'],
+        text=data['text']
+    )
+    db.session.add(new_bullet_point)
+    db.session.commit()
+    return jsonify({'id': new_bullet_point.id}), 201
+
+
+@app.route('/bullet-point/<int:bullet_point_id>', methods=['PUT'])
+def update_bullet_point(bullet_point_id):
+    bullet_point = WorkExperienceBulletPoint.query.get(bullet_point_id)
+    if not bullet_point or bullet_point.work_experience.user_id != current_user.id:
+        return jsonify({'message': 'Bullet point not found or access denied'}), 404
+
+    data = request.json
+    bullet_point.text = data['text']
+    db.session.commit()
+    return jsonify({'message': 'Bullet point updated'}), 200
+
+
+@app.route('/bullet-point/<int:bullet_point_id>', methods=['DELETE'])
+def delete_bullet_point(bullet_point_id):
+    bullet_point = WorkExperienceBulletPoint.query.get(bullet_point_id)
+    if not bullet_point or bullet_point.work_experience.user_id != current_user.id:
+        return jsonify({'message': 'Bullet point not found or access denied'}), 404
+
+    db.session.delete(bullet_point)
+    db.session.commit()
+    return jsonify({'message': 'Bullet point deleted'}), 200
+
+@app.route('/work-experience/<int:experience_id>', methods=['PUT'])
+def update_work_experience(experience_id):
+    experience = WorkExperience.query.get(experience_id)
+    if not experience or experience.user_id != current_user.id:
+        return jsonify({'message': 'Work experience not found or access denied'}), 404
+
+    data = request.json
+    end_date = None if data.get('end_date') == 'Present' else datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+
+    experience.job_title = data['job_title']
+    experience.company = data['company']
+    experience.start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+    experience.end_date = end_date
+
+    db.session.commit()
+    return jsonify({'message': 'Work experience updated'}), 200
+
+
+@app.route('/work-experience/<int:experience_id>', methods=['DELETE'])
+def delete_work_experience(experience_id):
+    experience = WorkExperience.query.get(experience_id)
+    if not experience or experience.user_id != current_user.id:
+        return jsonify({'message': 'Work experience not found or access denied'}), 404
+
+    # Delete associated bullet points
+    for bp in experience.bullet_points:
+        db.session.delete(bp)
+
+    db.session.delete(experience)
+    db.session.commit()
+    return jsonify({'message': 'Work experience and associated bullet points deleted'}), 200
+
+    ############ RESUME BUILDER - PROJECTS ###############
+
+@app.route('/projects', methods=['GET', 'POST'])
+def projects():
+    if request.method == 'GET':
+        user_id = current_user.id if current_user.is_authenticated else None
+        if user_id is None:
+            return jsonify([])  # Return an empty list if the user is not authenticated
+
+        # Fetch projects specific to the logged-in user
+        projects = Projects.query.filter_by(user_id=user_id).all()
+        return jsonify([{
+            'id': project.id,
+            'project_name': project.project_name,
+            'description': project.description,
+            'url': project.url,
+            'bullet_points': [{'id': bp.id, 'text': bp.text} for bp in project.bullet_points]
+        } for project in projects])
+
+    # Add a new project
+    data = request.json
+    new_project = Projects(
+        user_id=data['user_id'],  # Assuming user_id is provided in the request
+        project_name=data['project_name'],
+        description=data['description'],
+        url=data['url']
+    )
+    db.session.add(new_project)
+    db.session.commit()
+    return jsonify({'id': new_project.id}), 201
+
+
+
+
+@app.route('/project-bullet-point/<int:bullet_point_id>', methods=['PUT'])
+def update_bullet_point_project(bullet_point_id):
+    bullet_point = ProjectBulletPoint.query.get(bullet_point_id)
+    if not bullet_point or bullet_point.project.user_id != current_user.id:
+        return jsonify({'message': 'Bullet point not found or access denied'}), 404
+
+    data = request.json
+    bullet_point.text = data['text']
+    db.session.commit()
+    return jsonify({'message': 'Bullet point updated'}), 200
+
+@app.route('/project-bullet-point/<int:bullet_point_id>', methods=['DELETE'])
+def delete_project_bullet_point(bullet_point_id):
+    bullet_point = ProjectBulletPoint.query.get(bullet_point_id)
+    if not bullet_point or bullet_point.project.user_id != current_user.id:
+        return jsonify({'message': 'Bullet point not found or access denied'}), 404
+
+    db.session.delete(bullet_point)
+    db.session.commit()
+    return jsonify({'message': 'Project Bullet Point deleted'}), 200
+
+
+@app.route('/projects/<int:project_id>', methods=['PUT'])
+def update_project_project(project_id):
+    project = Projects.query.get(project_id)
+    if not project or project.user_id != current_user.id:
+        return jsonify({'message': 'Project not found or access denied'}), 404
+
+    data = request.json
+    project.project_name = data['project_name']
+    project.description = data['description']
+    project.url = data['url']
+
+    db.session.commit()
+    return jsonify({'message': 'Project updated'}), 200
+
+@app.route('/projects/<int:project_id>', methods=['DELETE'])
+def delete_project_project(project_id):
+    project = Projects.query.get(project_id)
+    if not project or project.user_id != current_user.id:
+        return jsonify({'message': 'Project not found or access denied'}), 404
+
+    # Delete associated bullet points
+    for bp in project.bullet_points:
+        db.session.delete(bp)
+
+    db.session.delete(project)
+    db.session.commit()
+    return jsonify({'message': 'Project and associated bullet points deleted'}), 200
+
+@app.route('/project-bullet-point', methods=['POST'])
+def add_project_bullet_point():
+    data = request.json
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    project = Projects.query.filter_by(id=data['project_id'], user_id=user_id).first()
+    if not project:
+        return jsonify({'message': 'Project not found or access denied'}), 404
+
+    new_bullet_point = ProjectBulletPoint(
+        project_id=data['project_id'],
+        text=data['text']
+    )
+    db.session.add(new_bullet_point)
+    db.session.commit()
+    return jsonify({'id': new_bullet_point.id}), 201
+
+############ RESUME BUILDER - EDUCATION ###############
+
+@app.route('/education', methods=['GET', 'POST'])
+def education():
+    if request.method == 'GET':
+        user_id = current_user.id if current_user.is_authenticated else None
+        if user_id is None:
+            return jsonify([])  # Return an empty list if the user is not authenticated
+
+        # Fetch education records specific to the logged-in user
+        education_records = Education.query.filter_by(user_id=user_id).all()
+        return jsonify([{
+            'id': record.id,
+            'degree': record.degree,
+            'institution': record.institution,
+            'graduation_year': record.graduation_year
+        } for record in education_records])
+
+    elif request.method == 'POST':
+        if not current_user.is_authenticated:
+            return jsonify({'message': 'Unauthorized'}), 401
+
+        data = request.json
+
+        new_education = Education(
+            user_id=current_user.id,
+            degree=data['degree'],
+            institution=data['institution'],
+            graduation_year=data['graduation_year']
+        )
+        db.session.add(new_education)
+        db.session.commit()
+        return jsonify({'id': new_education.id}), 201
+
+
+@app.route('/education/<int:education_id>', methods=['PUT'])
+def update_education(education_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    education_record = Education.query.get(education_id)
+    if not education_record or education_record.user_id != current_user.id:
+        return jsonify({'message': 'Education record not found or access denied'}), 404
+
+    data = request.json
+    education_record.degree = data['degree']
+    education_record.institution = data['institution']
+    education_record.graduation_year = data['graduation_year']
+
+    db.session.commit()
+    return jsonify({'message': 'Education record updated'}), 200
+
+
+
+@app.route('/education/<int:education_id>', methods=['DELETE'])
+def delete_education(education_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    education_record = Education.query.get(education_id)
+    if not education_record or education_record.user_id != current_user.id:
+        return jsonify({'message': 'Education record not found or access denied'}), 404
+
+    db.session.delete(education_record)
+    db.session.commit()
+    return jsonify({'message': 'Education record deleted'}), 200
+
+
+
+############ RESUME BUILDER - CERTIFICATIONS ###################################################
+
+# Endpoint for fetching and adding certifications
+@app.route('/certifications', methods=['GET', 'POST'])
+def certifications():
+    if request.method == 'GET':
+        user_id = current_user.id if current_user.is_authenticated else None
+        if user_id is None:
+            return jsonify([])  # Return an empty list if the user is not authenticated
+
+        # Fetch certification records specific to the logged-in user
+        certification_records = Certifications.query.filter_by(user_id=user_id).all()
+        return jsonify([{
+            'id': record.id,
+            'certification_name': record.certification_name,
+            'issued_by': record.issued_by,
+            'issue_date': record.issue_date.strftime('%Y-%m-%d') if record.issue_date else None,
+            'expiration_date': record.expiration_date.strftime('%Y-%m-%d') if record.expiration_date else None
+        } for record in certification_records])
+
+    elif request.method == 'POST':
+        if not current_user.is_authenticated:
+            return jsonify({'message': 'Unauthorized'}), 401
+
+        data = request.json
+
+        new_certification = Certifications(
+            user_id=current_user.id,
+            certification_name=data['certification_name'],
+            issued_by=data['issued_by'],
+            issue_date=datetime.strptime(data['issue_date'], '%Y-%m-%d').date() if data['issue_date'] else None,
+            expiration_date=datetime.strptime(data['expiration_date'], '%Y-%m-%d').date() if data['expiration_date'] else None,
+        )
+        db.session.add(new_certification)
+        db.session.commit()
+        return jsonify({'id': new_certification.id}), 201
+
+# Endpoint for updating certification records
+@app.route('/certifications/<int:certification_id>', methods=['PUT'])
+def update_certification(certification_id):
+    # Check if the user is authenticated
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    # Retrieve the certification record while ensuring it belongs to the current user
+    certification_record = Certifications.query.filter_by(id=certification_id, user_id=current_user.id).first()
+    if not certification_record:
+        return jsonify({'message': 'Certification record not found or access denied'}), 404
+
+    data = request.json
+    certification_record.certification_name = data['certification_name']
+    certification_record.issued_by = data['issued_by']
+    certification_record.issue_date = datetime.strptime(data['issue_date'], '%Y-%m-%d').date() if data['issue_date'] else None
+    certification_record.expiration_date = datetime.strptime(data['expiration_date'], '%Y-%m-%d').date() if data['expiration_date'] else None
+
+    db.session.commit()
+    return jsonify({'message': 'Certification record updated'}), 200
+
+# Endpoint for deleting certification records
+@app.route('/certifications/<int:certification_id>', methods=['DELETE'])
+def delete_certification(certification_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    certification_record = Certifications.query.get(certification_id)
+    if not certification_record or certification_record.user_id != current_user.id:
+        return jsonify({'message': 'Certification record not found or access denied'}), 404
+
+    db.session.delete(certification_record)
+    db.session.commit()
+    return jsonify({'message': 'Certification record deleted'}), 200
+
+
+
+############ RESUME BUILDER - PERSONAL INFORMATION ###################################################
+
+# Endpoint for fetching and adding personal information
+@app.route('/personal_information', methods=['GET', 'POST'])
+def personal_information():
+    if request.method == 'GET':
+        user_id = current_user.id if current_user.is_authenticated else None
+        if user_id is None:
+            return jsonify([])  # Return an empty list if the user is not authenticated
+
+        # Fetch personal information records specific to the logged-in user
+        personal_info_records = PersonalInformation.query.filter_by(user_id=user_id).all()
+        return jsonify([{
+            'id': record.id,
+            'FullName': record.FullName,
+            'email': record.email,
+            'contact_number': record.contact_number,
+            'city_of_residence': record.city_of_residence,
+            'state_of_residence': record.state_of_residence,
+            'website': record.website,
+            'github': record.github,
+            'linkedin': record.linkedin
+        } for record in personal_info_records])
+
+    elif request.method == 'POST':
+        if not current_user.is_authenticated:
+            return jsonify({'message': 'Unauthorized'}), 401
+
+        data = request.json
+
+        new_personal_info = PersonalInformation(
+            user_id=current_user.id,
+            FullName=data['FullName'],
+            email=data['email'],
+            contact_number=data['contact_number'],
+            city_of_residence=data['city_of_residence'],
+            state_of_residence=data['state_of_residence'],
+            website=data['website'],
+            github=data['github'],
+            linkedin=data['linkedin'],
+        )
+        db.session.add(new_personal_info)
+        db.session.commit()
+        return jsonify({'id': new_personal_info.id}), 201
+
+# Endpoint for updating personal information records
+@app.route('/personal_information/<int:personal_info_id>', methods=['PUT'])
+def update_personal_information(personal_info_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    personal_info_record = PersonalInformation.query.get(personal_info_id)
+    if not personal_info_record or personal_info_record.user_id != current_user.id:
+        return jsonify({'message': 'Personal information record not found or access denied'}), 404
+
+    data = request.json
+    personal_info_record.FullName = data['FullName']
+    personal_info_record.email = data['email']
+    personal_info_record.contact_number = data['contact_number']
+    personal_info_record.city_of_residence = data['city_of_residence']
+    personal_info_record.state_of_residence = data['state_of_residence']
+    personal_info_record.website = data['website']
+    personal_info_record.github = data['github']
+    personal_info_record.linkedin = data['linkedin']
+
+    db.session.commit()
+    return jsonify({'message': 'Personal information record updated'}), 200
+
+# Endpoint for deleting personal information records
+@app.route('/personal_information/<int:personal_info_id>', methods=['DELETE'])
+def delete_personal_information(personal_info_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    personal_info_record = PersonalInformation.query.get(personal_info_id)
+    if not personal_info_record or personal_info_record.user_id != current_user.id:
+        return jsonify({'message': 'Personal information record not found or access denied'}), 404
+
+    db.session.delete(personal_info_record)
+    db.session.commit()
+    return jsonify({'message': 'Personal information record deleted'}), 200
+
+
+
+    ############ RESUME BUILDER - SKILLS ###################################################
+
+# Endpoint for fetching and adding skills
+@app.route('/skills', methods=['GET', 'POST'])
+def skills():
+    if request.method == 'GET':
+        # Fetch all skills records for the current user
+        user_id = current_user.id if current_user.is_authenticated else None
+        if user_id is not None:
+            skills_records = Skills.query.filter_by(user_id=user_id).all()
+            return jsonify([{
+                'id': record.id,
+                'skill': record.skill
+            } for record in skills_records])
+        else:
+            return jsonify([])  # Return an empty list if the user is not authenticated
+
+    # Add new skill record
+    data = request.json
+
+    new_skill = Skills(
+        user_id=current_user.id,  # Assuming the user is authenticated
+        skill=data['skill']
+    )
+    db.session.add(new_skill)
+    db.session.commit()
+    return jsonify({'id': new_skill.id}), 201
+
+# Endpoint for updating skill records
+@app.route('/skills/<int:skill_id>', methods=['PUT'])
+def update_skill(skill_id):
+    skill_record = Skills.query.get(skill_id)
+    if not skill_record:
+        return jsonify({'message': 'Skill record not found'}), 404
+
+    data = request.json
+    skill_record.skill = data['skill']
+
+    db.session.commit()
+    return jsonify({'message': 'Skill record updated'}), 200
+
+# Endpoint for deleting skill records
+@app.route('/skills/<int:skill_id>', methods=['DELETE'])
+def delete_skill(skill_id):
+    skill_record = Skills.query.get(skill_id)
+    if not skill_record:
+        return jsonify({'message': 'Skill record not found'}), 404
+
+    db.session.delete(skill_record)
+    db.session.commit()
+    return jsonify({'message': 'Skill record deleted'}), 200
+
+
+    ############ RESUME BUILDER - SUMMARY ###################################################
+
+@app.route('/summary/<int:summary_id>', methods=['PUT'])
+def update_summary(summary_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    summary = Summary.query.get(summary_id)
+    if not summary or summary.user_id != current_user.id:
+        return jsonify({'message': 'Summary not found or access denied'}), 404
+
+    data = request.json
+    summary.summary_text = data['summary_text']
+
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Summary updated successfully!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Error updating summary: {str(e)}'}), 500
+
+
+@app.route('/summary', methods=['GET', 'POST'])
+def handle_summary():
+    if request.method == 'GET':
+        if not current_user.is_authenticated:
+            return jsonify({'message': 'Unauthorized'}), 401
+
+        user_id = current_user.id
+        summaries = Summary.query.filter_by(user_id=user_id).all()
+        return jsonify([{'id': summary.id, 'summary_text': summary.summary_text} for summary in summaries])
+
+    elif request.method == 'POST':
+        if not current_user.is_authenticated:
+            return jsonify({'message': 'Unauthorized'}), 401
+
+        data = request.json
+        summary_text = data['summary_text']
+
+        # Check if a summary already exists for this user
+        existing_summary = Summary.query.filter_by(user_id=current_user.id).first()
+        if existing_summary:
+            existing_summary.summary_text = summary_text
+            db.session.commit()
+            return jsonify({'message': 'Summary updated successfully!'}), 200
+
+        new_summary = Summary(user_id=current_user.id, summary_text=summary_text)
+        try:
+            db.session.add(new_summary)
+            db.session.commit()
+            return jsonify({'message': 'Summary added successfully!'}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error adding summary: {str(e)}'}), 500
+
+@app.route('/summary/<int:summary_id>', methods=['DELETE'])
+def delete_summary(summary_id):
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    summary = Summary.query.get(summary_id)
+    if not summary or summary.user_id != current_user.id:
+        return jsonify({'message': 'Summary not found or access denied'}), 404
+
+    try:
+        db.session.delete(summary)
+        db.session.commit()
+        return jsonify({'message': 'Summary deleted successfully!'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Error deleting summary: {str(e)}'}), 500
+
+############################## MY PROFILE ##########################################################################
+
+# # # # # # # # # RESUME UPLOAD - DOCX ## # # # # # # # # # # # #
+
+@app.route('/myprofile_resume_upload', methods=['POST'])
+def myprofile_resume_upload():
+    try:
+        docx_file = request.files['docx_file']
+        if docx_file and docx_file.filename.endswith('.docx'):
+            # Get the user_id dynamically based on the currently authenticated user
+            user_id = current_user.id if current_user.is_authenticated else None
+
+            if user_id is None:
+                return 'User not authenticated. Please log in.'
+
+            # Read the DOCX file and extract text
+            document = Document(BytesIO(docx_file.read()))
+            resume_text = '\n'.join([para.text for para in document.paragraphs])
+
+            filename = docx_file.filename
+
+            # Delete the most recent resume
+            most_recent_resume = UserResumes.query.filter_by(user_id=user_id).order_by(UserResumes.uploaded_at.desc()).first()
+            if most_recent_resume:
+                db.session.delete(most_recent_resume)
+
+            # Add the new resume with extracted text
+            new_resume = UserResumes(user_id, resume_text, filename)
+            db.session.add(new_resume)
+            db.session.commit()
+
+            # Redirect to the /myprofile_current_resume route after successful upload
+            return redirect(url_for('myprofile_current_resume'))
+        else:
+            return 'Invalid file format. Please upload a DOCX file.'
+    except Exception as e:
+        return f'An error occurred: {str(e)}'
+
+
+        # # # # ## # # DISPLAY RESUME NAME # # # ## # # #
+@app.route('/myprofile')
+def myprofile():
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    # Retrieve the most recent resume filename for the current user
+    if user_id is not None:
+        most_recent_resume = UserResumes.query.filter_by(user_id=user_id).order_by(UserResumes.uploaded_at.desc()).first()
+        if most_recent_resume:
+            most_recent_filename = most_recent_resume.filename
+        else:
+            most_recent_filename = None
+    else:
+        most_recent_filename = None
+
+    # Query the most recent UserDetails record
+    most_recent_user_details = UserDetails.query.order_by(UserDetails.UserID.desc()).first()
+
+    return render_template('myprofile.html', user_id=user_id, most_recent_filename=most_recent_filename, most_recent_user_details=most_recent_user_details)
+
+
+
+
+        # # # # ## # # USER DETAILS CRUD ROUTES # # # ## # # #
+
+@app.route('/delete_user_details', methods=['DELETE'])
+def delete_user_details():
+    # Retrieve user_id from the AJAX request's JSON body
+    data = request.get_json()
+    if not data or 'user_id' not in data:
+        return jsonify({'success': False, 'message': 'User ID not provided'}), 400
+
+    user_id = data['user_id']
+    
+    # Additional validation can be performed here if needed
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return jsonify({'success': False, 'message': 'Invalid user ID'}), 400
+
+    user_details = UserDetails.query.get(user_id)
+    if not user_details:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+
+    # Delete the UserDetails record from the database
+    db.session.delete(user_details)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'UserDetails deleted successfully'})
+
+
+@app.route('/update-user-details', methods=['POST'])
+def update_user_details():
+    if request.method == 'POST':
+        # Get data from the form
+        user_id = request.form.get('user_id')  # Get the user ID from the form data
+        full_name = request.form.get('full_name')
+        recent_position = request.form.get('recent_position')
+        desired_job_title = request.form.get('desired_job_title')
+        desired_job_location = request.form.get('desired_job_location')
+        desired_work_type = request.form.get('desired_work_type')
+        desired_compensation = request.form.get('desired_compensation')
+        job_alert_notifications = request.form.get('job_alert_notifications')
+
+        # Fetch the specific user's details based on user_id
+        user_details = UserDetails.query.get(user_id)
+        if user_details:
+            # Update user details
+            user_details.FullName = full_name
+            user_details.RecentPosition = recent_position
+            user_details.DesiredJobTitle = desired_job_title
+            user_details.DesiredJobLocation = desired_job_location
+            user_details.DesiredWorkType = desired_work_type
+            user_details.MinimumDesiredCompensation = desired_compensation
+            user_details.JobAlertNotifications = job_alert_notifications
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            # Return a JSON response for AJAX requests
+            return jsonify({'success': True, 'message': 'User details updated successfully'})
+
+        else:
+            # User not found
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+
+    # Handle other cases or errors here
+    return jsonify({'success': False, 'error': 'Invalid request method'}), 400
+
+
+@app.route('/create_user_details', methods=['POST'])
+def create_user_details():
+    if request.method == 'POST':
+        # Get data from the form
+        full_name = request.form.get('full_name')
+        recent_position = request.form.get('recent_position')
+        desired_job_title = request.form['desired_job_title']
+        desired_job_location = request.form['desired_job_location']
+        desired_work_type = request.form['desired_work_type']
+        minimum_desired_compensation = request.form['desired_compensation']
+        job_alert_notifications = request.form['job_alert_notifications']
+
+        # Create a new UserDetails object
+        new_user_details = UserDetails(
+            FullName=full_name,
+            RecentPosition=recent_position,
+            DesiredJobTitle=desired_job_title,
+            DesiredJobLocation=desired_job_location,
+            DesiredWorkType=desired_work_type,
+            MinimumDesiredCompensation=minimum_desired_compensation,
+            JobAlertNotifications=job_alert_notifications
+        )
+
+        # Add the new UserDetails object to the database
+        db.session.add(new_user_details)
+        db.session.commit()
+
+        flash('User details created successfully', 'success')
+        return jsonify({'success': True, 'message': 'User details created successfully', 'user_id': new_user_details.UserID})
+
+    return render_template('create_user_details.html')
+
+@app.route('/get-user-details')
+def get_user_details():
+    user_id = request.args.get('user_id')
+    user_details = UserDetails.query.get(user_id)
+    if user_details:
+        return jsonify({
+            'success': True,
+            'user': {
+                'full_name': user_details.FullName,
+                'recent_position': user_details.RecentPosition,
+                'desired_job_title': user_details.DesiredJobTitle,
+                'desired_job_location': user_details.DesiredJobLocation,
+                'desired_work_type': user_details.DesiredWorkType,
+                'desired_compensation': user_details.MinimumDesiredCompensation,
+                'job_alert_notifications': user_details.JobAlertNotifications
+            }
+        })
+    else:
+        return jsonify({'success': False, 'error': 'User details not found'}), 404
+
+
+
+
+@app.route('/success')
+def success():
+    # This route can be a success page where you inform the user that their details were updated successfully
+    return "User details updated successfully"
+
+@app.route('/error')
+def error():
+    # Handle errors and display an appropriate error message
+    return 'An error occurred. Please try again.'
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
-
