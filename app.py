@@ -2432,9 +2432,19 @@ def get_user_documents():
 
     ############ RESUME BUILDER #####################################################################
 
-    ################## VIEW RESUME ##########################
+    ################## UPDATE RESUME CONTAINER DYNAMICALLY ##########################
+@app.route('/update-resume')
+def update_resume():
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id is None:
+        # Handle unauthenticated case
+        return render_template('resume.html')
 
-@app.route('/resume/<int:user_id>')
+    # Use the 'resume' function to get the complete resume data
+    return resume(user_id)
+
+
+
 def resume(user_id):
     # Query the database for each section
     personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
@@ -2860,7 +2870,7 @@ def personal_information():
         personal_info_records = PersonalInformation.query.filter_by(user_id=user_id).all()
         return jsonify([{
             'id': record.id,
-            'FullName': record.FullName,
+            'full_name': record.full_name,
             'email': record.email,
             'contact_number': record.contact_number,
             'city_of_residence': record.city_of_residence,
@@ -2878,7 +2888,7 @@ def personal_information():
 
         new_personal_info = PersonalInformation(
             user_id=current_user.id,
-            FullName=data['FullName'],
+            full_name=data['full_name'],
             email=data['email'],
             contact_number=data['contact_number'],
             city_of_residence=data['city_of_residence'],
@@ -2902,7 +2912,7 @@ def update_personal_information(personal_info_id):
         return jsonify({'message': 'Personal information record not found or access denied'}), 404
 
     data = request.json
-    personal_info_record.FullName = data['FullName']
+    personal_info_record.full_name = data['full_name']
     personal_info_record.email = data['email']
     personal_info_record.contact_number = data['contact_number']
     personal_info_record.city_of_residence = data['city_of_residence']
@@ -3059,6 +3069,20 @@ def delete_summary(summary_id):
 
 # # # # # # # # # RESUME UPLOAD - DOCX ## # # # # # # # # # # # #
 
+@app.route('/myprofile_current_resume')
+def myprofile_current_resume():
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    # Retrieve the most recent resume filename for the current user
+    if user_id is not None:
+        most_recent_resume = UserResumes.query.filter_by(user_id=user_id).order_by(UserResumes.uploaded_at.desc()).first()
+        if most_recent_resume:
+            most_recent_filename = most_recent_resume.filename
+        else:
+            most_recent_filename = None
+    else:
+        most_recent_filename = None
+
 @app.route('/myprofile_resume_upload', methods=['POST'])
 def myprofile_resume_upload():
     try:
@@ -3087,7 +3111,7 @@ def myprofile_resume_upload():
             db.session.commit()
 
             # Redirect to the /myprofile_current_resume route after successful upload
-            return redirect(url_for('myprofile_current_resume'))
+            return redirect(url_for('myprofile'))
         else:
             return 'Invalid file format. Please upload a DOCX file.'
     except Exception as e:
@@ -3249,6 +3273,36 @@ def error():
     # Handle errors and display an appropriate error message
     return 'An error occurred. Please try again.'
 
+@app.route('/view-resume')
+def view_resume():
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id is None:
+        # Handle unauthenticated case
+        return "Please log in to view the resume", 401
+
+    # Call the 'resume' function to get the complete resume data
+    return resume(user_id)
+
+
+@app.route("/download_resume_pdf", methods=["GET"])
+def download_resume_pdf():
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id is None:
+        # Handle unauthenticated case
+        return "User not authenticated", 401
+
+    # Use the existing 'resume' function to get the complete resume data in HTML format
+    # The 'resume' function should return an HTML string of the resume
+    html_content = resume(user_id)
+
+    # Convert the HTML to PDF using pdfkit
+    pdf_content = pdfkit.from_string(html_content, False)
+
+    # Stream the PDF back to the user
+    response = Response(stream_with_context(io.BytesIO(pdf_content)))
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "inline"
+    return response
 
 
 if __name__ == "__main__":

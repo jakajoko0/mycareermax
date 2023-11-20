@@ -320,31 +320,6 @@
             });
         });
     </script>
-
-
-
-    <!-- Include Bootstrap JavaScript and Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <!-- Move your jQuery script to here -->
-    <script defer>
-        $(document).ready(function () {
-            console.log("Fetching username...");
-            const user_id = $("#userId").val(); // Get the user_id from the hidden input
-
-            $.get(`/get-username?user_id=${user_id}`, function (response) {
-                console.log("Username response:", response);
-                if (response.success) {
-                    const usernamePlaceholder = document.getElementById("username-placeholder");
-                    usernamePlaceholder.textContent = "Hello, " + response.username;
-                } else {
-                    console.error('Error fetching username:', response.error);
-                }
-            });
-        });
-    </script>
-
 </body>
 
 </html>
