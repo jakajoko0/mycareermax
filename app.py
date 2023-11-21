@@ -734,7 +734,7 @@ def delete_document(document_id):
 
 def analyze_resume_compatibility(job_description, user_resume):
     response = client.chat.completions.create(
-        model="gpt-4-1106-preview",
+        model="gpt-3.5-turbo-1106",
         messages=[
             {
                 "role": "system",
@@ -1053,28 +1053,214 @@ def download_html2pdf(document_id):
     if not doc:
         return "Document not found", 404
 
-    # Determine the format for download (default is docx)
     download_format = request.args.get("format", "docx")
 
-    if download_format == "docx":
-        # Create a new Document
-        document = Document()
-        document.add_paragraph(doc.document_content)
+    if download_format == "pdf":
+        # Define the HTML head with styles
+        html_head = """
+        <html>
+        <head>
+            <title>Resume</title>
+            <meta charset="UTF-8">
+            <style>
+   /*------------------------GLOBAL STYLES --------------------------*/
+        body {
+            font-size: 12px;
+            /* Base font size */
+        }
 
-    elif download_format == "pdf":
-        # Since the document content is already HTML, use it directly
-        html_content = doc.document_content
+        p,
+        li,
+        a {
+            font-size: 1em;
+            /* Relative to base font size */
+        }
 
-        # Use BeautifulSoup to parse and extract the content within <html> tags
+        /* Section Title Headers */
+        h2 {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #c4c4c4;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+            width: 100%;
+        }
+
+        @media print {
+            hr {
+                /* Specific style for print media */
+                background-color: #c4c4c4;
+            }
+        }
+
+        /*------------------------PERSONAL INFORMATION --------------------------*/
+        .personal-information .personal-name {
+            font-size: 3em;
+        }
+
+        .personal-information {
+            text-align: center;
+        }
+
+        .personal-details {
+            margin-top: 0;
+            margin-bottom: 2px;
+        }
+
+        /*------------------------SUMMARY SECTION --------------------------*/
+        .summary-section p {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        /*------------------------WORK EXPERIENCE --------------------------*/
+        .work-experience-entry .title-dates {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .job-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .dates {
+            font-size: 1em;
+            margin-left: auto;
+            font-weight: bold;
+        }
+
+        .company-name {
+            font-size: 1em;
+        }
+
+        .bullet-points {
+            font-size: 0.9em;
+        }
+
+
+        /*------------------------EDUCATION --------------------------*/
+        .education-section p {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        /*------------------------SKILLS --------------------------*/
+        .skills-list {
+            list-style-type: none;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        .skills-list li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        .skills-list li::after {
+            content: '•';
+            margin-left: 10px;
+        }
+
+        .skills-list li:last-child::after {
+            content: '';
+        }
+
+        /*------------------------CERTIFICATIONS SECTION STYLES --------------------------*/
+        .certificate {
+            list-style-type: none;
+            /* Remove default list styling */
+            padding: 10px 0;
+            /* Padding for each certificate item */
+            border-bottom: 1px solid #ddd;
+            /* A line between items */
+        }
+
+        .certificate:last-child {
+            border-bottom: none;
+            /* Remove the bottom border for the last item */
+        }
+
+
+        .certification-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cert-name-and-issuer {
+            font-weight: normal;
+            font-size: 1em;
+        }
+
+        .certification-dates {
+            font-size: 0.9em;
+            text-align: right;
+            color: #666;
+            /* Subtle color for dates */
+        }
+
+        .certification-url a {
+            font-size: 0.9em;
+            color: #0066cc;
+            /* Link color */
+            text-decoration: none;
+        }
+
+        .certification-url a:hover {
+            text-decoration: underline;
+            /* Underline on hover */
+        }
+
+        /*------------------------PROJECTS SECTION STYLES --------------------------*/
+        .project-entry .title-dates {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .project-url {
+            font-size: 1em;
+            margin-left: auto;
+            font-weight: bold;
+        }
+
+        .project-description {
+            font-size: 1em;
+        }
+
+        .project-bullet-points {
+            font-size: 0.9em;
+        }            </style>
+        </head>
+        """
+        html_footer = "</html>"
+
+        # Append the HTML head to the existing document content
+        html_content = html_head + doc.document_content + html_footer
+
+        # Use BeautifulSoup to ensure the HTML is well-formed
         soup = BeautifulSoup(html_content, "html.parser")
-        html_extract = str(soup.find('html')) if soup.find('html') else html_content
+        html_extract = str(soup)
 
         # Convert the extracted HTML to PDF using pdfkit
-        pdf_content = pdfkit.from_string(
-            html_extract, False, configuration=config, options=pdf_options
-        )
+        pdf_content = pdfkit.from_string(html_extract, False)
 
-        # Stream the PDF back to the user without a specific filename
+        # Stream the PDF back to the user
         response = Response(stream_with_context(io.BytesIO(pdf_content)))
         response.headers["Content-Type"] = "application/pdf"
         response.headers["Content-Disposition"] = "inline"
@@ -1082,7 +1268,6 @@ def download_html2pdf(document_id):
 
     else:
         return "Invalid format specified", 400
-
 
 @app.route("/dashboard", methods=["GET"])
 @login_required  # Only logged-in users can access this route
@@ -1182,10 +1367,10 @@ def logout():
 
 
 
-@app.route("/ai-builder")
-def ai_builder():
+@app.route("/rbtemp1")
+def rbtemp1():
     user_id = current_user.id if current_user.is_authenticated else None
-    return render_template("ai_builder.html", user_id=user_id)
+    return render_template("rbtemp1.html", user_id=user_id)
 
 
 @app.route("/")
@@ -1336,7 +1521,7 @@ def analyze_resume():
         },
     ]
 
-    response = client.chat.completions.create(model="gpt-4", messages=messages)
+    response = client.chat.completions.create(model="gpt-3.5-turbo-1106", messages=messages)
 
     feedback = response.choices[0].message.content.strip()
 
@@ -1420,7 +1605,7 @@ def generate_cover_letter():
         },
     ]
 
-    response = client.chat.completions.create(model="gpt-4", messages=messages)
+    response = client.chat.completions.create(model="gpt-3.5-turbo-1106", messages=messages)
 
     cover_letter = response.choices[0].message.content.strip()
     logging.info(f"Generated cover_letter: {cover_letter}")  # Log the cover_letter
@@ -1476,7 +1661,7 @@ def simulate_interview():
         user_message = f"The candidate is applying for a role as a {job_title} in the {industry} industry. The job description is as follows: {job_description}. The job requirements are: {job_requirements}. The candidate's resume is as follows: {resume}. Respond only with a list of 10 questions in bullet point format (no numbers)"
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo-1106",
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
@@ -1500,7 +1685,7 @@ def analyze_answer():
 
     # Use OpenAI API to analyze the answer
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo-1106",
         messages=[
             {
                 "role": "system",
@@ -1616,7 +1801,7 @@ def career_click():
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo-1106",
             messages=messages,
         )
     except openai.error.InvalidRequestError as e:
@@ -1671,7 +1856,7 @@ def resume_1():
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo-1106",
             messages=messages,
             temperature=1.0,
             max_tokens=2000,
@@ -1706,7 +1891,7 @@ def analyze_job():
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo-1106",
             messages=messages,
             temperature=1,
             top_p=1,
@@ -1781,7 +1966,7 @@ def resume_builder():
             user_content = [system_role, user_role]
 
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-3.5-turbo-1106",
                 messages=user_content,
                 temperature=1.0,
             )
@@ -1899,7 +2084,7 @@ def chat():
         client = OpenAI()
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo-1106",
             messages=messages,
             temperature=0.9,
             max_tokens=256,
@@ -2282,7 +2467,10 @@ def job_details_coverletter():
 
         # Call OpenAI's chat completion
         completion = client.chat.completions.create(
-            model="gpt-4-1106-preview",  # Replace with your desired model
+           #model="gpt-4-1106-preview",  
+            model="gpt-3.5-turbo-1106",  
+
+            	
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
@@ -2316,7 +2504,7 @@ def job_details_coverletter():
 
 def read_html_template():
     # Assuming 'templates' is a directory at the same level as 'app.py'
-    file_path = 'templates/resume.html'
+    file_path = 'templates/body_resume_template.html'
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
@@ -2350,10 +2538,10 @@ def job_details_resume():
         # Prepare the message for the OpenAI model
         html_template = read_html_template()
         user_message = f"""Task 1 : Convert this resume to a new format by using the provided HTML Template.
-        Task 2: Once you have the HTML code for the converted resume, insert key words into the resume that you extract from the job description.
-
+        Task 2: Rephrase the Summary or add one if no summary/intro/objective section exists. Use keywords from the Job description and follow this format: [Descriptive word] [your job title] [Experience level] [Work experience] [Skills] [Achievement] 
+        Task 3: Add a few skills to the skills section that are either mentioned in the job description or common skills for the job described.
         Rules: 
-        1.  Your response should include only the HTML code, beginning with <html> and ending with </html>, and nothing more. 
+        1. Your response should include only the HTML code, beginning with <body> and ending with </body>, and nothing more. 
         2. VERY IMPORTANT: Do not include any markdown formatting symbols like '```'. Exclude any additional text or explanations.
         3. You must convert all of the resume content to the new format. Do not leave any details off when providing the html of the new format.
         4. Do not delete any content while inserting key words. You can only edit or add from the content.
@@ -2362,14 +2550,16 @@ def job_details_resume():
         HTML Template: {html_template}
         Job description: {job_description}
         """
-
         # Call OpenAI's chat completion
         completion = client.chat.completions.create(
-            model="gpt-4-1106-preview",  # Replace with your desired model
+            model="gpt-4-1106-preview",  
+         #  model="gpt-3.5-turbo",  
+         #  model="gpt-3.5-turbo-1106",  
+
             messages=[
                 {"role": "user", "content": user_message},
             ],
-            temperature=0.7,  # Set temperature to 0.7
+            temperature=0.5,  
             max_tokens=4095,
             top_p=1,
             frequency_penalty=0,
@@ -2476,8 +2666,8 @@ def resume(user_id):
 
     ################## RESUME INPUT PAGE ##########################
 
-@app.route('/rbtemp1')
-def rbtemp1():
+@app.route('/ai-builder')
+def ai_builder():
     user_id = current_user.id if current_user.is_authenticated else None
     projects = []
     work_experiences = []
@@ -2499,7 +2689,7 @@ def rbtemp1():
         personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
         summary = Summary.query.filter_by(user_id=user_id).order_by(desc(Summary.created_at)).first()
 
-    return render_template('rbtemp1.html', user_id=user_id, projects=projects, work_experiences=work_experiences, educations=educations, certifications=certifications, personal_info=personal_info, summary=summary, skills=skills)
+    return render_template('ai_builder.html', user_id=user_id, projects=projects, work_experiences=work_experiences, educations=educations, certifications=certifications, personal_info=personal_info, summary=summary, skills=skills)
 
 
 ############ RESUME BUILDER - WORK EXPERIENCE ###############

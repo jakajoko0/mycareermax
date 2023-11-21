@@ -1,0 +1,149 @@
+<body>
+
+    <!-- Personal Information Section -->
+    <div class="personal-information">
+        <h2 class="personal-name">{{ personal_info.full_name }}</h2>
+        <p class="personal-details">
+            {% if personal_info.email %}Email: {{ personal_info.email }}{% endif %}
+            {% if personal_info.contact_number %}{% if personal_info.email %} | {% endif %}Contact: {{
+            personal_info.contact_number }}{% endif %}
+            {% if personal_info.city_of_residence %}{% if personal_info.email or personal_info.contact_number %} | {%
+            endif
+            %}City: {{ personal_info.city_of_residence }}{% endif %}
+            {% if personal_info.state_of_residence %}{% if personal_info.email or personal_info.contact_number or
+            personal_info.city_of_residence %} | {% endif %}State: {{ personal_info.state_of_residence }}{% endif %}
+        </p>
+        <p class="personal-details">
+            {% if personal_info.website %}Website: {{ personal_info.website }}{% endif %}
+            {% if personal_info.github %}{% if personal_info.website %} | {% endif %}GitHub: {{ personal_info.github
+            }}{%
+            endif %}
+            {% if personal_info.linkedin %}{% if personal_info.website or personal_info.github %} | {% endif %}LinkedIn:
+            {{
+            personal_info.linkedin }}{% endif %}
+        </p>
+    </div>
+
+    {% if summary %}
+    <hr>
+    <h2>Summary</h2>
+    <p>{{ summary.summary_text }}</p>
+    {% endif %}
+
+    <!-- Work Experience Section -->
+    <!-- NOTE TO AI: Please add ALL work experience details from the resume to this section. -->
+    {% if work_experiences %}
+    <div class="work-experience-section">
+        <hr>
+        <h2>Work Experience</h2>
+        {% for experience in work_experiences %}
+        <div class="work-experience-entry">
+            <div class="title-dates">
+                <span class="job-title">{{ experience.job_title }}</span>
+                <span class="dates">
+                    {{ experience.start_date | format_date_month_year }} –
+                    {{ experience.end_date | format_date_month_year }}
+                </span>
+            </div>
+            <div class="company-name">{{ experience.company }}</div>
+            <ul class="bullet-points">
+                {% for bullet_point in experience.bullet_points %}
+                <li>{{ bullet_point.text }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <!-- Education Section -->
+    {% if educations %}
+    <hr>
+    <h2>Education</h2>
+    {% for education in educations %}
+    <div class="education-section">
+        <!-- Loop through Education entries -->
+        <p>{{ education.institution }} | {{ education.graduation_year }}</p>
+        <p>{{ education.degree }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Projects Section -->
+    {% if projects %}
+    <hr>
+    <h2>Projects</h2>
+    {% for project in projects %}
+    <div class="project-entry">
+        <div>
+            <p class="project-name">{{ project.project_name }}</p>
+        </div>
+        <div>
+            <p class="project-url">{{ project.url }}</p>
+        </div>
+        <div>
+            <p class="project-description">{{ project.description }}</p>
+        </div>
+    </div>
+    <ul>
+        {% for bullet_point in project.bullet_points %}
+        <li>{{ bullet_point.text }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+    {% endif %}
+
+
+    <!-- Certificates Section -->
+    {% if certifications %}
+    <div class="certifications-section">
+        <hr>
+        <h2>Certifications</h2>
+        <ul>
+            <!-- Loop through Certifications entries -->
+            {% for certification in certifications %}
+            <li class="certificate">
+                <div class="certification-details">
+                    <div class="cert-name-and-issuer">
+                        <span>{{ certification.certification_name }}</span>
+                        {% if certification.issued_by %}
+                        , <span>{{ certification.issued_by }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="certification-dates">
+                        {% if certification.issue_date %}
+                        Issued on: <span>{{ certification.issue_date | format_date_numeric }}</span>
+                        {% endif %}
+                        {% if certification.expiration_date %}
+                        {% if certification.issue_date %} | {% endif %}
+                        Exp: <span>{{ certification.expiration_date | format_date_numeric }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if certification.certification_url %}
+                <div class="certification-url">
+                    <a href="{{ certification.certification_url }}">View Certification</a>
+                </div>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+
+
+
+        <!-- Skills Section -->
+        {% if skills %}
+        <hr>
+        <h2>Skills</h2>
+        <ul class="skills-list">
+            <!-- Loop through Skills entries -->
+            {% for skill in skills %}
+            <li>{{ skill.skill }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+</body>

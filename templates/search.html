@@ -41,8 +41,9 @@
 
         #jobs-list {
             width: 100%;
-            /* background-color: #7300ff;
-    /* Change this to the color you want for the container */
+            background-image: url('/static/images/jobslist_bg.svg');
+
+            /* background-color: #7300ff;*/
             height: calc(100vh - 150px);
             overflow-y: auto;
             padding: 20px;
@@ -77,14 +78,19 @@
             top: 56px;
             left: 0;
             right: 0;
-            background-image: radial-gradient(circle, #b700ff, #3776ff);
+            background-image: url('/static/images/search_container_bg.svg'), radial-gradient(circle, #b700ff, #3776ff);
+            background-size: cover;
+            background-repeat: no-repeat;
             z-index: 1000;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
             padding: 10px;
-            /* border-bottom: 1px solid #ccc; */
+            min-height: 80px;
+            /* Set a minimum height */
+            height: 10vh;
+            /* Flexible height based on viewport height */
         }
 
         #search-container input[type="text"] {
@@ -102,9 +108,21 @@
 
         #search-button {
             padding: 3px 20px;
+            background-image: radial-gradient(circle, #b700ff, #3776ff);
+            color: white;
             font-size: 14px;
             border-radius: 15px;
             margin-left: 5px;
+            background-image: linear-gradient(to right, blue, purple);
+            /* Gradient background */
+            color: white;
+            /* White text */
+            border: 20x;
+            border-color: white;
+            border-radius: 10px;
+            /* Rounded corners */
+            box-shadow: 2px 4px 8px rgba(255, 255, 255, 0.9);
+            cursor: pointer;
         }
 
         #main-content {
@@ -141,6 +159,7 @@
                 margin-top: 20px;
                 margin-left: 20px;
                 margin-right: 20px;
+                background-image: url('/static/images/job_details_bg (1).svg');
                 border-radius: 5px;
                 background-color: white;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -159,6 +178,10 @@
         @media screen and (max-width: 767px) {
             #search-container {
                 top: 56px;
+                min-height: 100px;
+                /* Larger minimum height for smaller screens */
+                height: 15vh;
+                /* Adjust the flexible height */
             }
 
             #jobs-list {
@@ -374,6 +397,21 @@
                 transform: rotate(360deg);
             }
         }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #000000;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+            width: 100%;
+        }
+
+        .material-symbols-outlined.icon-shadow:hover {
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -519,7 +557,6 @@
                     return;
                 }
 
-                // Data to send to the backend
                 const postData = {
                     jobId: jobId,
                     job_title: jobTitle,
@@ -529,47 +566,45 @@
                 };
 
                 try {
-                    const coverLetterPromise = fetch('/job-details-coverletter', {
+                    // Generate Cover Letter
+                    const coverLetterResponse = await fetch('/job-details-coverletter', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(postData)
                     });
-
-                    const resumePromise = fetch('/job-details-resume', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(postData)
-                    });
-
-                    const [coverLetterResponse, resumeResponse] = await Promise.all([coverLetterPromise, resumePromise]);
-
-                    if (coverLetterResponse.status === 401 || resumeResponse.status === 401) {
-                        alert("Your session has expired, please log in again.");
-                        return;
-                    }
-
-                    // Check if the response is OK and in JSON format
-                    const isJSON = (response) => response.headers.get('content-type')?.includes('application/json');
-                    if (!isJSON(coverLetterResponse) || !isJSON(resumeResponse)) {
-                        console.error('Response is not in JSON format');
-                        alert('Sign in to your myCareerMax account in order to generate custom documents.');
-                        return;
-                    }
 
                     const coverLetterData = await coverLetterResponse.json();
-                    const resumeData = await resumeResponse.json();
-
-                    if (coverLetterData.message === "Cover letter generated and saved successfully" &&
-                        resumeData.message === "Resume generated and saved successfully") {
-                        localStorage.setItem(`documentGenerated_${jobId}`, 'true');
-                        console.log('Document generation status stored in local storage for job ID:', jobId);
-
+                    if (coverLetterData.message === "Cover letter generated and saved successfully") {
+                        console.log('Cover letter generated:', coverLetterData);
+                        // Additional logic to display cover letter response
                         if (jobTitleElement) {
                             jobTitleElement.click();
                         }
                     } else {
-                        console.error('Failed to generate documents:', coverLetterData, resumeData);
+                        console.error('Failed to generate cover letter:', coverLetterData);
                     }
+
+                    // Generate Resume
+                    const resumeResponse = await fetch('/job-details-resume', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(postData)
+                    });
+
+                    const resumeData = await resumeResponse.json();
+                    if (resumeData.message === "Resume generated and saved successfully") {
+                        console.log('Resume generated:', resumeData);
+                        // Additional logic to display resume response
+                        if (jobTitleElement) {
+                            jobTitleElement.click();
+                        }
+                    } else {
+                        console.error('Failed to generate resume:', resumeData);
+                    }
+
+                    localStorage.setItem(`documentGenerated_${jobId}`, 'true');
+                    console.log('Document generation status stored in local storage for job ID:', jobId);
+
                 } catch (error) {
                     console.error('Error generating documents:', error);
                     alert('An error occurred while generating documents. Please check the console for more details.');
@@ -577,8 +612,6 @@
                     document.querySelector('.spinner').style.display = 'none';
                 }
             }
-
-
 
 
             function getUserIdFromSession() {
@@ -1000,12 +1033,16 @@
                         // Populate the selectedJobDetails with detailed information
                         selectedJobDetails.innerHTML = `
         <span class="material-symbols-outlined close-button">close</span>
-        <div class="job-details">
-            <h2><strong>${job.job_title}</strong></h2>
-            <div class="employer-and-location-container">
-                <p style="margin-bottom: 1px; color: gray;"><strong>${job.employer_name}</strong></p> 
-                <p style="margin-top: 1px; color: gray;">${job.job_city || 'Not specified'}</p>
-            </div>
+<div class="job-details">
+    <h2 style="margin-top: 10px; text-align: center;"><strong>${job.job_title}</strong></h2>
+    <div class="employer-and-location-container">
+        <p style="margin-bottom: 1px; color: black; text-align: center;"><strong>${job.employer_name}</strong></p> 
+        <p style="margin-top: 1px; color: black; text-align: center;">${job.job_city || 'Not specified'}</p>
+    </div>
+</div>
+
+
+
             <hr>
             <div id="generate-docs-button-container"></div>
             <hr>
@@ -1023,7 +1060,7 @@
             <hr>
             <div class="highlights-title-subtitle-container">
                 <p style="margin-bottom: 1px; color: black; font-size: 18px;"><strong>Job highlights</strong></p>
-                <p style="margin-top: 1px; color: gray; font-size: 14px;">Identified from the original job post</p>
+                <p style="margin-top: 1px; color: black; font-size: 14px;">Identified from the original job post</p>
             </div>
             ${Object.entries(job.job_highlights).map(([key, value]) => `
                 <strong>${key}:</strong>
@@ -1098,9 +1135,12 @@
             </td>
             ${docxDownloadLink}
             <td>
-                <button class="btn btn-danger" onclick="deleteDocument(${doc.id})">Delete</button>
+                <span class="material-symbols-outlined icon-shadow" '
+                    onclick="deleteDocument(${doc.id})">
+                    Delete
+                </span>
             </td>
-        </tr>
+                    </tr>
     `;
                             });
 

@@ -1,398 +1,487 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Builder | myCareerMax</title>
-    <!-- Fonts -->
+    <title>Resume Builder</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <!-- Popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-
-    <!-- Bootstrap -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Quill -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-
-
-
+    <link href="https://fonts.googleapis.com/css2?family=Clicker+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Spinner styles */
-        .custom-spinner {
-            width: 5rem;
-            height: 5rem;
-            border-radius: 50%;
-            border: 8px solid transparent;
-            border-top-color: #0022ff;
-            border-bottom-color: #0022ff;
-            border-right-color: #ae00ff;
-            border-left-color: #ae00ff;
-            animation: spin 1s linear infinite;
+        .delete-project-btn {
+            background-color: red;
+            /* Red background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            margin-left: 8px;
         }
 
-        /* Spinner text */
-        .centered-spinner-text {
-            color: #ae00ff;
-            background-color: white;
-            font-weight: bold;
-            text-align: center;
-            white-space: nowrap;
+        .delete-project-btn:hover {
+            background-color: #a30000;
+            /* Darker red on hover */
         }
 
-        /* Centering container */
-        .centered-spinner-container {
+        .certifications-header {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
+            /* Align button to the top right */
+            margin-bottom: 10px;
+            /* Add some space between the button and certifications */
         }
 
-        /* Spinner wrapper */
-        #spinner-wrapper {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
+        .add-certification-button {
+            position: absolute;
+            top: 10px;
+            /* Adjust as needed */
+            right: 10px;
+            /* Adjust as needed */
+            border: none;
+            background-color: transparent;
+            /* Or any color you prefer */
+            cursor: pointer;
         }
 
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
+        #add-certification-button .material-symbols-outlined {
+            font-size: 24px;
+            /* Adjust size as needed */
+            color: #006400;
+            /* Or any color you prefer */
+        }
+
+        /* Add this CSS in your stylesheet or <style> tag */
+        .close-icon {
+            font-size: 16px;
+            /* Adjust the size as needed */
+            color: red;
+            cursor: pointer;
+        }
+
+        .close-icon:hover {
+            color: darkred;
+            /* Change the color on hover if desired */
+        }
+
+
+        .section-container {
+            background-color: #fff;
+            /* Example background color */
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+            overflow: auto
+        }
+
+        .section-container {
+            position: relative;
+            /* Required for absolute positioning of the button */
+        }
+
+        #add-new-project {
+            position: absolute;
+            top: 10px;
+            /* Adjust as needed */
+            right: 10px;
+            /* Adjust as needed */
+            border: none;
+            background-color: transparent;
+            /* Or any color you prefer */
+            cursor: pointer;
+        }
+
+        #add-new-project .material-symbols-outlined {
+            font-size: 24px;
+            /* Adjust size as needed */
+            color: #006400;
+            /* Or any color you prefer */
+        }
+
+
+        #add-new-education {
+            position: absolute;
+            top: 10px;
+            /* Adjust as needed */
+            right: 10px;
+            /* Adjust as needed */
+            border: none;
+            background-color: transparent;
+            /* Or any color you prefer */
+            cursor: pointer;
+        }
+
+        #add-new-education .material-symbols-outlined {
+            font-size: 24px;
+            /* Adjust size as needed */
+            color: #006400;
+            /* Or any color you prefer */
+        }
+
+
+        #add-new-personal-info {
+            position: absolute;
+            top: 10px;
+            /* Adjust as needed */
+            right: 10px;
+            /* Adjust as needed */
+            border: none;
+            background-color: transparent;
+            /* Or any color you prefer */
+            cursor: pointer;
+        }
+
+        #add-new-personal-info .material-symbols-outlined {
+            font-size: 24px;
+            /* Adjust size as needed */
+            color: #006400;
+            /* Or any color you prefer */
+        }
+
+        #add-new-experience {
+            position: absolute;
+            top: 10px;
+            /* Adjust as needed */
+            right: 10px;
+            /* Adjust as needed */
+            border: none;
+            background-color: transparent;
+            /* Or any color you prefer */
+            cursor: pointer;
+        }
+
+        #add-new-experience .material-symbols-outlined {
+            font-size: 24px;
+            /* Adjust size as needed */
+            color: #006400;
+            /* Or any color you prefer */
+        }
+
+
+        .side-container {
+            margin-top: 20px;
+            background-image: url('/static/images/resume_preview.svg');
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 825px;
+            overflow: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+            /* Add this line to allow text wrapping */
+        }
+
+
+        .main-container {
+            padding: 20px;
+            min-height: 900px;
+            border-radius: 10px;
+            background-image: url('/static/images/abstract_jobslist.svg');
+            /* Example fixed height */
+            overflow-y: auto;
+            margin-top: 20px;
+            /* Show scrollbar only when needed */
+            /* Additional styling (e.g., padding, margins) can be added as per your design needs */
         }
 
         body {
-            font-family: 'Prompt', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(120deg, #ffffff, #ffffff);
-            /* Correct property for gradient */
+            background-image: radial-gradient(circle, #b700ff, #3776ff)
         }
 
-        .navbar {
-            background-image: linear-gradient(120deg, #ae00ff, #0051ff);
-            background-size: cover;
-            background-attachment: fixed;
-        }
-
-
-        nav {
-            display: flex;
-            justify-content: center;
-            list-style: none;
-            padding: 0;
+        body {
+            font-size: 12px;
+            /* Base font size */
         }
 
         nav li {
             margin: 0 15px;
         }
 
-        nav a {
-            color: rgb(255, 255, 255);
-            text-decoration: none;
+        .section-toggle {
+            display: none;
         }
 
-        .custom-form-background {
-            background: linear-gradient(120deg, #6b9aff, #d06aff);
-            padding: 100px;
+        .section-label {
+            /* Style your label/header here */
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .section-content {
+            display: none;
+            /* additional styling for the content */
+        }
+
+        .section-toggle:checked+.section-label+.section-content {
+            display: block;
+        }
+
+        .submit-btn {
+            background-color: rgb(0, 21, 255);
+            /* Green background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
             border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
         }
 
-        /* Media query for small screens */
-        @media (max-width: 768px) {
-            .custom-form-background {
-                padding: 15px;
-                /* Adjust this value based on your preference */
-            }
+        .submit-btn:hover {
+            background-color: #000264;
+            /* Darker green on hover */
+        }
+
+        .submit-new-skills-btn {
+            background-color: rgb(0, 21, 255);
+            /* Green background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+        .delete-btn {
+            background-color: red;
+            /* Red background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            margin-left: 8px;
+        }
+
+        .delete-btn:hover {
+            background-color: #a30000;
+            /* Darker red on hover */
+        }
+
+        .add-summary-btn {
+            background-color: green;
+            /* Green background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+        .add-summary-btn:hover {
+            background-color: #006400;
+            /* Darker green on hover */
+        }
+
+        .add-new-skill-btn:hover {
+            background-color: #006400;
+            /* Darker green on hover */
+        }
+
+        .add-new-skill-btn {
+            background-color: green;
+            /* Green background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+
+        .add-bullet-exp {
+            background-color: green;
+            /* Green background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            padding: 2px 5px;
+            /* Padding around the text */
+            border-radius: 10px;
+            /* Rounded edges */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow for depth */
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+        .add-bullet-exp:hover {
+            background-color: #006400;
+            /* Darker green on hover */
+        }
+
+        .resume-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Center everything */
+        }
+
+        .mycareermax-resume-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-family: 'Clicker Script', cursive;
+            margin-right: 10px;
+            /* Add some space between text and icon */
+            color: white;
+            display: inline-block;
+            /* Ensure inline or inline-block */
+        }
+
+        .pdf-icon {
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+            display: inline-block;
+            /* Ensure inline or inline-block */
+        }
+
+
+        .preview-notice {
+            font-size: 14px;
+            /* Adjust as needed for readability */
+            border-radius: 5px;
+            line-height: 1.6;
+            /* Spacing between lines for better readability */
+            color: #ffffff;
+            /* Color of the text, choose a readable color */
+            margin-bottom: 20px;
+            /* Space before the resume preview starts */
+            margin-top: 20px;
+            font-family: 'Quicksand', sans-serif;
+            padding: 0 15px;
+            /* Padding on the sides */
+            box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.9);
+            /* Box shadow */
+            background-color: #6f6f6f;
+            /* Light gray background */
+            padding: 15px;
+            /* Add some padding around the text */
+            margin-bottom: 15px;
+            /* Add some margin at the bottom */
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
+            color: rgb(81, 0, 255)
+                /* Increase this value for larger size */
+        }
+
+        .view-resume-icon {
+            color: white;
+            cursor: pointer;
+            font-size: 80px;
+            display: block;
+            /* Make the icon a block element to center it */
+            margin: 0 auto;
+            /* Center the icon horizontally */
+            text-align: center;
+            /* Center the text inside the icon */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            /* Add shadow to the text */
         }
     </style>
-
-    <script>
-
-        function showSpinner() {
-            const spinnerWrapper = document.getElementById("spinner-wrapper");
-            spinnerWrapper.style.display = "block";
-        }
-
-        function hideSpinner() {
-            const spinnerWrapper = document.getElementById("spinner-wrapper");
-            spinnerWrapper.style.display = "none";
-        }
-
-        let workExperienceCount = 1;
-
-        function addWorkExperience() {
-            workExperienceCount++;
-            const container = document.getElementById("workExperienceContainer");
-            const newFields = document.createElement('div');
-            newFields.innerHTML = `
-                <div class="mb-3">
-                    <label>Job Title:</label>
-                    <input type="text" class="form-control" name="job_title${workExperienceCount}">
-                </div>
-                <div class="mb-3">
-                    <label>Company:</label>
-                    <input type="text" class="form-control" name="company${workExperienceCount}">
-                </div>
-                <div class="mb-3">
-                    <label>Date:</label>
-                    <input type="text" class="form-control" name="date${workExperienceCount}">
-                </div>
-                <div class="mb-3">
-                    <label>Responsibilities:</label>
-                    <textarea class="form-control" name="responsibilities${workExperienceCount}" rows="4"></textarea>
-                </div>`;
-            container.appendChild(newFields);
-        }
-
-        function removeWorkExperience() {
-            if (workExperienceCount > 1) {
-                const container = document.getElementById("workExperienceContainer");
-                container.removeChild(container.lastChild);
-                workExperienceCount--;
-            }
-        }
-
-        let educationCount = 1;
-
-        function addEducation() {
-            educationCount++;
-            const container = document.getElementById("educationContainer");
-            const newFields = document.createElement('div');
-            newFields.id = `educationSet${educationCount}`;
-            newFields.innerHTML = `
-        <div class="mb-3">
-            <label>School Name:</label>
-            <input type="text" class="form-control" name="school${educationCount}">
-        </div>
-        <div class="mb-3">
-            <label>City:</label>
-            <input type="text" class="form-control" name="city${educationCount}">
-        </div>
-        <div class="mb-3">
-            <label>Degree:</label>
-            <input type="text" class="form-control" name="degree${educationCount}">
-        </div>
-        <div class="mb-3">
-            <label>Major:</label>
-            <input type="text" class="form-control" name="major${educationCount}">
-        </div>
-        <div class="mb-3">
-            <label>Dates Attended:</label>
-            <input type="text" class="form-control" name="dates${educationCount}">
-        </div>`;
-            container.appendChild(newFields);
-            const addButton = document.getElementById("addEducationButton");
-            const removeButton = document.getElementById("removeEducationButton");
-            container.appendChild(addButton);
-            container.appendChild(removeButton);
-        }
-
-        function removeEducation() {
-            if (educationCount > 1) {
-                const container = document.getElementById(`educationSet${educationCount}`);
-                container.remove();
-                educationCount--;
-            }
-        }
-
-        // COLLECT SECTION FIELD DATA //
-
-
-
-        function collectDataAndSubmitForm(type) {
-            // Show the spinner when the button is clicked
-            showSpinner();
-
-            // Initialize an array to hold work experience data
-            const workExperienceData = [];
-            for (let i = 1; i <= workExperienceCount; i++) {
-                const jobTitle = document.getElementsByName(`job_title${i}`)[0].value;
-                const company = document.getElementsByName(`company${i}`)[0].value;
-                const date = document.getElementsByName(`date${i}`)[0].value;
-                const responsibilities = document.getElementsByName(`responsibilities${i}`)[0].value;
-                workExperienceData.push({ jobTitle, company, date, responsibilities });
-            }
-
-            // Initialize an array to hold education data
-            const educationData = [];
-            for (let i = 1; i <= educationCount; i++) {
-                const school = document.getElementsByName(`school${i}`)[0].value;
-                const city = document.getElementsByName(`city${i}`)[0].value;
-                const degree = document.getElementsByName(`degree${i}`)[0].value;
-                const major = document.getElementsByName(`major${i}`)[0].value;
-                const dates = document.getElementsByName(`dates${i}`)[0].value;
-                educationData.push({ school, city, degree, major, dates });
-            }
-
-            // Collect personal information data
-            const personalInfoData = {
-                fullName: document.getElementsByName("full_name")[0].value,
-                email: document.getElementsByName("email")[0].value,
-                phone: document.getElementsByName("phone")[0].value,
-                cityState: document.getElementsByName("city_state")[0].value,
-                linkedin: document.getElementsByName("linkedin")[0].value,
-                website: document.getElementsByName("website")[0].value
-            };
-
-            // Collect summary, skills, and keywords
-            const summary = document.getElementsByName("summary")[0].value;
-            const skills = document.getElementsByName("skills")[0].value;
-            const keywords = document.getElementsByName("keywords")[0].value;
-
-            // Create the payload object
-            const payload = {
-                type: type,
-                personalinfo: personalInfoData,
-                summary,
-                skills,
-                keywords,
-                workexp: workExperienceData,
-                education: educationData
-            };
-
-            // Initialize the Quill editor if not already done
-            if (window.quill === undefined) {
-                window.quill = new Quill('#quillEditor', {
-                    theme: 'snow'
-                });
-            }
-
-            // Make the fetch request
-            fetch("/resume-builder", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            }).then(response => response.json())
-                .then(data => {
-                    // Hide the spinner when data is received
-                    hideSpinner();
-
-                    // Display the resume or error message
-                    if (data.resume) {
-                        // Update this line to set the content of the Quill editor
-                        quill.setContents([{ insert: data.resume }]);
-
-                        // Make the Quill editor and the buttons visible
-                        document.getElementById("quillEditor").style.visibility = 'visible';
-                        document.getElementById("copyButton").style.visibility = "visible";
-                        document.getElementById("downloadButton").style.visibility = 'visible';
-                        document.getElementById("saveToDashboardBtn").style.visibility = 'visible';
-                    } else {
-                        document.getElementById("apiResponse").innerHTML = `<p>Error: ${data.error}</p>`;
-                    }
-                }).catch(() => {
-                    // Hide the spinner if there is an error
-                    hideSpinner();
-                });
-        }
-
-        function downloadAsTxt() {
-            // Make sure to initialize quill beforehand or check its existence
-            if (typeof quill !== 'undefined') {
-                const textToSave = quill.getText();  // Using Quill's API to get text
-                const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
-                const link = document.createElement("a");
-                link.href = window.URL.createObjectURL(blob);
-                link.download = "resume.txt";
-                link.click();
-            } else {
-                console.error("Quill editor is not initialized.");
-            }
-        }
-
-        function saveDocument() {
-            const userId = document.getElementById("userId").value;
-            const documentName = 'Resume (Resume Builder)';
-            const documentType = 'Resume (Resume Builder)';
-
-            // Initialize documentContent based on the available source (Quill editor or a regular textarea)
-            let documentContent;
-            if (typeof quill !== 'undefined') {
-                documentContent = quill.getText();  // Using Quill's API to get text
-            } else {
-                documentContent = document.getElementById("apiResponseTextArea").value;  // Directly read from textarea
-            }
-
-            fetch('/save_document', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: userId,
-                    document_name: documentName,
-                    document_content: documentContent,
-                    document_type: documentType,
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message === "Document saved successfully. You may view your Saved Documents on your Dashboard") {
-                        alert("Resume saved successfully! You may view and download your Saved Resume's from your Dashboard");
-                    } else {
-                        alert("You must be logged in to access your Dashboard.");
-                    }
-                })
-                .catch(error => {
-                    console.error("An error occurred:", error);
-                });
-        }
-
-
-
-        function copyToClipboard() {
-            // Make sure to initialize quill beforehand or check its existence
-            if (typeof quill !== 'undefined') {
-                const textToCopy = quill.getText();  // Using Quill's API to get text
-                const textArea = document.createElement("textarea");
-                textArea.value = textToCopy;
-                document.body.appendChild(textArea);
-                textArea.select();
-                textArea.setSelectionRange(0, 99999); // For mobile devices
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-                alert("Copied to clipboard!");
-            } else {
-                console.error("Quill editor is not initialized.");
-            }
-        }
-    </script>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-71KL2GKNB6"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-71KL2GKNB6');
-</script>
 
 <body>
     <input type="hidden" id="userId" value="{{ user_id }}">
 
     <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Retrieve the user_id value from the hidden input
+            const userId = document.getElementById("userId").value;
 
-        $(document).ready(function () {
             console.log("Fetching username...");
-            $.get("/get-username", function (response) {
+            $.get(`/get-username/${userId}`, function (response) {
                 console.log("Username response:", response);
                 if (response.success) {
                     const usernamePlaceholder = document.getElementById("username-placeholder");
@@ -401,12 +490,11 @@
                     console.error('Error fetching username:', response.error);
                 }
             });
-
         });
-    </script>
 
+    </script>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #ffffff;">myCareerMax.com</a>
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
         <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
             data-target="#navbarNav" data-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
@@ -416,7 +504,7 @@
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
-                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #ffffff;">
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
                         <span id="username-placeholder">Login Here</span>
                     </a>
                     <div aria-labelledby="navbarDropdown" class="dropdown-menu">
@@ -428,18 +516,18 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #ffffff;">myDashboard</a>
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/search" style="color: #ffffff;">AI Job Search</a>
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/tools" style="color: #ffffff;">Create✨</a>
+                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
                 </li>
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
-                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #ffffff;">
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
                         Tools
                     </a>
                     <div aria-labelledby="toolsDropdown" class="dropdown-menu">
@@ -449,278 +537,1093 @@
                 </li>
                 <!-- New link for CareerBot -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerbot" style="color: #ffffff;">Max</a>
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
                 </li>
                 <!-- End of Dropdown for username -->
             </ul>
         </div>
     </nav>
-
-
-    <!-- Spinner Wrapper -->
-    <div id="spinner-wrapper" style="display: none;">
-        <!-- Spinner and Text -->
-        <div id="spinner" class="centered-spinner-container">
-            <div class="custom-spinner"></div>
-            <div class="centered-spinner-text">Creating Your Resume</div>
-        </div>
-    </div>
-
-
-
-    <div class="container">
-        <div style="text-align:center; margin-top: 40px; display: flex; justify-content: center;">
-            <!-- Wrapper div with default width and height -->
-            <div style="width: 300px; height: 150px;">
-                <!-- Image with Bootstrap's img-fluid class -->
-                <img src="{{ url_for('static', filename='images/createresume.png') }}" alt="Your Logo"
-                    class="img-fluid" />
-            </div>
-        </div>
-    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Main Content Container -->
+            <div class="col-md-4">
+                <div class="main-container" style="height: 500px; overflow-y: auto;">
+                    <div>
+                        {% if current_user.is_authenticated %}
+                        <div>
+                            <div class="resume-header">
+                                <div class="mycareermax-resume-title">
+                                    <h2>myCareerMax Resume</h2>
+                                </div>
+                            </div>
+                        </div>
 
 
 
+                        <!-------------------------PERSONAL INFORMATION ----------------------->
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-personal-info" class="section-toggle">
+                            <label for="toggle-personal-info" class="section-label"><span
+                                    class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Personal Information</label>
+                            <div class="section-content">
+                                <div id="personal-info-container">
+                                    <!-- Personal Information will be loaded here -->
+                                </div>
+                                <button id="add-new-personal-info"><span class="material-symbols-outlined">
+                                        add
+                                    </span></button>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    loadPersonalInfo();
+                                    document.getElementById('add-new-personal-info').addEventListener('click', addNewPersonalInfo);
+                                });
+
+                                function loadPersonalInfo() {
+                                    fetch('/personal_information')  // Update to use '/personal_information'
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const container = document.getElementById('personal-info-container');
+                                            container.innerHTML = '';
+                                            data.forEach(personalInfo => {
+                                                const personalInfoDiv = document.createElement('div');
+                                                personalInfoDiv.className = 'personal-info';
+                                                personalInfoDiv.id = 'personal-info-' + personalInfo.id;
+                                                personalInfoDiv.innerHTML = `
+                                                    <p>${personalInfo.full_name}</p>
+                                                    <p>Email: ${personalInfo.email}</p>
+                                                    <p>Contact Number: ${personalInfo.contact_number}</p>
+                                                    <p>City of Residence: ${personalInfo.city_of_residence}</p>
+                                                    <p>State of Residence: ${personalInfo.state_of_residence}</p>
+                                                    <p>Website: ${personalInfo.website}</p>
+                                                    <p>GitHub: ${personalInfo.github}</p>
+                                                    <p>LinkedIn: ${personalInfo.linkedin}</p>
+    <button class="delete-btn" onclick="deletePersonalInfo(${personalInfo.id})">
+        Delete Personal Information
+    </button>                                                `;
+                                                container.appendChild(personalInfoDiv);
+                                            });
+                                        });
+                                }
+
+                                function addNewPersonalInfo() {
+                                    const container = document.getElementById('personal-info-container');
+                                    const newPersonalInfoDiv = document.createElement('div');
+                                    newPersonalInfoDiv.className = 'personal-info';
+                                    newPersonalInfoDiv.innerHTML = `
+                                            <input type="text" id="new-full-name" placeholder="Full Name">
+                                            <input type="text" id="new-email" placeholder="Email">
+                                            <input type="text" id="new-contact-number" placeholder="Contact Number">
+                                            <input type="text" id="new-city-of-residence" placeholder="City of Residence">
+                                            <input type="text" id="new-state-of-residence" placeholder="State of Residence">
+                                            <input type="text" id="new-website" placeholder="Website">
+                                            <input type="text" id="new-github" placeholder="GitHub">
+                                            <input type="text" id="new-linkedin" placeholder="LinkedIn">
+<button class="submit-btn" onclick="submitNewPersonalInfo()">
+    Submit New Personal Information
+</button>
+                                        `;
+                                    container.appendChild(newPersonalInfoDiv);
+                                }
+
+                                function submitNewPersonalInfo() {
+                                    const fullName = document.getElementById('new-full-name').value;
+                                    const email = document.getElementById('new-email').value;
+                                    const contactNumber = document.getElementById('new-contact-number').value;
+                                    const cityOfResidence = document.getElementById('new-city-of-residence').value;
+                                    const stateOfResidence = document.getElementById('new-state-of-residence').value;
+                                    const website = document.getElementById('new-website').value;
+                                    const github = document.getElementById('new-github').value;
+                                    const linkedin = document.getElementById('new-linkedin').value;
+
+                                    const data = {
+                                        user_id: '{{ user_id }}', // Ensure this is correctly populated
+                                        full_name: fullName,
+                                        email: email,
+                                        contact_number: contactNumber,
+                                        city_of_residence: cityOfResidence,
+                                        state_of_residence: stateOfResidence,
+                                        website: website,
+                                        github: github,
+                                        linkedin: linkedin
+                                    };
+
+                                    fetch('/personal_information', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            // Assuming loadPersonalInfo updates the personal info section
+                                            loadPersonalInfo();
+                                            // Update the entire side-container with the latest resume data
+                                            updateSideContainer();
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
 
 
-    <!-- Collapsible Introductory Text -->
-    <div class="text-center"> <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#introText"
-            aria-expanded="false" aria-controls="introText">
-            👉 Click here to learn how to use our New Resume Builder!
-        </button>
+                                function deletePersonalInfo(personalInfoId) {
+                                    fetch(`/personal_information/${personalInfoId}`, { method: 'DELETE' })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json(); // Ensure your server is returning JSON here
+                                        })
+                                        .then(data => {
+                                            loadPersonalInfo();
+                                            updateSideContainer();
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
 
-        <div class="collapse text-center" id="introText">
-            <div class="card card-body text-left">
-                <h3 class="text-center">Welcome to our New Resume Builder!</h3>
-                <p>Navigating today's job market is challenging, but we're here to give you the edge you need. Our
-                    tool is
-                    designed not just to build your resume, but to optimize it for Applicant Tracking Systems (ATS).
-                    Here's
-                    how to
-                    get started:</p>
+                                function updateSideContainer() {
+                                    fetch('/update-resume') // Corrected endpoint
+                                        .then(response => response.text())
+                                        .then(html => {
+                                            document.querySelector('.side-container').innerHTML = html;
+                                        })
+                                        .catch(error => {
+                                            console.error('Error updating side container:', error);
+                                        });
+                                }
 
-                <h4 class="text-center">How It Works</h4>
-                <ol>
-                    <li><strong>Personal Information</strong>: Fill in your basic details like name, contact
-                        information,
-                        and online
-                        profiles.</li>
-                    <li><strong>Summary</strong>: Craft a compelling summary that encapsulates your career.</li>
-                    <li><strong>Work Experience</strong>: List your professional history including responsibilites.
-                        Start with your most recent/current position and work backwards.
-                    <li><strong>Education</strong>: Add your educational background, again starting with your most
-                        recent/current school and working backwards.
-                    </li>
-                    <li><strong>Skills</strong>: Detail your professional skills that make you the right fit for the
-                        job.
-                    </li>
-                    <li><strong>✨Keywords</strong>: This feature is only available when you use the AI-Enhanced
-                        option to build your resume. Input specific keywords that you wish to highlight and have
-                        them auto-integrated seamlessly throughout your resume.</li>
-                </ol>
 
-                <h4 class="text-center">Final Steps</h4>
-                <ul>
-                    <li>Click <strong>Build Resume</strong> to generate an ATS-optimized resume with your provided
-                        details.</li>
-                    <li>Or, go a step further with our <strong>AI-Enhanced Resume Builder</strong> for a
-                        resume
-                        that's not
-                        just optimized but enhanced with AI-driven content.</li>
-                </ul>
+                            </script>
+                        </div>
 
-                <h4 class="text-center">Why Choose the AI-Enhanced Option?</h4>
-                <ul>
-                    <li><strong>ATS-Friendly</strong>: Before your resume ever reaches human eyes, it's screened by
-                        AI systems. Level the playing field with our
-                        <strong>ChatGPT-4</strong>-driven tool, specifically engineered to understand ATS algorithms
-                        and elevate your
-                        resume's ranking. Here are just 2 examples of specific sentence structure and bullet
-                        point
-                        models that are used.
+                        <!-------------------------SUMMARY ----------------------->
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-summary" class="section-toggle">
+                            <label for="toggle-summary" class="section-label"><span class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Summary</label>
+                            <div class="section-content">
+                                <div id="summaries">
+                                    <!-- Existing summaries will be loaded here -->
+                                </div>
+                                <button class="add-summary-btn" id="add-summary-button">Add Summary</button>
 
-                        <p><strong>Summary</strong> sentence structure: <strong>[Soft
-                                Skill] +
-                                [Most
-                                Recent
-                                Job Title]</strong> who is passionate about <strong>[Your Stance on the
-                                Industry]</strong>
-                        </p>
-                        <p><strong>Work Experience</strong> bullet point model:
-                            <strong>[Action
-                                Verb] +
-                                [Cause] +
-                                [Effect] + [Measurable Outcome]</strong>
-                        </p>
+                                <form id="add-summary-form" style="display: none;">
+                                    <textarea id="summary-text" placeholder="Enter your summary"></textarea>
+                                    <button type="submit" class="submit-btn">Submit</button>
+                                </form>
+                            </div>
 
-                    </li>
-                    <li><strong>Enhanced Content</strong>: Benefit from these proven sentence structures that
-                        recruiters
-                        love, among many others.
-                    </li>
-                    <li><strong>Keyword Integration</strong>: Your provided keywords will be seamlessly woven into
-                        your
-                        resume,
-                        boosting its relevance.</li>
-                </ul>
-                <h4 class="text-center">Already have a resume and want to see your ATS-Friendliness score? Check out
-                    our Resume Scanner
-                    <a href="/resume-enhancer" class="text-info">HERE</a>
-                </h4>
-                <h4 class="text-center">Need a Cover Letter to go along with your newly enhanced resume? Let us take
-                    care of that for you. Click
-                    <a href="/cover-letter-generator" class="text-info"> HERE </a> to create your personalized,
-                    AI-generated, Cover Letter.
-                </h4>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    loadSummaries();
+                                    document.getElementById('add-summary-button').addEventListener('click', toggleAddSummaryForm);
 
-            </div>
-        </div>
-    </div>
+                                    // Add event listener for the form submission
+                                    document.getElementById('add-summary-form').addEventListener('submit', function (event) {
+                                        event.preventDefault();
+                                        addOrUpdateSummary();
+                                    });
+                                });
 
-    <div class="container">
-        <form class="custom-form-background" method="post">
-            <!-- Personal Information -->
-            <div class="mb-3">
-                <label class="form-label"><strong>PERSONAL INFORMATION</strong></label>
-                <div class="row">
-                    <!-- Each of these divs will take up 6 columns on medium to large screens and 12 columns on small screens -->
-                    <div class="col-12 col-md-6 mb-3">
-                        <label>Full Name:</label>
-                        <input class="form-control" name="full_name" type="text" />
-                    </div>
-                    <div class="col-12 col-md-6 mb-3">
-                        <label>Email:</label>
-                        <input class="form-control" name="email" type="text" />
-                    </div>
-                    <div class="col-12 col-md-6 mb-3">
-                        <label>Phone Number:</label>
-                        <input class="form-control" name="phone" type="text" />
-                    </div>
-                    <div class="col-12 col-md-6 mb-3">
-                        <label>City, State:</label>
-                        <input class="form-control" name="city_state" type="text" />
-                    </div>
-                    <div class="col-12 col-md-6 mb-3">
-                        <label>LinkedIn Profile:</label>
-                        <input class="form-control" name="linkedin" type="text" />
-                    </div>
-                    <div class="col-12 col-md-6 mb-3">
-                        <label>Website:</label>
-                        <input class="form-control" name="website" type="text" />
+                                // Function to load summaries from the backend
+                                function loadSummaries() {
+                                    fetch('/summary?user_id={{ user_id }}')
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const summariesContainer = document.getElementById('summaries');
+                                            summariesContainer.innerHTML = '';
+
+                                            if (data.length === 0) {
+                                                // If no summaries exist, show the add-summary form
+                                                toggleAddSummaryForm();
+                                            }
+
+                                            data.forEach(summary => {
+                                                const summaryDiv = document.createElement('div');
+                                                summaryDiv.id = `summary-${summary.id}`; // Set a unique ID for each summary
+                                                summaryDiv.innerHTML = `
+                                                                <p>${summary.summary_text}</p>
+<button class="delete-btn" onclick="deleteSummary(${summary.id})">Delete</button>
+                                                            `;
+                                                summariesContainer.appendChild(summaryDiv);
+                                            });
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                                // Function to toggle the add-summary form visibility
+                                function toggleAddSummaryForm() {
+                                    const addSummaryForm = document.getElementById('add-summary-form');
+                                    const addSummaryButton = document.getElementById('add-summary-button');
+
+                                    if (addSummaryForm.style.display === 'none') {
+                                        addSummaryForm.style.display = 'block';
+                                        addSummaryButton.style.display = 'none';
+                                    } else {
+                                        addSummaryForm.style.display = 'none';
+                                        addSummaryButton.style.display = 'block';
+                                    }
+                                }
+
+                                function addOrUpdateSummary() {
+                                    const summaryText = document.getElementById('summary-text').value;
+
+                                    const data = {
+                                        user_id: '{{ user_id }}',  // Ensure this is correctly populated
+                                        summary_text: summaryText
+                                    };
+
+                                    fetch('/summary', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            console.log('Summary added/updated:', data);
+                                            loadSummaries(); // Reload the summaries after adding/updating
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+
+                                // Function to update a summary
+                                function updateSummary(summaryId, updatedSummaryText) {
+                                    const data = {
+                                        summary_text: updatedSummaryText
+                                    };
+
+                                    fetch(`/summary/${summaryId}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadSummaries(); // Reload the summaries after updating
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+
+                                // Function to delete a summary
+                                function deleteSummary(summaryId) {
+                                    fetch(`/summary/${summaryId}`, {
+                                        method: 'DELETE'
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadSummaries(); // Reload the summaries after deleting
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                            </script>
+                        </div>
+
+
+                        <!-------------------------WORK EXPERIENCE ----------------------->
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-work-experience" class="section-toggle">
+                            <label for="toggle-work-experience" class="section-label"><span
+                                    class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Work Experience</label>
+                            <div class="section-content">
+                                <div id="work-experience-container">
+                                    <!-- Work experiences will be loaded here -->
+                                </div>
+                                <div>
+                                    <button id="add-new-experience"><span class="material-symbols-outlined">
+                                            add
+                                        </span></button>
+                                </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        loadWorkExperiences();
+                                        document.getElementById('add-new-experience').addEventListener('click', addNewExperience);
+                                    });
+
+                                    function loadWorkExperiences() {
+                                        fetch('/work-experience')
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                const container = document.getElementById('work-experience-container');
+                                                container.innerHTML = '';
+                                                data.forEach(exp => {
+                                                    const expDiv = document.createElement('div');
+                                                    expDiv.className = 'work-experience';
+                                                    expDiv.id = 'work-exp-' + exp.id;
+                                                    expDiv.innerHTML = `
+                            <p>${exp.job_title} at ${exp.company}</p>
+                            <p>From: ${exp.start_date} To: ${exp.end_date}</p>
+<ul id="bullet-points-${exp.id}">
+    ${exp.bullet_points.map(bp => `
+        <li class="bullet-point">
+            ${bp.text} <span class="material-symbols-outlined close-icon" onclick="deleteBulletPoint(${bp.id}, ${exp.id})">close</span>
+        </li>`
+                                                    ).join('')}
+</ul>
+<button class="add-bullet-exp" onclick="addBulletPoint(${exp.id})">Add Bullet</button>
+<button class="delete-btn" onclick="deleteWorkExperience(${exp.id})">Delete Experience</button>
+                        `;
+                                                    container.appendChild(expDiv);
+                                                });
+                                            });
+                                    }
+
+                                    function addNewExperience() {
+                                        const container = document.getElementById('work-experience-container');
+                                        const newExpDiv = document.createElement('div');
+                                        newExpDiv.className = 'work-experience';
+                                        newExpDiv.innerHTML = `
+        <input type="text" id="new-job-title" placeholder="Job Title">
+        <input type="text" id="new-company" placeholder="Company">
+        <input type="date" id="new-start-date">
+        <input type="date" id="new-end-date">
+        <input type="checkbox" id="current-job" onchange="toggleEndDate()"> Present
+<button class="submit-btn" onclick="submitNewExperience()">Submit New Experience</button>
+    `;
+                                        container.appendChild(newExpDiv);
+                                    }
+
+                                    function submitNewExperience() {
+                                        const jobTitle = document.getElementById('new-job-title').value;
+                                        const company = document.getElementById('new-company').value;
+                                        const startDate = document.getElementById('new-start-date').value;
+                                        const isCurrentJob = document.getElementById('current-job').checked;
+                                        let endDate = document.getElementById('new-end-date').value;
+
+                                        // If 'Present' is checked, set endDate to 'Present'
+                                        if (isCurrentJob) {
+                                            endDate = 'Present';
+                                        }
+
+                                        const data = {
+                                            user_id: '{{ user_id }}', // Ensure this is correctly populated
+                                            job_title: jobTitle,
+                                            company: company,
+                                            start_date: startDate,
+                                            end_date: endDate
+                                        };
+
+                                        fetch('/work-experience', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify(data)
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                loadWorkExperiences(); // Reload the work experiences after adding a new one
+                                                updateSideContainer(); // Update the entire side-container
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                    }
+
+                                    function addBulletPoint(experienceId) {
+                                        const bulletPointsContainer = document.getElementById(`bullet-points-${experienceId}`);
+                                        const inputLi = document.createElement('li');
+                                        inputLi.className = 'bullet-point';
+                                        inputLi.innerHTML = `
+                <input type="text" id="new-bullet-${experienceId}">
+               <button class="submit-btn" onclick="submitBulletPoint(${experienceId})">Submit Bullet</button>
+
+            `;
+                                        bulletPointsContainer.appendChild(inputLi);
+                                    }
+
+                                    function submitBulletPoint(experienceId) {
+                                        const bulletText = document.getElementById(`new-bullet-${experienceId}`).value;
+                                        const data = {
+                                            work_experience_id: experienceId,
+                                            text: bulletText
+                                        };
+
+                                        fetch('/bullet-point', {  // Update this endpoint if necessary
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify(data)
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                loadWorkExperiences(); // Reload the work experiences after adding a bullet point
+                                                updateSideContainer(); // Update the entire side-container
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                    }
+
+
+                                    function deleteWorkExperience(experienceId) {
+                                        fetch(`/work-experience/${experienceId}`, { method: 'DELETE' })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                loadWorkExperiences(); // Reload the work experiences after deleting
+                                                updateSideContainer(); // Update the entire side-container
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                    }
+
+
+                                    function deleteBulletPoint(bulletPointId, experienceId) {
+                                        fetch(`/bullet-point/${bulletPointId}`, { method: 'DELETE' })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                loadWorkExperiences(); // Reload the work experiences after deleting a bullet point
+                                                updateSideContainer(); // Update the entire side-container
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                    }
+
+
+                                    function toggleEndDate() {
+                                        const endDateInput = document.getElementById('new-end-date');
+                                        const isCurrentJob = document.getElementById('current-job').checked;
+
+                                        if (isCurrentJob) {
+                                            endDateInput.disabled = true;
+                                            endDateInput.value = ''; // Clear the end date if 'Present' is checked
+                                        } else {
+                                            endDateInput.disabled = false;
+                                        }
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                        <!-------------------------EDUCATION ----------------------->
+
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-education" class="section-toggle">
+                            <label for="toggle-education" class="section-label"><span class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Education</label>
+                            <div class="section-content">
+                                <div id="education-container">
+                                    <!-- Education will be loaded here -->
+                                </div>
+                                <button id="add-new-education">
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    loadEducation();
+                                    document.getElementById('add-new-education').addEventListener('click', addNewEducation);
+                                });
+
+                                function loadEducation() {
+                                    return new Promise((resolve, reject) => {
+                                        fetch('/education')
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                const container = document.getElementById('education-container');
+                                                container.innerHTML = '';
+                                                data.forEach(education => {
+                                                    const educationDiv = document.createElement('div');
+                                                    educationDiv.className = 'education';
+                                                    educationDiv.id = 'education-' + education.id;
+                                                    educationDiv.innerHTML = `
+                        <p>${education.degree}</p>
+                        <p>Institution: ${education.institution}</p>
+                        <p>Graduation Year: ${education.graduation_year}</p>
+                        <button class="delete-btn" onclick="deleteEducation(${education.id})">Delete Education</button>
+                    `;
+                                                    container.appendChild(educationDiv);
+                                                });
+                                                resolve(); // Resolve the promise after processing all data
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                                reject(error); // Reject the promise if there is an error
+                                            });
+                                    });
+                                }
+
+
+                                function addNewEducation() {
+                                    const container = document.getElementById('education-container');
+                                    const newEducationDiv = document.createElement('div');
+                                    newEducationDiv.className = 'education';
+                                    newEducationDiv.innerHTML = `
+                    <input type="text" id="new-degree" placeholder="Degree">
+                    <input type="text" id="new-institution" placeholder="Institution">
+                    <input type="text" id="new-graduation-year" placeholder="Graduation Year">
+<button class="submit-btn" onclick="submitNewEducation()">Submit New Education</button>
+                `;
+                                    container.appendChild(newEducationDiv);
+                                }
+
+                                function submitNewEducation() {
+                                    const degree = document.getElementById('new-degree').value;
+                                    const institution = document.getElementById('new-institution').value;
+                                    const graduationYear = document.getElementById('new-graduation-year').value;
+
+                                    const data = {
+                                        user_id: '{{ user_id }}', // Ensure this is correctly populated
+                                        degree: degree,
+                                        institution: institution,
+                                        graduation_year: graduationYear
+                                    };
+
+                                    fetch('/education', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadEducation(); // Reload the education section after adding a new entry
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+
+                                function deleteEducation(educationId) {
+                                    fetch(`/education/${educationId}`, { method: 'DELETE' })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadEducation(); // Reload the education section after deleting an entry
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                            </script>
+                        </div>
+                        <!-------------------------PROJECTS ----------------------->
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-projects" class="section-toggle">
+                            <label for="toggle-projects" class="section-label"><span class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Projects</label>
+                            <div class="section-content">
+                                <div id="project-container">
+                                    <!-- Projects will be loaded here -->
+                                </div>
+                                <button id="add-new-project">
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    loadProjects();
+                                    document.getElementById('add-new-project').addEventListener('click', addNewProject);
+                                });
+
+                                function loadProjects() {
+                                    return new Promise((resolve, reject) => {
+                                        fetch('/projects')
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                const container = document.getElementById('project-container');
+                                                container.innerHTML = '';
+                                                data.forEach(project => {
+                                                    const projectDiv = document.createElement('div');
+                                                    projectDiv.className = 'project';
+                                                    projectDiv.id = 'project-' + project.id;
+                                                    projectDiv.innerHTML = `
+                        <p>${project.project_name}</p>
+                        <p>Description: ${project.description}</p>
+                        <p>URL: ${project.url}</p>
+                        <ul id="bullet-points-${project.id}">
+                            ${project.bullet_points.map(bp => `
+                                <li class="bullet-point-project">
+                                    ${bp.text} 
+                                    <span class="material-symbols-outlined close-icon" onclick="deleteBulletPoint_project(${bp.id}, ${project.id})">close</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <button class="add-bullet-exp" onclick="addBulletPoint_project(${project.id})">Add Bullet</button>
+                        <button class="delete-project-btn" onclick="deleteProject_project(${project.id})">Delete Project</button>
+                    `;
+                                                    container.appendChild(projectDiv);
+                                                });
+                                                resolve(); // Resolve the promise after processing all data
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                                reject(error); // Reject the promise if there is an error
+                                            });
+                                    });
+                                }
+
+
+                                function addNewProject() {
+                                    const container = document.getElementById('project-container');
+                                    const newProjectDiv = document.createElement('div');
+                                    newProjectDiv.className = 'project';
+                                    newProjectDiv.innerHTML = `
+                <input type="text" id="new-project-name" placeholder="Project Name">
+                <input type="text" id="new-description" placeholder="Description">
+                <input type="text" id="new-url" placeholder="URL">
+<button class="submit-btn" onclick="submitNewProject()">Submit New Project</button>
+            `;
+                                    container.appendChild(newProjectDiv);
+                                }
+
+                                function submitNewProject() {
+                                    const projectName = document.getElementById('new-project-name').value;
+                                    const description = document.getElementById('new-description').value;
+                                    const url = document.getElementById('new-url').value;
+
+                                    const data = {
+                                        user_id: '{{ user_id }}', // Ensure this is correctly populated
+                                        project_name: projectName,
+                                        description: description,
+                                        url: url
+                                    };
+
+                                    fetch('/projects', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadProjects(); // Reload the projects section after adding a new project
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+
+                                // Modify the addBulletPoint_project function
+                                function addBulletPoint_project(projectId) {
+                                    const bulletPointsContainer = document.getElementById(`bullet-points-${projectId}`);
+                                    const inputLi = document.createElement('li');
+                                    inputLi.className = 'bullet-point-project'; // Use the correct class name
+                                    inputLi.innerHTML = `
+        <input type="text" id="new-bullet-${projectId}">
+    <button class="submit-btn" onclick="submitBulletPoint_project(${projectId})">Submit Bullet</button>
+    `;
+                                    bulletPointsContainer.appendChild(inputLi);
+                                }
+
+                                // Modify the submitBulletPoint_project function
+                                function submitBulletPoint_project(projectId) {
+                                    const bulletText = document.getElementById(`new-bullet-${projectId}`).value;
+                                    const data = {
+                                        project_id: projectId,
+                                        text: bulletText
+                                    };
+
+                                    fetch('/project-bullet-point', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadProjects(); // Reload the projects section after adding a bullet point
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+
+
+                                function deleteProject_project(projectId) {
+                                    fetch(`/projects/${projectId}`, { method: 'DELETE' })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadProjects(); // Reload the projects section after deleting a project
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                                function deleteBulletPoint_project(bulletPointId, projectId) {
+                                    fetch(`/project-bullet-point/${bulletPointId}`, { method: 'DELETE' })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadProjects(); // Reload the projects section after deleting a bullet point
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                            </script>
+                        </div>
+
+                        <!-------------------------CERTIFICATIONS ----------------------->
+
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-certifications" class="section-toggle">
+                            <label for="toggle-certifications" class="section-label"><span
+                                    class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Certifications</label>
+                            <div class="section-content">
+                                <div class="certifications-header">
+                                    <button id="add-new-certification" class="add-certification-button">
+                                        <span class="material-symbols-outlined">add</span>
+                                    </button>
+                                </div>
+                                <div id="certifications-container">
+                                    <!-- Certifications will be loaded here -->
+                                </div>
+                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    loadCertifications();
+                                    document.getElementById('add-new-certification').addEventListener('click', addNewCertification);
+                                });
+
+                                function loadCertifications() {
+                                    fetch('/certifications')  // Assuming you have a '/certifications' endpoint
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const container = document.getElementById('certifications-container');
+                                            container.innerHTML = '';
+                                            data.forEach(certification => {
+                                                const certificationDiv = document.createElement('div');
+                                                certificationDiv.className = 'certification';
+                                                certificationDiv.id = 'certification-' + certification.id;
+                                                certificationDiv.innerHTML = `
+                            <p>${certification.certification_name}</p>
+                            <p>Issued by: ${certification.issued_by}</p>
+                            <p>Issue Date: ${certification.issue_date}</p>
+                            <p>Expiration Date: ${certification.expiration_date}</p>
+                            <button class="delete-btn" onclick="deleteCertification(${certification.id})">Delete Certification</button>
+                        `;
+                                                container.appendChild(certificationDiv);
+                                            });
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                                function addNewCertification() {
+                                    const container = document.getElementById('certifications-container');
+                                    const newCertificationDiv = document.createElement('div');
+                                    newCertificationDiv.className = 'certification';
+                                    newCertificationDiv.innerHTML = `
+                <input type="text" id="new-certification-name" placeholder="Certification Name">
+                <input type="text" id="new-issued-by" placeholder="Issued by">
+                <input type="date" id="new-issue-date" placeholder="Issue Date">
+                <input type="date" id="new-expiration-date" placeholder="Expiration Date">
+<button class="submit-btn" onclick="submitNewCertification()">Submit New Certification</button>
+            `;
+                                    container.appendChild(newCertificationDiv);
+                                }
+
+                                function submitNewCertification() {
+                                    const certificationName = document.getElementById('new-certification-name').value;
+                                    const issuedBy = document.getElementById('new-issued-by').value;
+                                    const issueDate = document.getElementById('new-issue-date').value;
+                                    const expirationDate = document.getElementById('new-expiration-date').value;
+
+                                    const data = {
+                                        user_id: '{{ user_id }}', // Ensure this is correctly populated
+                                        certification_name: certificationName,
+                                        issued_by: issuedBy,
+                                        issue_date: issueDate,
+                                        expiration_date: expirationDate
+                                    };
+
+                                    fetch('/certifications', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadCertifications(); // Reload the certifications section
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+
+                                function deleteCertification(certificationId) {
+                                    fetch(`/certifications/${certificationId}`, { method: 'DELETE' })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            loadCertifications(); // Reload the certifications section
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                            </script>
+                        </div>
+
+
+                        <!-------------------------SKILLS ----------------------->
+                        <div class="section-container">
+                            <input type="checkbox" id="toggle-skills" class="section-toggle">
+                            <label for="toggle-skills" class="section-label"><span class="material-symbols-outlined">
+                                    unfold_more
+                                </span>Skills</label>
+                            <div class="section-content">
+                                <div id="skills-container">
+                                    <!-- Skills will be loaded here -->
+                                </div>
+                                <button class="add-new-skill-btn" id="add-new-skill">Add New Skill</button>
+                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    loadSkills();
+                                    document.getElementById('add-new-skill').addEventListener('click', addNewSkill);
+                                });
+
+                                function loadSkills() {
+                                    fetch('/skills')
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const container = document.getElementById('skills-container');
+                                            container.innerHTML = '';
+
+                                            data.forEach(skill => {
+                                                const skillDiv = document.createElement('div');
+                                                skillDiv.className = 'skill';
+
+                                                // Display the skill, styled icon for close, and attach the deleteSkill function with the skill's ID
+                                                skillDiv.innerHTML = `
+                    <span>${skill.skill}</span>
+                    <span class="material-symbols-outlined close-icon" onclick="deleteSkill(${skill.id})">close</span>
+                `;
+
+                                                container.appendChild(skillDiv);
+                                            });
+                                        });
+                                }
+
+
+                                function addNewSkill() {
+                                    const container = document.getElementById('skills-container');
+                                    const newSkillDiv = document.createElement('div');
+                                    newSkillDiv.className = 'skill';
+                                    newSkillDiv.innerHTML = `
+            <textarea id="new-skill" placeholder="Enter skills separated by commas or new lines"></textarea>
+            <button class="submit-new-skills-btn" onclick="submitNewSkills()">Submit New Skills</button>
+
+        `;
+                                    container.appendChild(newSkillDiv);
+                                }
+
+                                async function submitNewSkills() {
+                                    const skillsInput = document.getElementById('new-skill').value;
+                                    const skills = skillsInput.split(/,|\n/).map(skill => skill.trim()).filter(skill => skill.length > 0);
+
+                                    for (const skill of skills) {
+                                        const data = { skill: skill };
+
+                                        try {
+                                            const response = await fetch('/skills', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify(data)
+                                            });
+
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+
+                                            await response.json();
+                                            console.log('Skill added:', skill);
+                                        } catch (error) {
+                                            console.error('Error:', error);
+                                        }
+                                    }
+
+                                    await loadSkills(); // Reload skills after adding
+                                    updateSideContainer(); // Update the entire side-container
+                                }
+
+
+                                function deleteSkill(skillId) {
+                                    fetch(`/skills/${skillId}`, { method: 'DELETE' })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(async data => {
+                                            await loadSkills(); // Reload the skills section
+                                            updateSideContainer(); // Update the entire side-container
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
+                            </script>
+
+                        </div>
+                        <div>
+                            <p class="preview-notice">This view represents a dynamic preview of your resume as you build
+                                it
+                                using our resume
+                                builder. It is designed to give you an idea of how your content is being arranged and
+                                displayed.
+
+                                Please note that this is just a preview and may not reflect the final formatting and
+                                layout
+                                of
+                                your resume.
+                                For a fully formatted and correctly sized version of your resume, generate a PDF by
+                                clicking the
+                                PDF icon. This will create a polished, professional PDF version of your resume,
+                                optimized for
+                                printing and
+                                sharing with potential employers.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Summary -->
-            <div class="mb-3">
-                <label class="form-label"><strong>SUMMARY</strong></label>
-                <textarea class="form-control" name="summary" rows="4"></textarea>
-            </div>
-            <!-- Work Experience -->
-            <div class="mb-3">
-                <label class="form-label"><strong>WORK EXPERIENCE</strong></label>
-                <div id="workExperienceContainer">
-                    <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>Job Title:</label>
-                            <input class="form-control" name="job_title1" type="text" />
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>Company:</label>
-                            <input class="form-control" name="company1" type="text" />
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>Date:</label>
-                            <input class="form-control" name="date1" type="text" />
-                        </div>
-                        <div class="col-12 mb-3">
-                            <label>Responsibilities:</label>
-                            <textarea class="form-control" name="responsibilities1" rows="4"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-success mb-3" onclick="addWorkExperience()" style="color: white;" type="button">➕
-                    Add
-                    Experience</button>
-                <button class="btn btn-danger mb-3" onclick="removeWorkExperience()" style="color: white;"
-                    type="button">➖
-                    Remove Experience</button>
-            </div>
-            <!-- Education -->
-            <div class="mb-3">
-                <label class="form-label"><strong>EDUCATION</strong></label>
-                <div id="educationContainer">
-                    <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>School Name:</label>
-                            <input class="form-control" name="school1" type="text" />
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>City:</label>
-                            <input class="form-control" name="city1" type="text" />
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>Degree:</label>
-                            <input class="form-control" name="degree1" type="text" />
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>Major:</label>
-                            <input class="form-control" name="major1" type="text" />
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <label>Dates Attended:</label>
-                            <input class="form-control" name="dates1" type="text" />
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-success mb-3" id="addEducationButton" onclick="addEducation()"
-                    style="color: white;" type="button">➕ Add Education</button>
-                <button class="btn btn-danger mb-3" id="removeEducationButton" onclick="removeEducation()"
-                    style="color: white;" type="button">➖ Remove Education</button>
-            </div>
-            <!-- Skills -->
-            <div class="mb-3">
-                <label class="form-label"><strong>SKILLS</strong></label>
-                <textarea class="form-control" name="skills" rows="4"></textarea>
-            </div>
-            <!-- Keywords -->
-            <div class="mb-3">
-                <label class="form-label"><strong>KEYWORDS</strong></label>
-                <input class="form-control" name="keywords"
-                    placeholder="e.g., Incident Management, Customer Satisfaction" type="text" />
-            </div>
-            <!-- Submit -->
-            <button class="btn btn-primary mb-2" onclick="collectDataAndSubmitForm('generate')" type="button">Build
-                Resume</button>
-            <button class="btn btn-secondary ml-2 job-box-btn"
-                style="background: linear-gradient(to right, #0022ff, #ae00ff); color: white;"
-                onclick="collectDataAndSubmitForm('rewrite')" type="button">
-                ✨AI-Enhanced Resume
-            </button>
 
-        </form>
-    </div>
+            <!------------------------ Side Rectangle Container ---------------------------------------->
+            <div class="col-md-8">
 
-    <!-- New div to display API Response -->
-    <div id="apiResponse" style="margin-top: 30px;">
-        <div id="quillEditor" style="height: 400px;"></div>
+                <!-- Icon to View Resume as PDF -->
+                <span class="material-symbols-outlined view-resume-icon"
+                    onclick="window.open('/download_resume_pdf', '_blank')">
+                    picture_as_pdf
+                </span>
+                <div class="side-container" style="border: 1px solid #000; border-top: 3px solid #000; height: 600px;">
+                    <!-- Including the resume template here -->
+                    <div>{% include 'resume.html' %}</div>
+                </div>
+            </div>
+
+        </div>
     </div>
-    <!-- Buttons -->
-    <div style="margin-top: 15px;">
-        <!-- Download Button -->
-        <button class="btn btn-success mb-2" id="downloadButton" onclick="downloadAsTxt()" style="visibility: hidden;"
-            type="button">⬇️ Download (.TXT)</button>
-        <!-- Copy to Clipboard Button -->
-        <button class="btn btn-info mb-2" id="copyButton" onclick="copyToClipboard()" style="visibility: hidden;"
-            type="button">📋 Copy to Clipboard</button>
-        <!-- Save to Dashboard Button -->
-        <button class="btn btn-primary mb-2" id="saveToDashboardBtn" onclick="saveDocument()"
-            style="visibility: hidden;" type="button">💾 Save to Dashboard (.DOCX &amp; .PDF)</button>
     </div>
-    <script>
-        var quill = new Quill('#quillEditor', {
-            theme: 'snow'
-        });
-    </script>
+    {% else %}
+    <!-- Content for users who are not authenticated -->
+    <p>Please log in to access your resume data.</p>
+    <a href="/login" class="btn btn-primary">Log In</a>
+    {% endif %}
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
