@@ -198,7 +198,7 @@
             padding: 20px;
             min-height: 900px;
             border-radius: 10px;
-            background-image: url('/static/images/abstract_jobslist.svg');
+            background-image: url('/static/images/jobs_list_bg.svg');
             /* Example fixed height */
             overflow-y: auto;
             margin-top: 20px;
@@ -403,9 +403,9 @@
         }
 
         .mycareermax-resume-title {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            font-family: 'Clicker Script', cursive;
+            font-size: .75em;
+            margin-bottom: 3px;
+            font-family: 'Poppins', sans-serif;
             margin-right: 10px;
             /* Add some space between text and icon */
             color: white;
@@ -550,14 +550,21 @@
                 <div class="main-container" style="height: 500px; overflow-y: auto;">
                     <div>
                         {% if current_user.is_authenticated %}
-                        <div>
+                        <div style="text-align: center;">
                             <div class="resume-header">
                                 <div class="mycareermax-resume-title">
-                                    <h2>myCareerMax Resume</h2>
+                                    <h2 style="margin-bottom: 1px;">Build Your ATS Optimized</h2>
+                                    <!-- Reduced margin-bottom -->
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Add the centered and scaled image -->
+                        <div style="text-align: center; margin-top: 10px;"> <!-- Increased margin-top -->
+                            <img src="https://drive.google.com/uc?export=download&id=1GOvninF-QfNN8ACfnHDnR5kJWZ4QYb--"
+                                alt="MyCareerMax Resume Title Image" style="width: 105%; margin-bottom: 20px;">
+                            <!-- Increased margin-bottom -->
+                        </div>
 
 
                         <!-------------------------PERSONAL INFORMATION ----------------------->
@@ -1577,19 +1584,23 @@
 
                         </div>
                         <div>
-                            <p class="preview-notice">This view represents a dynamic preview of your resume as you build
+                            <p class="preview-notice">Note: The Preview represents a dynamic preview of your resume as
+                                you build
                                 it
                                 using our resume
                                 builder. It is designed to give you an idea of how your content is being arranged and
                                 displayed.
 
-                                Please note that this is just a preview and may not reflect the final formatting and
+                                Please note that this is just a preview, and depending on the screen size of the device
+                                you're using to build your
+                                resume, may not reflect the final formatting and
                                 layout
                                 of
                                 your resume.
                                 For a fully formatted and correctly sized version of your resume, generate a PDF by
                                 clicking the
-                                PDF icon. This will create a polished, professional PDF version of your resume,
+                                PDF icon above the Preview area. This will create a polished, professional PDF version
+                                of your resume,
                                 optimized for
                                 printing and
                                 sharing with potential employers.</p>
