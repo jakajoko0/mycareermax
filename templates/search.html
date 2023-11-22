@@ -41,7 +41,9 @@
 
         #jobs-list {
             width: 100%;
-            background-image: url('/static/images/jobslist_bg.svg');
+            background-image: url('/static/images/jobs_list_bg.svg');
+            border-radius: 15px;
+            border: 1px solid #ccc;
 
             /* background-color: #7300ff;*/
             height: calc(100vh - 150px);
@@ -88,9 +90,7 @@
             align-items: center;
             padding: 10px;
             min-height: 80px;
-            /* Set a minimum height */
-            height: 10vh;
-            /* Flexible height based on viewport height */
+            height: auto;
         }
 
         #search-container input[type="text"] {
@@ -105,6 +105,26 @@
             text-align: center;
             font-size: 12px;
         }
+
+        @media screen and (max-width: 767px) {
+            #search-container {
+                flex-direction: column;
+                align-items: stretch;
+                max-height: 100px;
+                /* Example height, adjust as needed */
+                overflow-y: auto;
+                /* Enables vertical scrolling */
+            }
+
+            #search-container input[type="text"],
+            #search-container button,
+            #search-container label {
+                width: calc(100% - 20px);
+                margin: 5px 10px;
+                box-sizing: border-box;
+            }
+        }
+
 
         #search-button {
             padding: 3px 20px;
@@ -128,7 +148,7 @@
         #main-content {
             padding-top: 150px;
             width: 100%;
-            background-image: radial-gradient(circle, #b700ff, #3776ff);
+            background-image: url('/static/images/jobs_list_bg.svg');
             /* background-image: linear-gradient(120deg, #b700ff, #3776ff); */
             /* Change this to your desired background color */
             display: flex;
@@ -176,13 +196,6 @@
         }
 
         @media screen and (max-width: 767px) {
-            #search-container {
-                top: 56px;
-                min-height: 100px;
-                /* Larger minimum height for smaller screens */
-                height: 15vh;
-                /* Adjust the flexible height */
-            }
 
             #jobs-list {
                 height: calc(100vh - 56px);
@@ -412,6 +425,89 @@
         .material-symbols-outlined.icon-shadow:hover {
             cursor: pointer;
         }
+
+        #search-container input[type="text"] {
+            margin: 0 10px 10px 0;
+            border-radius: 15px;
+            border: 1px solid #ccc;
+            padding: 3px 5px;
+            /* Reduced padding */
+            text-align: center;
+            font-size: 12px;
+            /* Adjust font size as needed */
+        }
+
+
+        @media screen and (max-width: 767px) {
+            #search-container {
+                display: flex;
+                flex-direction: row;
+                /* Align items horizontally */
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                align-items: flex-start;
+                padding: 1px;
+                /* Adjust padding */
+            }
+
+            #search-container .search-fields {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                max-width: 150px;
+                margin-right: 10px;
+                /* Space to the right of search fields */
+            }
+
+            #search-container .search-controls {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                max-width: 150px;
+                margin-left: 10px;
+                /* Space to the left of search controls */
+            }
+
+            #search-container #job-query,
+            #search-container #job-location {
+                width: 100%;
+                margin: 1px 0;
+                /* Adjust margin */
+            }
+
+            #search-container #search-button,
+            #search-container #filters-container {
+                width: 100%;
+                margin: 1px 0;
+                margin-top: 10px;
+            }
+
+            #search-container #filters-container {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
+
+            #search-container #filters-container label {
+                margin-left: 5px;
+
+            }
+        }
+
+        #search-container #filters-container label,
+        #search-container #filters-container input[type="checkbox"] {
+            font-size: 12px;
+            /* Smaller font size for smaller screens */
+            color: white;
+            /* Ensuring the text is white */
+            /* Make text and checkbox white */
+        }
+
+        #search-container #job-query,
+        #search-container #job-location {
+            border: 2px solid #39FF14;
+            /* Neon green border */
+        }
     </style>
 
 </head>
@@ -504,11 +600,33 @@
         </div>
     </nav>
     <div id="search-container">
-        <label for="job-query"></label>
-        <input type="text" id="job-query" placeholder="Enter job title or Keyword(s)">
-        <label for="job-location"></label>
-        <input type="text" id="job-location" placeholder="Enter location">
-        <button id="search-button">Search</button>
+        <div class="search-fields">
+            <label for="job-query"></label>
+            <input type="text" id="job-query" placeholder="Job title or Keyword(s)">
+            <label for="job-location"></label>
+            <input type="text" id="job-location" placeholder="Location">
+        </div>
+        <div class="search-controls">
+            <button id="search-button">Search</button>
+            <div id="filters-container">
+                <!-- <select id="category-select">
+                <option value="">Select Category</option>
+            </select>
+            <select id="job-title-select">
+                <option value="">Select Job Title</option>
+            </select>
+           Add more dropdowns or checkboxes for other filters -->
+
+                <!-- Checkbox for Remote Jobs Only -->
+                <label>
+                    <input type="checkbox" id="remote-jobs-only" />
+                    Remote Jobs Only
+                </label>
+            </div>
+        </div>
+
+
+
     </div>
     <div class="spinner" style="display: none;"></div>
 
@@ -662,66 +780,28 @@
                 }
                 toggleCloseButton(selectedJobDetails.style.display === 'block');
             }
-
-            function fetchMoreJobListings() {
-                if (isFetchingJobs) return;
-                isFetchingJobs = true;
-                page++;
-                console.log('Fetching more job listings, Page:', page);
-
-                fetch(`/fetch-job-listings-get?page=${page}`, { method: 'GET' })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('More Job Listings Data:', data);
-                        displayJobListings(data.data || [], true);
-                        isFetchingJobs = false;
-                        updateAllSaveIcons(); // Update save icons here as well
-                    })
-                    .catch(error => {
-                        console.error('Error fetching more job listings:', error);
-                        isFetchingJobs = false;
-                    });
-            }
-
-            function resetAndFetchJobListings() {
-                page = 1; // Reset the page counter
-                jobsList.innerHTML = ''; // Clear the job list
-                fetchJobListings(); // Fetch the job listings
-            }
-
-            if (searchButton) {
-                searchButton.addEventListener('click', resetAndFetchJobListings);
-            }
-
-            function selectFirstJob() {
-                const firstJobTitle = document.querySelector('.job-title');
-                if (firstJobTitle) {
-                    firstJobTitle.click(); // Programmatically click the first job title to display its details
-                }
-            }
-
+            // Function to fetch job listings based on the current search criteria
             function fetchJobListings() {
                 console.log('Fetching initial job listings');
                 const jobQuery = document.getElementById('job-query').value;
                 const jobLocation = document.getElementById('job-location').value;
-                // Do not reset page here anymore
+                const remoteJobsOnly = document.getElementById('remote-jobs-only').checked;
+
                 const queryParams = new URLSearchParams({
                     query: jobQuery,
                     location: jobLocation,
-                    page: page
+                    page: page,
+                    remote_jobs_only: remoteJobsOnly
                 });
 
-                fetch(`/fetch-job-listings-get?${queryParams.toString()}`, {
-                    method: 'GET'
-                })
+                fetch(`/fetch-job-listings-get?${queryParams.toString()}`, { method: 'GET' })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Response Data:', data);  // Add this logging
+                        console.log('Response Data:', data);
                         displayJobListings(data.data || [], false);
                         isFetchingJobs = false;
-                        // Only select the first job if the screen is wider than 767px
                         if (window.innerWidth > 767) {
-                            selectFirstJob(); // Select the first job after the listings are displayed
+                            selectFirstJob();
                         }
                     })
                     .catch(error => {
@@ -730,10 +810,86 @@
                     });
             }
 
-            // Only setup the initial fetch when the screen is wider than 767px
-            if (window.innerWidth > 767) {
-                fetchJobListings();
+            // Function to reset and fetch job listings
+            function resetAndFetchJobListings() {
+                page = 1; // Reset the page counter
+                jobsList.innerHTML = ''; // Clear the job list
+                fetchJobListings(); // Fetch the job listings
             }
+
+            // Add an event listener to the checkbox
+            document.getElementById('remote-jobs-only').addEventListener('change', resetAndFetchJobListings);
+
+            // Event listener for the search button
+            if (searchButton) {
+                searchButton.addEventListener('click', resetAndFetchJobListings);
+            }
+
+            function fetchMoreJobListings() {
+                if (isFetchingJobs) return; // Prevent multiple simultaneous requests
+                isFetchingJobs = true; // Set flag to true
+                page++; // Increment page number for the next API call
+
+                // Make an API call similar to fetchJobListings but for the next page
+                const jobQuery = document.getElementById('job-query').value;
+                const jobLocation = document.getElementById('job-location').value;
+                const remoteJobsOnly = document.getElementById('remote-jobs-only').checked;
+
+                const queryParams = new URLSearchParams({
+                    query: jobQuery,
+                    location: jobLocation,
+                    page: page,
+                    remote_jobs_only: remoteJobsOnly
+                });
+
+                fetch(`/fetch-job-listings-get?${queryParams.toString()}`, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        displayJobListings(data.data || [], true); // Append new jobs to the existing list
+                        isFetchingJobs = false; // Reset the flag after successful fetch
+                    })
+                    .catch(error => {
+                        console.error('Error fetching more job listings:', error);
+                        isFetchingJobs = false; // Reset the flag even if the fetch fails
+                    });
+            }
+
+
+            // Function to select the first job in the list
+            function selectFirstJob() {
+                const firstJobTitle = document.querySelector('.job-title');
+                if (firstJobTitle) {
+                    firstJobTitle.click();
+                }
+            }
+
+            // Function to fetch and display search filters
+            function fetchAndDisplaySearchFilters() {
+                fetch('/fetch-job-filters', { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        displayDropdownOptions('category-select', data.data.categories);
+                        displayDropdownOptions('job-title-select', data.data.job_titles);
+                        // Repeat for other filters as necessary
+                    })
+                    .catch(error => {
+                        console.error('Error fetching search filters:', error);
+                    });
+            }
+
+            // Function to display dropdown options
+            function displayDropdownOptions(selectId, options) {
+                const selectElement = document.getElementById(selectId);
+                options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.name;
+                    selectElement.appendChild(optionElement);
+                });
+            }
+
+            // Initialize the filters on page load
+            document.addEventListener('DOMContentLoaded', fetchAndDisplaySearchFilters);
 
 
             // Call this function once to setup the infinite scrolling
@@ -1207,6 +1363,7 @@
                     saveJob(jobId, isCurrentlySaved);
                 });
             });
+            fetchJobListings();
 
             setupInfiniteScroll();
             checkScreenSize();

@@ -1367,7 +1367,7 @@ def logout():
 
 
 
-@app.route("/rbtemp1")
+#@app.route("/rbtemp1")
 def rbtemp1():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("rbtemp1.html", user_id=user_id)
@@ -1711,12 +1711,13 @@ headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
 
 @app.route("/fetch-job-listings-get", methods=["GET"])
 def fetch_job_listings_get():
-   #user_id = current_user.id  # Assuming user authentication is in place
+    #user_id = current_user.id  # Assuming user authentication is in place
     query = request.args.get("query", '')
     location = request.args.get("location", '')
     page = request.args.get("page", 1)
+    remote = request.args.get("remote_jobs_only", 'false')  # Fetch remote jobs only if this parameter is set
 
-    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}"
+    url = f"{RAPIDAPI_BASE_URL}/search?query={query} in {location}&page={page}&remote_jobs_only={remote}"
 
     try:
         response = requests.get(url, headers=headers)
@@ -1731,8 +1732,24 @@ def fetch_job_listings_get():
         logging.error(f"Request failed: {e}")
         return jsonify({"error": "Failed to fetch data"}), 500
 
+@app.route("/fetch-job-filters", methods=["GET"])
+def fetch_job_filters():
+    query = request.args.get("query", "Python developer in Texas, USA")  # Default query if not provided
+    remote = request.args.get("remote_jobs_only", "false")  # Default to 'false' if not provided
 
-@app.route("/fetch-job-listings", methods=["POST"])
+    url = "https://jsearch.p.rapidapi.com/search-filters"
+    querystring = {"query": query, "remote_jobs_only": remote}
+
+    try:
+        response = requests.get(url, headers=headers, params=querystring)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        logging.error(f"Request failed: {e}")
+        return jsonify({"error": "Failed to fetch filters"}), 500
+
+
+#@app.route("/fetch-job-listings", methods=["POST"])
 def fetch_job_listings_post():
     # Get JSON data sent with POST request
     data = request.get_json()
@@ -1759,7 +1776,7 @@ def fetch_job_listings_post():
 
 
 # AI JOB SEARCH - AI COVER LETTER - OPENAI API CALLS
-@app.route("/career_click", methods=["POST"])
+#@app.route("/career_click", methods=["POST"])
 def career_click():
     logging.info("Inside /career_click route")  # Debugging
 
