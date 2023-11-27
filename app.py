@@ -1405,9 +1405,9 @@ def careerbot():
     return render_template("careerbot.html", user_id=user_id)
 
 
-@app.route("/resume-enhancer")
-def resume_enhancer():
-    return render_template("resume_enhancer.html")
+@app.route("/resume-report")
+def resume_report():
+    return render_template("resume_report.html")
 
 
 @app.route("/interview-prep")
@@ -1418,11 +1418,6 @@ def interview_prep():
 @app.route("/create")
 def create():
     return render_template("create.html")
-
-@app.route('/resume-report')
-def resume_report():
-    user_id = current_user.id if current_user.is_authenticated else None
-    return render_template("resume_report.html", user_id=user_id)
 
 
 @app.route("/apptracker")
@@ -1444,7 +1439,7 @@ def sitemap():
         # List of routes to explicitly include in the sitemap
         include_routes = [
             "/forgot-password",
-            "/tools",
+            "/create",
             "/interview-prep",
             "/resume-enhancer",
             "/",
@@ -1452,8 +1447,8 @@ def sitemap():
             "/cover-letter-generator",
             "/dashboard",
             "/logout",
-            "/careerclick",
-            "/ai-builder",
+            "/search",
+            "/resume-builder",
             "/delete_account",
             "/register",
             "/login",
@@ -1462,11 +1457,9 @@ def sitemap():
         # List of routes to explicitly exclude from the sitemap
         exclude_routes = [
             "/get_resume_max",
-
             "/get-saved-jobs",
             "/get_latest_resume_name",
             "/sitemap.xml",
-            "/resume-builder",
             "/get-ranked-jobs",
         ]
 
@@ -1932,8 +1925,8 @@ def analyze_job():
 
 
 # RESUME BUILDER - OPENAI API CALLS
-@app.route("/resume-builder", methods=["GET", "POST"])
-def resume_builder():
+#@app.route("/resume-builder", methods=["GET", "POST"])
+#def resume_builder():
     if request.method == "POST":
         data = request.json
         request_type = data.get("type", "rewrite")  # Default to 'rewrite'
@@ -2690,8 +2683,8 @@ def resume(user_id):
 
     ################## RESUME INPUT PAGE ##########################
 
-@app.route('/ai-builder')
-def ai_builder():
+@app.route('/resume-builder')
+def resume_builder():
     user_id = current_user.id if current_user.is_authenticated else None
     projects = []
     work_experiences = []
@@ -2713,7 +2706,7 @@ def ai_builder():
         personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
         summary = Summary.query.filter_by(user_id=user_id).order_by(desc(Summary.created_at)).first()
 
-    return render_template('ai_builder.html', user_id=user_id, projects=projects, work_experiences=work_experiences, educations=educations, certifications=certifications, personal_info=personal_info, summary=summary, skills=skills)
+    return render_template('resume_builder.html', user_id=user_id, projects=projects, work_experiences=work_experiences, educations=educations, certifications=certifications, personal_info=personal_info, summary=summary, skills=skills)
 
 
 ############ RESUME BUILDER - WORK EXPERIENCE ###############
