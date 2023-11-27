@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Assessment Report</title>
+    <title>myCareerMax Resume Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
         }
 
         .header {
-            background: #333;
+            background: #000000;
             color: #fff;
             padding: 20px;
             text-align: center;
@@ -29,19 +29,41 @@
         .score {
             font-size: 40px;
             color: #4CAF50;
+            font-weight: bold;
             margin-top: 10px;
             /* Spacing above the score for better separation */
         }
 
         .section {
-            background: #fff;
+            /*background: linear-gradient(to right, blue, purple);*/
+            background: rgb(97, 97, 97);
             padding: 20px;
             margin-top: 20px;
+            color: white;
+            /* This sets the text color to white */
+        }
+
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            /* This makes the text bold */
         }
 
         .section-title {
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            /* Makes the text bold */
+            background-color: black;
+            /* Sets the background color to black */
+            color: white;
+            /* Sets the text color to white, for better contrast */
+            text-align: center;
+            /* Centers the text horizontally */
+            padding: 5px;
+            /* Adds some padding inside the box */
+            display: block;
+            /* Ensures the element takes the full width for centering */
         }
 
         .feedback,
@@ -56,30 +78,140 @@
         }
 
         @media screen and (max-width: 768px) {
-            .container {
-                width: 95%;
+
+
+            .header h1 {
+                font-size: 14px;
+                font-weight: bold;
+                /* This makes the text bold */
             }
 
-            .header h1,
+            .section {
+                /*background: linear-gradient(to right, blue, purple);*/
+                background: rgb(97, 97, 97);
+                padding: 20px;
+                margin-top: 20px;
+                color: white;
+                width: 95%;
+                /* This sets the text color to white */
+            }
+
             .section-title {
-                font-size: 20px;
+                font-size: 14px;
+                font-weight: bold;
+                /* Makes the text bold */
+                background-color: black;
+                /* Sets the background color to black */
+                color: white;
+                /* Sets the text color to white, for better contrast */
+                text-align: center;
+                /* Centers the text horizontally */
+                padding: 5px;
+                /* Adds some padding inside the box */
+                display: block;
+                /* Ensures the element takes the full width for centering */
             }
 
             .score {
                 font-size: 24px;
+                font-weight: bold;
+                color: green
             }
 
             .actions ul {
                 padding-left: 0;
             }
+
+            .percent-display {
+                color: green;
+                /* Sets the text color to green */
+                font-weight: bold;
+                /* Makes the text bold */
+                font-size: 24px;
+                /* Sets the font size */
+                background-color: black;
+                /* Sets the background color to black */
+                border-radius: 15px;
+                /* Gives very rounded edges */
+                padding: 5px 10px;
+                /* Adds some padding inside the box */
+                display: inline-block;
+                /* Adjusts the element to fit the content */
+                text-align: center;
+                /* Centers the text horizontally */
+            }
+
         }
 
         @media screen and (max-width: 480px) {
 
-            .header h1,
-            .section-title {
-                font-size: 18px;
+            .header h1 {
+                font-size: 14px;
+                font-weight: bold;
+                /* This makes the text bold */
             }
+
+            .section-title {
+                font-size: 14px;
+                font-weight: bold;
+                /* Makes the text bold */
+                background-color: black;
+                /* Sets the background color to black */
+                color: white;
+                /* Sets the text color to white, for better contrast */
+                text-align: center;
+                /* Centers the text horizontally */
+                padding: 5px;
+                /* Adds some padding inside the box */
+                display: block;
+                /* Ensures the element takes the full width for centering */
+            }
+
+
+            .score {
+                font-size: 20px;
+                font-weight: bold;
+                color: green
+            }
+
+            .percent-display {
+                color: green;
+                /* Sets the text color to green */
+                font-weight: bold;
+                /* Makes the text bold */
+                font-size: 24px;
+                /* Sets the font size */
+                background-color: black;
+                /* Sets the background color to black */
+                border-radius: 15px;
+                /* Gives very rounded edges */
+                padding: 5px 10px;
+                /* Adds some padding inside the box */
+                display: inline-block;
+                /* Adjusts the element to fit the content */
+                text-align: center;
+                /* Centers the text horizontally */
+            }
+
+        }
+
+        .percent-display {
+            color: green;
+            /* Sets the text color to green */
+            font-weight: bold;
+            /* Makes the text bold */
+            font-size: 24px;
+            /* Sets the font size */
+            background-color: black;
+            /* Sets the background color to black */
+            border-radius: 15px;
+            /* Gives very rounded edges */
+            padding: 5px 10px;
+            /* Adds some padding inside the box */
+            display: inline-block;
+            /* Adjusts the element to fit the content */
+            text-align: center;
+            /* Centers the text horizontally */
         }
     </style>
 
@@ -89,69 +221,76 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Resume Assessment Report</h1>
+            <!-- Image centered and responsive -->
+            <div class="text-center">
+                <h1>myCareerMax <br> Resume Report</h1>>
+            </div>
             <div class="score">Score: %</div>
         </div>
+    </div>
 
-        <div class="section">
-            <h2 class="section-title">Section 1</h2>
-            <p class="feedback">
-                {Feedback and comments}
-            </p>
+
+    <div class="section">
+        <h2 class="section-title">Section 1</h2>
+        <div class="percent-display">{%}</div>
+        <p class="feedback">
+            {Feedback and comments}
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Section 2</h2>
+        <div class="percent-display">{%}</div>
+        <p class="feedback">
+            {Feedback and comments}
+        </p>
+    </div>
+
+    <!-- Add more sections as needed -->
+
+    <div class="section">
+        <h2 class="section-title">Summary of Analysis</h2>
+        <p class="feedback">
+            {Overall summary of feedback and reasoning for the resume assessment score provided.} </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Keywords Found</h2>
+        <div class="actions">
+            <ul>
+                <li>Keyword 1 </li>
+                <li>Keyword 2 </li>
+                <li>Keyword 3 </li>
+                <li>Keyword 4 </li>
+                <li>Keyword 5 </li>
+                <li>Keyword 6 </li>
+                <li>Keyword 7 </li>
+                <li>Keyword 8 </li>
+                <li>Keyword 9 </li>
+                <li>Keyword 10 </li>
+                <!-- Add more action items as needed -->
+            </ul>
         </div>
+    </div>
 
-        <div class="section">
-            <h2 class="section-title">Section 2</h2>
-            <p class="feedback">
-                {Feedback and comments}
-            </p>
+    <div class="section">
+        <h2 class="section-title">Recommended Actions</h2>
+        <div class="actions">
+            <ul>
+                <li>Action item 1 to improve the score</li>
+                <li>Action item 2 to improve the score</li>
+                <li>Action item 3 to improve the score</li>
+                <li>Action item 4 to improve the score</li>
+                <li>Action item 5 to improve the score</li>
+                <li>Action item 6 to improve the score</li>
+                <li>Action item 7 to improve the score</li>
+                <li>Action item 8 to improve the score</li>
+                <li>Action item 9 to improve the score</li>
+                <li>Action item 10 to improve the score</li>
+                <!-- Add more action items as needed -->
+            </ul>
         </div>
-
-        <div class="section">
-            <h2 class="section-title">Summary of Analysis</h2>
-            <p class="feedback">
-                {Overall summary of feedback and reasoning for the resume assessment score provided.} </p>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Keywords Found</h2>
-            <div class="actions">
-                <ul>
-                    <li>Keyword 1 </li>
-                    <li>Keyword 2 </li>
-                    <li>Keyword 3 </li>
-                    <li>Keyword 4 </li>
-                    <li>Keyword 5 </li>
-                    <li>Keyword 6 </li>
-                    <li>Keyword 7 </li>
-                    <li>Keyword 8 </li>
-                    <li>Keyword 9 </li>
-                    <li>Keyword 10 </li>
-
-
-                    <!-- Add more action items as needed -->
-                </ul>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Recommended Actions</h2>
-            <div class="actions">
-                <ul>
-                    <li>Action item 1 to improve the score</li>
-                    <li>Action item 2 to improve the score</li>
-                    <li>Action item 3 to improve the score</li>
-                    <li>Action item 4 to improve the score</li>
-                    <li>Action item 5 to improve the score</li>
-                    <li>Action item 6 to improve the score</li>
-                    <li>Action item 7 to improve the score</li>
-                    <li>Action item 8 to improve the score</li>
-                    <li>Action item 9 to improve the score</li>
-                    <li>Action item 10 to improve the score</li>
-                    <!-- Add more action items as needed -->
-                </ul>
-            </div>
-        </div>
+    </div>
 
     </div>
 </body>

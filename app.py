@@ -1415,13 +1415,14 @@ def interview_prep():
     return render_template("interview_prep.html")
 
 
-@app.route("/tools")
-def tools():
-    return render_template("tools.html")
+@app.route("/create")
+def create():
+    return render_template("create.html")
 
 @app.route('/resume-report')
 def resume_report():
-    return render_template('resume-report.html')
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("resume_report.html", user_id=user_id)
 
 
 @app.route("/apptracker")
@@ -3593,7 +3594,7 @@ def process_resume():
 
     try:
         completion = client.chat.completions.create(
-           #model="gpt-4-1106-preview",  
+            model="gpt-4-1106-preview",  
             messages=[
                 {
                     "role": "user",
@@ -3606,10 +3607,17 @@ def process_resume():
             presence_penalty=0
         )
         
+        # Get the response and strip Markdown code block symbols
         html_response = completion.choices[0].message.content.strip()
+        if html_response.startswith("```html"):
+            html_response = html_response[7:]  # Remove the starting ```html
+        if html_response.endswith("```"):
+            html_response = html_response[:-3]  # Remove the ending ```
+
         return jsonify({'html_response': html_response})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

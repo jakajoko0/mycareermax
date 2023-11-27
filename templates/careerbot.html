@@ -85,51 +85,52 @@
         });
     </script>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-right: 20px;">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+            data-target="#navbarNav" data-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/tools" style="color: #003c86;">Create✨</a>
-                </li>
-                <!-- Tools Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
-                        Tools
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="toolsDropdown">
-                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
-                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
-                    </div>
-                </li>
-                <!-- New link for CareerBot -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
-                </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #003c86;">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
                         <span id="username-placeholder">Login Here</span>
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div aria-labelledby="navbarDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
                         <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
                         <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div aria-labelledby="toolsDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
                 </li>
                 <!-- End of Dropdown for username -->
             </ul>

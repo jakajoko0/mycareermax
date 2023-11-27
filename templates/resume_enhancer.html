@@ -3,6 +3,17 @@
 
 <head>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <title>Resume Analysis Report | myCareerMax</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -20,9 +31,10 @@
             background: linear-gradient(to right, rgb(49, 52, 255), #9845ff);
             /* Blue and purple gradient */
             padding: 20px;
+            position: relative;
         }
 
-        /* Responsive Design */
+        /* Responsive Design 
         @media (max-width: 600px) {
             .main-container {
                 width: 100%;
@@ -39,12 +51,12 @@
             }
         }
 
-        /* Style for the Resume Analysis Container */
+        /* Style for the Resume Analysis Container 
         .resume-analysis-container {
             margin: auto;
             padding: 10px;
             width: 80%;
-        }
+        }*/
 
         /* Style for Other Content Container */
         .other-content-container {
@@ -72,7 +84,7 @@
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
+            font-size: 1em;
             margin: 4px 2px;
             cursor: pointer;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
@@ -80,12 +92,19 @@
 
         h1 {
             color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        h2 {
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 40px;
             /* Sets the text color to white */
         }
 
         .other-content-container h1 {
             margin-bottom: 20px;
-            /* Add 20px space below the h1 tag */
+            font-family: 'Poppins', sans-serif;
         }
 
         /* Responsive Design */
@@ -95,14 +114,14 @@
             #fileInput {
                 padding: 1em 2em;
                 /* Adjust the padding for the desired size using em units */
-                font-size: 1.5em;
+                font-size: 1em;
                 /* Responsive font size using em units */
             }
 
             /* Make the "Upload Your Resume (.docx)" text responsive */
             .other-content-container h1 {
-                font-size: 3em;
-                /* Responsive font size using em units */
+                font-size: 1em;
+                font-family: 'Poppins', sans-serif;
             }
 
             /* Adjust the font size of other text elements as needed */
@@ -114,15 +133,10 @@
             button {
                 padding: 1em 2em;
                 /* Responsive padding using em units */
-                font-size: 1.5em;
+                font-size: 1em;
                 /* Responsive font size using em units */
             }
 
-            /* Additional styles for responsiveness as needed */
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
             .main-container {
                 width: 100%;
                 padding: 10px;
@@ -132,19 +146,102 @@
                 /* Add horizontal scroll if needed */
             }
 
-            /* Rest of your existing CSS rules for responsiveness */
+            h2 {
+                color: white;
+                font-family: 'Poppins', sans-serif;
+                font-size: 24px;
+                /* Sets the text color to white */
+            }
+        }
+
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .resume-analysis-container {
+            background: rgb(97, 97, 97);
+            position: relative;
+            /* Add this line */
         }
     </style>
 
 </head>
 
 <body>
+    <input type="hidden" id="userId" value="{{ user_id }}">
+    <script defer>
+        $(document).ready(function () {
+            console.log("Fetching username...");
+            $.get("/get-username", function (response) {
+                console.log("Username response:", response);
+                if (response.success) {
+                    const usernamePlaceholder = document.getElementById("username-placeholder");
+                    usernamePlaceholder.textContent = "Hello, " + response.username;
+                } else {
+                    console.error('Error fetching username:', response.error);
+                }
+            });
+        });
+    </script>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+            data-target="#navbarNav" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div aria-labelledby="navbarDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div aria-labelledby="toolsDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/resume-enhancer" style="color: #003c86;">Resume Scanner</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
     <!-- Main Container -->
     <div class="main-container">
         <!-- File Upload Container -->
         <div class="other-content-container">
-            <h1>Resume Analysis Report<br>How ATS Friendly is your Resume?</h1>
-            <p style="color: white;">Upload your resume (.docx)</p>
+            <h2>How ATS Friendly is your Resume?</h2>
+            <p style="color: white;">Upload your resume (.docx) or paste it below</p>
             <input type="file" id="fileInput" accept=".docx">
             <br><br>
         </div>
@@ -157,10 +254,17 @@
     <!-- Resume Analysis Container -->
     <div class="resume-analysis-container">
         <div id="resume-analysis-container"></div>
+        <!-- Spinner Container (Initially Hidden) -->
+        <div id="spinner-container"
+            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; display: flex; flex-direction: column; align-items: center; display: none;">
+            <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
+
 
     </div>
-
-
     <script>
         function extractTextFromDocx(file) {
             var formData = new FormData();
@@ -195,25 +299,31 @@
 
         function processAndDisplayResume() {
             const resumeText = document.getElementById('extractedText').value;
-            const htmlTemplate = ""; // If you need to send an HTML template, specify it here.
+            const spinnerContainer = document.getElementById('spinner-container');
+            spinnerContainer.style.display = 'block'; // Show the spinner
 
             fetch('/process-resume', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ resume_text: resumeText, html_template: htmlTemplate })
+                body: JSON.stringify({ resume_text: resumeText }) // Assuming you're sending the resume text
             })
                 .then(response => response.json())
                 .then(data => {
+                    // Hide the spinner when the data is received
+                    spinnerContainer.style.display = 'none';
                     // Assuming the response contains a field 'html_response' with the HTML content
                     const resumeAnalysisContainer = document.getElementById('resume-analysis-container');
                     resumeAnalysisContainer.innerHTML = data.html_response; // Set the inner HTML of the container
                 })
                 .catch(error => {
+                    // Hide the spinner if there's an error
+                    spinnerContainer.style.display = 'none';
                     console.error('Error:', error);
                 });
         }
+
 
     </script>
 </body>
