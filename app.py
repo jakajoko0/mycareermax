@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Response, stream_with_context
 import pdfkit
 import threading
+from pathlib import Path
 from io import BytesIO
 import re
 import time
@@ -20,6 +21,7 @@ import io
 from flask import send_file
 from openai import OpenAI
 import requests
+import docx
 import pyodbc
 from flask import (
     Flask,
@@ -1416,6 +1418,10 @@ def interview_prep():
 @app.route("/tools")
 def tools():
     return render_template("tools.html")
+
+@app.route('/resume-report')
+def resume_report():
+    return render_template('resume-report.html')
 
 
 @app.route("/apptracker")
@@ -3502,7 +3508,7 @@ def download_resume_pdf():
     # The 'resume' function should return an HTML string of the resume
     html_content = resume(user_id)
 
-    # Convert the HTML to PDF using pdfkit
+    # Convert the HTML to PDF using pdfkitd
     pdf_content = pdfkit.from_string(html_content, False)
 
     # Stream the PDF back to the user
@@ -3511,6 +3517,99 @@ def download_resume_pdf():
     response.headers["Content-Disposition"] = "inline"
     return response
 
+@app.route('/rephrase-summary', methods=['POST'])
+def process_summary():
+    data = request.json
+    summary_text = data['summary']
 
+    # Revised prompt with specific instructions for output format
+    prompt = (f"Please rephrase the following summary from a resume to make it sound more professional. "
+              f"Provide the rephrased summary in a clear and concise manner, without any additional commentary or explanation.Very Important: Do not include any headers or titles before the revised summary. Your response should include just the rephrased summary and that is all. Do not include any text like 'Revised Summary:' before the summary.\n\n"
+              f"Original Summary: {summary_text}")
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.5,  # Adjusted for more precise output
+            max_tokens=150,    # Adjusted to limit the length of the response
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        
+        # Accessing the response content
+        rephrased_summary = completion.choices[0].message.content.strip()
+
+        return jsonify({'rephrased_summary': rephrased_summary})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/extract-text', methods=['POST'])
+def extract_text():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    if file and allowed_file(file.filename):
+        doc = docx.Document(file)
+        extracted_text = '\n'.join([para.text for para in doc.paragraphs])
+        return jsonify({'extracted_text': extracted_text})
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'docx'}
+
+
+@app.route('/process-resume', methods=['POST'])
+def process_resume():
+    data = request.json
+    resume_text = data.get('resume_text')
+
+    # Read the HTML template content from a file
+    template_path = Path(app.root_path) / 'templates' / 'ATS_score_template.html'
+    with open(template_path, 'r', encoding='utf-8') as file:
+        ats_score_template = file.read()
+
+    # Construct the prompt for OpenAI
+    prompt = (
+        f"Please analyze the provided resume text for its ATS friendliness. Assess each section and give it a score (%). Provide feedback for each section, an overall summary of the analysis, a list of extracted keywords, and a bullet point list of action items for improvement. Use the provided html template to create an analysis report. Provide only the HTML code in your response.\n"
+        f"Rules:\n"
+        f"1. Your response should include only the HTML code, beginning with <html> and ending with </html>, and nothing more.\n"
+        f"2. VERY IMPORTANT: Do not include any markdown formatting symbols like '```'. Exclude any additional text or explanations.\n"
+        f"\nATS score template: {ats_score_template}"
+        f"\nResume text: {resume_text}"
+        f"\nSample response: <html>....</html>"
+        f"\nVery important: DO NOT USE ANY MARKDOWN FORMATTING SYMBOLS LIKE '```'. EXAMPLE RESPONSE: <html>...</html>"
+    )
+
+    try:
+        completion = client.chat.completions.create(
+           #model="gpt-4-1106-preview",  
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.25,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        
+        html_response = completion.choices[0].message.content.strip()
+        return jsonify({'html_response': html_response})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

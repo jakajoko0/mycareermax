@@ -243,23 +243,18 @@
 
         .submit-btn {
             background-color: rgb(0, 21, 255);
-            /* Green background */
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
         }
 
         .submit-btn:hover {
@@ -273,19 +268,15 @@
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
         }
 
         .delete-btn {
@@ -294,21 +285,16 @@
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-            margin-left: 8px;
         }
 
         .delete-btn:hover {
@@ -322,19 +308,15 @@
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
         }
 
         .add-summary-btn:hover {
@@ -375,19 +357,15 @@
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
         }
 
         .add-bullet-exp:hover {
@@ -468,6 +446,155 @@
             /* Center the text inside the icon */
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             /* Add shadow to the text */
+        }
+
+        /* The Modal (background) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Semi-transparent background outside the modal */
+            border-radius: 10px;
+        }
+
+        /* Base Modal Content Styling */
+        .modal-content {
+            background: linear-gradient(to right, #6e45e2, #88d3ce);
+            color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            /* Default width */
+            max-width: 600px;
+            /* Maximum width */
+            border-radius: 10px;
+            font-size: 1rem;
+            /* Responsive font size */
+        }
+
+        /* Specific styling for smaller screens */
+        @media screen and (max-width: 600px) {
+            .modal-content {
+                width: 90%;
+                /* Increase width on smaller screens */
+                font-size: 0.9rem;
+                /* Slightly smaller font size for very narrow screens */
+            }
+        }
+
+        /* Responsive paragraph text inside modal */
+        .modal-content p {
+            font-size: 1em;
+            /* Responsive font size */
+        }
+
+
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        #use-rephrased-summary,
+        #discard-rephrased-summary {
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            /* Adjust padding for size */
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+            width: auto;
+            /* Adjust width to content */
+            display: inline-block;
+            /* Align buttons next to each other */
+        }
+
+        #use-rephrased-summary {
+            background-color: rgb(0, 255, 0);
+        }
+
+        #discard-rephrased-summary {
+            background-color: rgb(25, 0, 255);
+        }
+
+        #use-rephrased-summary:hover {
+            box-shadow: 0px 4px 10px rgba(0, 128, 0, 0.3);
+        }
+
+        #discard-rephrased-summary:hover {
+            box-shadow: 0px 4px 10px rgba(128, 0, 0, 0.3);
+        }
+
+        /* Change Button Styling */
+        #change-btn {
+            background: linear-gradient(to right, #7b00ff, #005eff);
+            /* Gradient background */
+            color: white;
+            /* White text */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        #change-btn:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            /* Slightly larger shadow on hover */
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            /* Slightly different gradient on hover */
+        }
+
+        /* Base styling for the textarea */
+        .responsive-textarea {
+            width: 90%;
+            /* 90% of its container */
+            height: 9em;
+            /* Adjust height as needed */
+            max-width: 100%;
+            /* Ensures it doesn't overflow its container */
+            margin: auto;
+            /* Center it within the container */
+            display: block;
+            /* To enable margin auto to work */
+            resize: vertical;
+            /* Allow only vertical resizing */
+        }
+
+        /* Specific styling for smaller screens */
+        @media screen and (max-width: 600px) {
+            .responsive-textarea {
+                width: 95%;
+                /* Slightly wider on smaller screens */
+                height: 7em;
+                /* Adjust height for narrow screens */
+            }
         }
     </style>
 </head>
@@ -726,9 +853,27 @@
                                 <button class="add-summary-btn" id="add-summary-button">Add Summary</button>
 
                                 <form id="add-summary-form" style="display: none;">
-                                    <textarea id="summary-text" placeholder="Enter your summary"></textarea>
+                                    <textarea id="summary-text" class="responsive-textarea"
+                                        placeholder="Enter your summary"></textarea>
                                     <button type="submit" class="submit-btn">Submit</button>
+                                    <button type="button" id="change-btn" class="change-btn"
+                                        style="display: none;">✨View
+                                        Enhanced Summary</button>
                                 </form>
+                                <!-- The Modal -->
+                                <div id="rephraseModal" class="modal">
+
+                                    <!-- Modal content -->
+                                    <div class="modal-content">
+                                        <span class="close">&times;</span>
+                                        <p id="rephrased-summary">Rephrased summary will appear here.</p>
+                                        <button id="use-rephrased-summary">Add to Resume</button>
+                                        <button id="discard-rephrased-summary">Keep Original</button>
+                                    </div>
+
+                                </div>
+
+
                             </div>
 
                             <script>
@@ -742,6 +887,87 @@
                                         addOrUpdateSummary();
                                     });
                                 });
+
+                                // Event listener for the Change button
+                                const changeBtn = document.getElementById('change-btn');
+                                if (changeBtn) {
+                                    changeBtn.addEventListener('click', function () {
+                                        const summaryText = document.getElementById('summary-text').value;
+
+                                        // Make sure this URL is the one where your backend handles the OpenAI API call
+                                        fetch('/rephrase-summary', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ summary: summaryText })
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                console.log('OpenAI response:', data);
+
+                                                // Assuming data contains the rephrased summary
+                                                // Show the modal with the rephrased summary
+                                                const modal = document.getElementById("rephraseModal");
+                                                modal.style.display = "block";
+                                                document.getElementById("rephrased-summary").innerText = data.rephrased_summary;
+
+                                                // Handle the "Use" button click in the modal
+                                                document.getElementById("use-rephrased-summary").onclick = function () {
+                                                    // Update the summary text area with the rephrased summary
+                                                    document.getElementById("summary-text").value = data.rephrased_summary;
+
+                                                    // Call the addOrUpdateSummary function to submit the updated summary
+                                                    addOrUpdateSummary();
+
+                                                    // Hide the modal
+                                                    modal.style.display = "none";
+                                                };
+
+                                                // Handle the "No" button click in the modal
+                                                document.getElementById("discard-rephrased-summary").onclick = function () {
+                                                    modal.style.display = "none";
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                    });
+                                }
+
+                                function addOrUpdateSummary() {
+                                    const summaryText = document.getElementById('summary-text').value;
+
+                                    const data = {
+                                        user_id: '{{ user_id }}', // Replace with the actual user ID
+                                        summary_text: summaryText
+                                    };
+
+                                    fetch('/summary', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            console.log('Summary added/updated:', data);
+                                            loadSummaries(); // Reload the summaries after adding/updating
+                                            updateSideContainer(); // Update the entire side-container
+                                            document.getElementById('change-btn').style.display = 'inline'; // Show the change button
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                        });
+                                }
+
 
                                 // Function to load summaries from the backend
                                 function loadSummaries() {
@@ -785,34 +1011,7 @@
                                     }
                                 }
 
-                                function addOrUpdateSummary() {
-                                    const summaryText = document.getElementById('summary-text').value;
 
-                                    const data = {
-                                        user_id: '{{ user_id }}',  // Ensure this is correctly populated
-                                        summary_text: summaryText
-                                    };
-
-                                    fetch('/summary', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify(data)
-                                    })
-                                        .then(response => {
-                                            if (!response.ok) {
-                                                throw new Error('Network response was not ok');
-                                            }
-                                            return response.json();
-                                        })
-                                        .then(data => {
-                                            console.log('Summary added/updated:', data);
-                                            loadSummaries(); // Reload the summaries after adding/updating
-                                            updateSideContainer(); // Update the entire side-container
-                                        })
-                                        .catch(error => {
-                                            console.error('Error:', error);
-                                        });
-                                }
 
 
                                 // Function to update a summary
