@@ -2819,7 +2819,81 @@ def delete_work_experience(experience_id):
     db.session.commit()
     return jsonify({'message': 'Work experience and associated bullet points deleted'}), 200
 
-    ############ RESUME BUILDER - PROJECTS ###############
+from flask import jsonify, request
+import re  # Import regular expressions module
+
+@app.route('/generate-bullet-points', methods=['POST'])
+def generate_bullet_points():
+    data = request.json
+    job_title = data['job_title']
+
+    # Construct the prompt for OpenAI
+    prompt = (f"List common or suggested bullet points for a resume under the job title '{job_title}'. "
+              "The bullet points should be specific, relevant, and professionally written. Do not number them or format them. Simply list each bullet point with a space between them. Do not use any - symbols. Provide only the text of each bullet point.")
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,  # Adjusted for creativity in generating diverse bullet points
+            max_tokens=200,    # Adjusted to accommodate several bullet points
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        
+        # Extract bullet points from response and process them
+        bullet_points_raw = completion.choices[0].message.content.strip().split('\n')
+        bullet_points_processed = [re.sub(r"^[0-9-]+\s*", "", bp) for bp in bullet_points_raw]
+
+        return jsonify({'bullet_points': bullet_points_processed})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/openai-enhance', methods=['POST'])
+def enhance_bullet_point():
+    data = request.json
+    bullet_text = data['text']
+
+    # Construct the prompt for OpenAI
+    prompt = f"Rewrite this bullet point to be more impactful and professional: '{bullet_text}'"
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.5,  # Adjust as needed
+            max_tokens=60,    # Adjust based on expected length of enhancement
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        # Extract the enhanced bullet point from response
+        enhanced_bullet_point_raw = completion.choices[0].message.content.strip()
+
+        # Process the enhanced bullet point to remove any numbers or hyphens at the beginning
+        enhanced_bullet_point_processed = re.sub(r"^[0-9-]+\s*", "", enhanced_bullet_point_raw)
+
+        return jsonify({'enhanced_text': enhanced_bullet_point_processed})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+    ############ RESUME BUILDER - PROJECTS #####################################################
 
 @app.route('/projects', methods=['GET', 'POST'])
 def projects():
@@ -3198,6 +3272,40 @@ def delete_skill(skill_id):
     db.session.delete(skill_record)
     db.session.commit()
     return jsonify({'message': 'Skill record deleted'}), 200
+
+@app.route('/generate-skills', methods=['POST'])
+def generate_skills():
+    data = request.json
+    job_titles = data['job_titles']
+
+    # Construct the prompt for OpenAI
+    prompt = (f"List common skills for resumes with job titles: {', '.join(job_titles)}. "
+              "The skills should be relevant and professionally useful for these roles.")
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,  # Adjusted for creativity in generating diverse skills
+            max_tokens=200,    # Adjusted to accommodate several skills
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        
+        # Extract skills from response and process them
+        skills_raw = completion.choices[0].message.content.strip().split('\n')
+        skills_processed = [re.sub(r"^[0-9-.]+\s*", "", skill) for skill in skills_raw]
+
+        return jsonify({'skills': skills_processed})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
     ############ RESUME BUILDER - SUMMARY ###################################################
@@ -3611,6 +3719,10 @@ def process_resume():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

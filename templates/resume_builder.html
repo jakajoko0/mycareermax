@@ -22,21 +22,16 @@
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-            margin-left: 8px;
         }
 
         .delete-project-btn:hover {
@@ -64,16 +59,19 @@
             cursor: pointer;
         }
 
-        #add-certification-button .material-symbols-outlined {
-            font-size: 24px;
+        /* Update the selector to target the span inside the button with class 'add-certification-button' */
+        .add-certification-button .material-symbols-outlined {
+            font-size: 48px;
             /* Adjust size as needed */
             color: #006400;
             /* Or any color you prefer */
         }
 
+
+
         /* Add this CSS in your stylesheet or <style> tag */
         .close-icon {
-            font-size: 16px;
+            font-size: 24px;
             /* Adjust the size as needed */
             color: red;
             cursor: pointer;
@@ -115,7 +113,7 @@
         }
 
         #add-new-project .material-symbols-outlined {
-            font-size: 24px;
+            font-size: 48px;
             /* Adjust size as needed */
             color: #006400;
             /* Or any color you prefer */
@@ -135,7 +133,7 @@
         }
 
         #add-new-education .material-symbols-outlined {
-            font-size: 24px;
+            font-size: 48px;
             /* Adjust size as needed */
             color: #006400;
             /* Or any color you prefer */
@@ -155,7 +153,7 @@
         }
 
         #add-new-personal-info .material-symbols-outlined {
-            font-size: 24px;
+            font-size: 48px;
             /* Adjust size as needed */
             color: #006400;
             /* Or any color you prefer */
@@ -174,10 +172,8 @@
         }
 
         #add-new-experience .material-symbols-outlined {
-            font-size: 24px;
-            /* Adjust size as needed */
+            font-size: 48px;
             color: #006400;
-            /* Or any color you prefer */
         }
 
 
@@ -211,7 +207,7 @@
         }
 
         body {
-            font-size: 12px;
+            font-size: 14px;
             /* Base font size */
         }
 
@@ -324,32 +320,49 @@
             /* Darker green on hover */
         }
 
-        .add-new-skill-btn:hover {
-            background-color: #006400;
-            /* Darker green on hover */
-        }
-
         .add-new-skill-btn {
             background-color: green;
             /* Green background */
             color: white;
             /* White text */
             border: none;
-            /* No border */
-            padding: 2px 5px;
-            /* Padding around the text */
-            border-radius: 10px;
-            /* Rounded edges */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
-            /* Box shadow for depth */
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
             cursor: pointer;
-            /* Cursor changes to pointer on hover */
+            margin-top: 10px;
+            font-weight: bold;
             transition: all 0.3s ease;
-            /* Smooth transition for hover effects */
-            margin-right: 8px;
-            margin-top: 8px;
         }
 
+        .add-new-skill-btn:hover {
+            background-color: #006400;
+            /* Darker green on hover */
+        }
+
+        .add-key-skills-btn {
+            background: linear-gradient(to right, #7b00ff, #005eff);
+            /* Gradient background */
+            color: white;
+            /* White text */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Box shadow */
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .add-key-skills-btn:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+        }
 
         .add-bullet-exp {
             background-color: green;
@@ -429,9 +442,9 @@
                 'FILL' 0,
                 'wght' 400,
                 'GRAD' 0,
-                'opsz' 24;
-            color: rgb(81, 0, 255)
-                /* Increase this value for larger size */
+                'opsz' 48;
+            /*   color: rgb(81, 0, 255)
+               */
         }
 
         .view-resume-icon {
@@ -465,16 +478,16 @@
 
         /* Base Modal Content Styling */
         .modal-content {
-            background: linear-gradient(to right, #6e45e2, #88d3ce);
-            color: white;
+            background: linear-gradient(to right, rgb(92, 159, 236), #ffffff);
+            color: rgb(0, 0, 0);
             margin: 5% auto;
             padding: 20px;
-            border: 1px solid #888;
+            border: 1px solid #00ff04;
             width: 80%;
             /* Default width */
             max-width: 600px;
             /* Maximum width */
-            border-radius: 10px;
+            border-radius: 20px;
             font-size: 1rem;
             /* Responsive font size */
         }
@@ -531,11 +544,11 @@
         }
 
         #use-rephrased-summary {
-            background-color: rgb(0, 255, 0);
+            background-color: #00a803;
         }
 
         #discard-rephrased-summary {
-            background-color: rgb(25, 0, 255);
+            background-color: rgb(255, 38, 0);
         }
 
         #use-rephrased-summary:hover {
@@ -545,6 +558,25 @@
         #discard-rephrased-summary:hover {
             box-shadow: 0px 4px 10px rgba(128, 0, 0, 0.3);
         }
+
+        .sparkles-bullets-btn {
+            background: linear-gradient(to right, #7b00ff, #005eff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .sparkles-bullets-btn:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+        }
+
 
         /* Change Button Styling */
         #change-btn {
@@ -596,6 +628,130 @@
                 /* Adjust height for narrow screens */
             }
         }
+
+        .sparkles-icon {
+            cursor: pointer;
+        }
+
+        .skill-textarea {
+            width: 90%;
+            max-width: 100%;
+            /* Ensures it doesn't overflow its container */
+            box-sizing: border-box;
+            /* Includes padding and border in the width */
+            /* Additional styling as needed */
+        }
+
+
+        .modal-title {
+            text-align: center;
+            /* Centers the title text in the modal */
+        }
+
+        .close-modal-btn {
+            display: block;
+            margin: 10px auto;
+            /* Centers the button in the modal */
+            padding: 5px 10px;
+            /* Adds some padding to the button */
+            cursor: pointer;
+            /* Changes the cursor to pointer on hover */
+            margin-top: 10px;
+            color: #ff3c3c;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-icon {
+            color: red;
+            /* Change the color of the close icon to red */
+        }
+
+        .material-symbols-outlined.add-icon {
+            cursor: pointer;
+            color: #00a803
+                /* Sets the color of the icon to green */
+        }
+
+        .material-symbols-outlined.sparkles-icon {
+            font-size: 20px;
+        }
+
+        .material-symbols-outlined.close-icon {
+            position: relative;
+            top: 5px;
+            /* Adjust the value as needed */
+        }
+
+        /* Enhanced Bullet Modal buttons */
+        .enhanced-modal-button {
+            margin: 10px 5px;
+            /* Adjust the margin values as needed */
+        }
+
+        /* Apply this class to both buttons in the modal */
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            /* 5% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            /* Could be more or less, depending on screen size */
+        }
+
+        .button.close-modal {
+            color: rgb(140, 140, 140);
+
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: rgb(121, 121, 121);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .skills-list {
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            margin-bottom: 10px;
+        }
+
+        .add-skill-icon {
+            color: #00a803;
+            position: relative;
+            top: 6px;
+            /* Adjust this value as needed */
+            cursor: pointer;
+            /* To show a pointer cursor on hover */
+        }
     </style>
 </head>
 
@@ -633,7 +789,7 @@
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
                         data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
-                        <span id="username-placeholder">Login Here</span>
+                        <span id="username-placeholder">Account</span>
                     </a>
                     <div aria-labelledby="navbarDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
@@ -844,9 +1000,9 @@
                         <!-------------------------SUMMARY ----------------------->
                         <div class="section-container">
                             <input type="checkbox" id="toggle-summary" class="section-toggle">
-                            <label for="toggle-summary" class="section-label"><span class="material-symbols-outlined">
-                                    unfold_more
-                                </span>Summary</label>
+                            <label for="toggle-summary" class="section-label">
+                                <span class="material-symbols-outlined">unfold_more</span>Summary
+                            </label>
                             <div class="section-content">
                                 <div id="summaries">
                                     <!-- Existing summaries will be loaded here -->
@@ -857,9 +1013,8 @@
                                     <textarea id="summary-text" class="responsive-textarea"
                                         placeholder="Enter your summary"></textarea>
                                     <button type="submit" class="submit-btn">Submit</button>
-                                    <button type="button" id="change-btn" class="change-btn"
-                                        style="display: none;">✨View
-                                        Enhanced Summary</button>
+                                    <button type="button" id="change-btn" class="change-btn" style="display: none;">✨
+                                        Optimize</button>
                                 </form>
                                 <!-- The Modal -->
                                 <div id="rephraseModal" class="modal">
@@ -887,7 +1042,11 @@
                                         event.preventDefault();
                                         addOrUpdateSummary();
                                     });
+
+                                    // Initialize Bootstrap Tooltips
+                                    $('[data-toggle="tooltip"]').tooltip();
                                 });
+
 
                                 // Event listener for the Change button
                                 const changeBtn = document.getElementById('change-btn');
@@ -1069,19 +1228,46 @@
                         <!-------------------------WORK EXPERIENCE ----------------------->
                         <div class="section-container">
                             <input type="checkbox" id="toggle-work-experience" class="section-toggle">
-                            <label for="toggle-work-experience" class="section-label"><span
-                                    class="material-symbols-outlined">
-                                    unfold_more
-                                </span>Work Experience</label>
+                            <label for="toggle-work-experience" class="section-label">
+                                <span class="material-symbols-outlined">unfold_more</span>Work Experience
+                            </label>
                             <div class="section-content">
                                 <div id="work-experience-container">
                                     <!-- Work experiences will be loaded here -->
                                 </div>
+                                <!-- The Bullet Points Modal -->
+                                <div id="bulletPointsModal" class="modal">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="closeBulletPointsModal()">&times;</span>
+                                        <div id="suggested-bullets">
+                                            <!-- Suggested bullet points will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <button id="add-new-experience"><span class="material-symbols-outlined">
                                             add
                                         </span></button>
                                 </div>
+                                <div id="enhancedBulletModal" class="modal">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="closeEnhancedBulletModal()">&times;</span>
+                                        <h3 class="modal-title">Enhanced Bullet Point:</h3>
+                                        <ul>
+                                            <li id="enhanced-text"></li>
+                                        </ul>
+                                        <button onclick="replaceBulletPoint()"
+                                            class="btn btn-success enhanced-modal-button">Replace</button>
+                                        <button onclick="closeEnhancedBulletModal()"
+                                            class="btn btn-danger enhanced-modal-button">Discard</button>
+                                    </div>
+                                </div>
+
+
+
+
+
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function () {
                                         loadWorkExperiences();
@@ -1099,35 +1285,62 @@
                                                     expDiv.className = 'work-experience';
                                                     expDiv.id = 'work-exp-' + exp.id;
                                                     expDiv.innerHTML = `
-                            <p>${exp.job_title} at ${exp.company}</p>
-                            <p>From: ${exp.start_date} To: ${exp.end_date}</p>
-<ul id="bullet-points-${exp.id}">
-    ${exp.bullet_points.map(bp => `
-        <li class="bullet-point">
-            ${bp.text} <span class="material-symbols-outlined close-icon" onclick="deleteBulletPoint(${bp.id}, ${exp.id})">close</span>
-        </li>`
-                                                    ).join('')}
-</ul>
-<button class="add-bullet-exp" onclick="addBulletPoint(${exp.id})">Add Bullet</button>
-<button class="delete-btn" onclick="deleteWorkExperience(${exp.id})">Delete Experience</button>
-                        `;
+                    <p>${exp.job_title} at ${exp.company}</p>
+                    <p>From: ${exp.start_date} To: ${exp.end_date}</p>
+                    <button class="sparkles-bullets-btn" onclick="fetchSuggestedBullets('${exp.job_title}', ${exp.id})">✨ Need Bullet Ideas?</button>
+                    <ul id="bullet-points-${exp.id}">
+                        ${exp.bullet_points.map(bp => `
+                            <li class="bullet-point">
+                                ${bp.text}
+                                <span class="material-symbols-outlined close-icon" onclick="deleteBulletPoint(${bp.id}, ${exp.id})">close</span>
+                                <span class="material-symbols-outlined sparkles-icon" onclick="enhanceBulletPoint(${bp.id}, ${exp.id}, '${bp.text.replace(/'/g, "\\'")}')">&#x2728;</span>
+                            </li>`).join('')}
+                    </ul>
+                    <button class="add-bullet-exp" onclick="addBulletPoint(${exp.id})">Add Bullet</button>
+                    <button class="delete-btn" onclick="deleteWorkExperience(${exp.id})">Delete Experience</button>
+                `;
                                                     container.appendChild(expDiv);
                                                 });
-                                            });
+                                            })
+                                            .catch(error => console.error('Error:', error));
                                     }
+
+                                    function enhanceBulletPoint(bulletPointId, experienceId, bulletText) {
+                                        if (!bulletText) {
+                                            console.error('Bullet text is undefined');
+                                            return;
+                                        }
+
+                                        fetch('/openai-enhance', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ text: bulletText })
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                showEnhancedBulletModal(data.enhanced_text, bulletPointId, experienceId);
+                                            })
+                                            .catch(error => console.error('Error:', error));
+                                    }
+
 
                                     function addNewExperience() {
                                         const container = document.getElementById('work-experience-container');
                                         const newExpDiv = document.createElement('div');
                                         newExpDiv.className = 'work-experience';
                                         newExpDiv.innerHTML = `
-        <input type="text" id="new-job-title" placeholder="Job Title">
-        <input type="text" id="new-company" placeholder="Company">
-        <input type="date" id="new-start-date">
-        <input type="date" id="new-end-date">
-        <input type="checkbox" id="current-job" onchange="toggleEndDate()"> Present
-<button class="submit-btn" onclick="submitNewExperience()">Submit New Experience</button>
-    `;
+                    <input type="text" id="new-job-title" placeholder="Job Title">
+                    <input type="text" id="new-company" placeholder="Company">
+                    <input type="date" id="new-start-date">
+                    <input type="date" id="new-end-date">
+                    <input type="checkbox" id="current-job" onchange="toggleEndDate()"> Present
+                    <button class="submit-btn" onclick="submitNewExperience()">Submit New Experience</button>
+                `;
                                         container.appendChild(newExpDiv);
                                     }
 
@@ -1138,13 +1351,12 @@
                                         const isCurrentJob = document.getElementById('current-job').checked;
                                         let endDate = document.getElementById('new-end-date').value;
 
-                                        // If 'Present' is checked, set endDate to 'Present'
                                         if (isCurrentJob) {
                                             endDate = 'Present';
                                         }
 
                                         const data = {
-                                            user_id: '{{ user_id }}', // Ensure this is correctly populated
+                                            user_id: '{{ user_id }}',
                                             job_title: jobTitle,
                                             company: company,
                                             start_date: startDate,
@@ -1156,30 +1368,45 @@
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify(data)
                                         })
-                                            .then(response => {
-                                                if (!response.ok) {
-                                                    throw new Error('Network response was not ok');
-                                                }
-                                                return response.json();
-                                            })
+                                            .then(response => response.json())
                                             .then(data => {
-                                                loadWorkExperiences(); // Reload the work experiences after adding a new one
-                                                updateSideContainer(); // Update the entire side-container
+                                                const newExperienceId = data.id;
+                                                loadWorkExperiences(); // This will add the sparkles bullets button
+                                                updateSideContainer();
+
+                                                // Fetch the suggested bullet points for the new job title
+                                                return fetch('/generate-bullet-points', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ job_title: jobTitle })
+                                                })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        const modal = document.getElementById("bulletPointsModal");
+                                                        modal.style.display = "block";
+                                                        const bulletsContainer = document.getElementById("suggested-bullets");
+                                                        bulletsContainer.innerHTML = '<h3 class="modal-title">Let us help you kick things off. Here are some commonly used bullet points for this role:</h3><ul>';
+                                                        data.bullet_points.forEach(bp => {
+                                                            bulletsContainer.innerHTML += `<li>${bp} <span class="material-symbols-outlined add-icon" onclick="addBulletToExperience('${bp.replace(/'/g, "\\'")}', ${newExperienceId})">add_circle</span></li>`;
+                                                        });
+                                                        bulletsContainer.innerHTML += '</ul>';
+                                                        bulletsContainer.innerHTML += '<button class="btn btn-danger btn-block close-modal-btn text-white" onclick="closeBulletPointsModal()">Close</button>';
+
+                                                    });
                                             })
-                                            .catch(error => {
-                                                console.error('Error:', error);
-                                            });
+                                            .catch(error => console.error('Error:', error));
                                     }
+
+
 
                                     function addBulletPoint(experienceId) {
                                         const bulletPointsContainer = document.getElementById(`bullet-points-${experienceId}`);
                                         const inputLi = document.createElement('li');
                                         inputLi.className = 'bullet-point';
                                         inputLi.innerHTML = `
-                <input type="text" id="new-bullet-${experienceId}">
-               <button class="submit-btn" onclick="submitBulletPoint(${experienceId})">Submit Bullet</button>
-
-            `;
+                    <input type="text" id="new-bullet-${experienceId}">
+                    <button class="submit-btn" onclick="submitBulletPoint(${experienceId})">Submit Bullet</button>
+                `;
                                         bulletPointsContainer.appendChild(inputLi);
                                     }
 
@@ -1190,7 +1417,75 @@
                                             text: bulletText
                                         };
 
-                                        fetch('/bullet-point', {  // Update this endpoint if necessary
+                                        fetch('/bullet-point', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify(data)
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                loadWorkExperiences();
+                                                updateSideContainer(); // Update the entire side-container
+
+                                            })
+                                            .catch(error => console.error('Error:', error));
+                                    }
+
+                                    function deleteWorkExperience(experienceId) {
+                                        fetch(`/work-experience/${experienceId}`, { method: 'DELETE' })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                loadWorkExperiences();
+                                                updateSideContainer(); // Update the entire side-container
+
+                                            })
+                                            .catch(error => console.error('Error:', error));
+                                    }
+
+                                    function deleteBulletPoint(bulletPointId, experienceId) {
+                                        fetch(`/bullet-point/${bulletPointId}`, { method: 'DELETE' })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                loadWorkExperiences();
+                                                updateSideContainer(); // Update the entire side-container
+
+                                            })
+                                            .catch(error => console.error('Error:', error));
+                                    }
+
+                                    function toggleEndDate() {
+                                        const endDateInput = document.getElementById('new-end-date');
+                                        const isCurrentJob = document.getElementById('current-job').checked;
+
+                                        if (isCurrentJob) {
+                                            endDateInput.disabled = true;
+                                            endDateInput.value = '';
+                                        } else {
+                                            endDateInput.disabled = false;
+                                        }
+                                    }
+
+                                    function addBulletToExperience(bulletText, experienceId) {
+                                        const workExperienceContainer = document.getElementById(`work-exp-${experienceId}`);
+                                        if (!workExperienceContainer) {
+                                            console.error(`Work experience container not found for ID: ${experienceId}`);
+                                            return;
+                                        }
+
+                                        const bulletPointsList = workExperienceContainer.querySelector(`#bullet-points-${experienceId}`);
+                                        if (!bulletPointsList) {
+                                            console.error(`Bullet points list not found in work experience container for ID: ${experienceId}`);
+                                            return;
+                                        }
+
+                                        // Data to be sent to the server
+                                        const data = {
+                                            work_experience_id: experienceId,
+                                            text: bulletText
+                                        };
+
+                                        // POST request to add the bullet point to the database
+                                        fetch('/bullet-point', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify(data)
@@ -1202,72 +1497,132 @@
                                                 return response.json();
                                             })
                                             .then(data => {
-                                                loadWorkExperiences(); // Reload the work experiences after adding a bullet point
+                                                // Add the bullet point to the DOM
+                                                const bulletPointItem = document.createElement('li');
+                                                bulletPointItem.className = 'bullet-point';
+                                                bulletPointItem.innerHTML = `
+            ${bulletText}
+            <span class="material-symbols-outlined close-icon" onclick="deleteBulletPoint(${data.id}, ${experienceId})">close</span>
+            <span class="material-symbols-outlined sparkles-icon" onclick="enhanceBulletPoint(${data.id}, ${experienceId}, '${bulletText.replace(/'/g, "\\'")}')">&#x2728;</span>
+        `;
+                                                bulletPointsList.appendChild(bulletPointItem);
                                                 updateSideContainer(); // Update the entire side-container
+
+                                                // Gray out the selected bullet point in the modal
+                                                grayOutSelectedBullet(bulletText);
                                             })
                                             .catch(error => {
                                                 console.error('Error:', error);
                                             });
                                     }
 
-
-                                    function deleteWorkExperience(experienceId) {
-                                        fetch(`/work-experience/${experienceId}`, { method: 'DELETE' })
-                                            .then(response => {
-                                                if (!response.ok) {
-                                                    throw new Error('Network response was not ok');
-                                                }
-                                                return response.json();
-                                            })
-                                            .then(data => {
-                                                loadWorkExperiences(); // Reload the work experiences after deleting
-                                                updateSideContainer(); // Update the entire side-container
-                                            })
-                                            .catch(error => {
-                                                console.error('Error:', error);
-                                            });
-                                    }
-
-
-                                    function deleteBulletPoint(bulletPointId, experienceId) {
-                                        fetch(`/bullet-point/${bulletPointId}`, { method: 'DELETE' })
-                                            .then(response => {
-                                                if (!response.ok) {
-                                                    throw new Error('Network response was not ok');
-                                                }
-                                                return response.json();
-                                            })
-                                            .then(data => {
-                                                loadWorkExperiences(); // Reload the work experiences after deleting a bullet point
-                                                updateSideContainer(); // Update the entire side-container
-                                            })
-                                            .catch(error => {
-                                                console.error('Error:', error);
-                                            });
-                                    }
-
-
-                                    function toggleEndDate() {
-                                        const endDateInput = document.getElementById('new-end-date');
-                                        const isCurrentJob = document.getElementById('current-job').checked;
-
-                                        if (isCurrentJob) {
-                                            endDateInput.disabled = true;
-                                            endDateInput.value = ''; // Clear the end date if 'Present' is checked
-                                        } else {
-                                            endDateInput.disabled = false;
+                                    // Function to gray out the selected bullet in the modal
+                                    function grayOutSelectedBullet(bulletText) {
+                                        const bulletsInModal = document.getElementById("suggested-bullets").children;
+                                        for (let i = 0; i < bulletsInModal.length; i++) {
+                                            const bulletItem = bulletsInModal[i];
+                                            const bulletItemText = bulletItem.textContent || bulletItem.innerText;
+                                            if (bulletItemText.includes(bulletText)) {
+                                                bulletItem.style.color = 'gray';
+                                                break; // Stop the loop once the matching bullet point is found
+                                            }
                                         }
                                     }
+
+
+
+                                    function closeBulletPointsModal() {
+                                        const modal = document.getElementById("bulletPointsModal");
+                                        modal.style.display = "none";
+                                    }
+
+                                    function showEnhancedBulletModal(enhancedText, bulletPointId, experienceId) {
+                                        const modal = document.getElementById("enhancedBulletModal");
+                                        document.getElementById("enhanced-text").innerText = enhancedText;
+                                        modal.style.display = "block";
+
+                                        // Save IDs for use in the replace function
+                                        modal.dataset.bulletPointId = bulletPointId;
+                                        modal.dataset.experienceId = experienceId;
+                                    }
+
+                                    function replaceBulletPoint() {
+                                        const modal = document.getElementById("enhancedBulletModal");
+                                        const enhancedText = document.getElementById("enhanced-text").innerText;
+                                        const bulletPointId = modal.dataset.bulletPointId;
+                                        const experienceId = modal.dataset.experienceId;
+
+                                        // Replace the bullet point in the DOM and in the database
+                                        // For example:
+                                        fetch(`/bullet-point/${bulletPointId}`, {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ text: enhancedText })
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                loadWorkExperiences();
+                                                updateSideContainer();
+                                                closeEnhancedBulletModal();  // Close the modal after replacement
+                                            })
+                                            .catch(error => console.error('Error:', error));
+
+                                        modal.style.display = "none";
+                                    }
+
+                                    function closeEnhancedBulletModal() {
+                                        const modal = document.getElementById("enhancedBulletModal");
+                                        modal.style.display = "none";
+                                    }
+                                    function addSparklesBulletsButton(experienceId, jobTitle) {
+                                        const bulletPointsContainer = document.getElementById(`bullet-points-${experienceId}`);
+                                        if (bulletPointsContainer) {
+                                            const sparklesButton = document.createElement('button');
+                                            sparklesButton.className = 'sparkles-bullets-btn';
+                                            sparklesButton.innerHTML = '✨ Need Bullet Ideas?';
+                                            sparklesButton.onclick = function () {
+                                                fetchSuggestedBullets(jobTitle, experienceId);
+                                            };
+                                            bulletPointsContainer.appendChild(sparklesButton);
+                                        }
+                                    }
+
+
+                                    function fetchSuggestedBullets(jobTitle, experienceId) {
+                                        fetch('/generate-bullet-points', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ job_title: jobTitle })
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                const modal = document.getElementById("bulletPointsModal");
+                                                modal.style.display = "block";
+                                                const bulletsContainer = document.getElementById("suggested-bullets");
+                                                bulletsContainer.innerHTML = '<h3 class="modal-title">Suggested bullet points for this type of role:</h3><ul>';
+                                                data.bullet_points.forEach(bp => {
+                                                    bulletsContainer.innerHTML += `<li>${bp} <span class="material-symbols-outlined add-icon" onclick="addBulletToExperience('${bp.replace(/'/g, "\\'")}', ${experienceId})">add_circle</span></li>`;
+                                                });
+                                                bulletsContainer.innerHTML += '</ul>';
+                                                bulletsContainer.innerHTML += '<button class="btn btn-danger btn-block text-white close-modal-btn" onclick="closeBulletPointsModal()">Close</button>';
+
+                                            })
+                                            .catch(error => console.error('Error:', error));
+                                    }
+
+
+
                                 </script>
                             </div>
                         </div>
+
                         <!-------------------------EDUCATION ----------------------->
 
                         <div class="section-container">
                             <input type="checkbox" id="toggle-education" class="section-toggle">
-                            <label for="toggle-education" class="section-label"><span class="material-symbols-outlined">
-                                    unfold_more
-                                </span>Education</label>
+                            <label for="toggle-education" class="section-label">
+                                <span class="material-symbols-outlined">unfold_more</span>Education
+                            </label>
                             <div class="section-content">
                                 <div id="education-container">
                                     <!-- Education will be loaded here -->
@@ -1380,9 +1735,9 @@
                         <!-------------------------PROJECTS ----------------------->
                         <div class="section-container">
                             <input type="checkbox" id="toggle-projects" class="section-toggle">
-                            <label for="toggle-projects" class="section-label"><span class="material-symbols-outlined">
-                                    unfold_more
-                                </span>Projects</label>
+                            <label for="toggle-projects" class="section-label">
+                                <span class="material-symbols-outlined">unfold_more</span>Projects
+                            </label>
                             <div class="section-content">
                                 <div id="project-container">
                                     <!-- Projects will be loaded here -->
@@ -1687,6 +2042,8 @@
                                     unfold_more
                                 </span>Skills</label>
                             <div class="section-content">
+                                <button id="add-key-skills-btn" class="add-key-skills-btn">✨ Generate Key
+                                    Skills</button>
                                 <div id="skills-container">
                                     <!-- Skills will be loaded here -->
                                 </div>
@@ -1696,6 +2053,26 @@
                                 document.addEventListener('DOMContentLoaded', function () {
                                     loadSkills();
                                     document.getElementById('add-new-skill').addEventListener('click', addNewSkill);
+                                });
+
+                                document.getElementById('add-key-skills-btn').addEventListener('click', async function () {
+                                    try {
+                                        const response = await fetch('/work-experience');
+                                        const experiences = await response.json();
+                                        const jobTitles = experiences.map(exp => exp.job_title);
+
+                                        const skillResponse = await fetch('/generate-skills', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ job_titles: jobTitles })
+                                        });
+
+                                        const skillsResponse = await skillResponse.json();
+                                        showSkillsModal(skillsResponse.skills); // Pass only the skills array
+
+                                    } catch (error) {
+                                        console.error('Error:', error);
+                                    }
                                 });
 
                                 function loadSkills() {
@@ -1726,10 +2103,9 @@
                                     const newSkillDiv = document.createElement('div');
                                     newSkillDiv.className = 'skill';
                                     newSkillDiv.innerHTML = `
-            <textarea id="new-skill" placeholder="Enter skills separated by commas or new lines"></textarea>
-            <button class="submit-new-skills-btn" onclick="submitNewSkills()">Submit New Skills</button>
-
-        `;
+        <textarea id="new-skill" class="skill-textarea" placeholder="Enter skills separated by commas or new lines"></textarea>
+        <button class="submit-new-skills-btn" onclick="submitNewSkills()">Submit New Skills</button>
+    `;
                                     container.appendChild(newSkillDiv);
                                 }
 
@@ -1762,7 +2138,6 @@
                                     updateSideContainer(); // Update the entire side-container
                                 }
 
-
                                 function deleteSkill(skillId) {
                                     fetch(`/skills/${skillId}`, { method: 'DELETE' })
                                         .then(response => {
@@ -1772,6 +2147,7 @@
                                             return response.json();
                                         })
                                         .then(async data => {
+                                            console.log('Skill deleted:', skillId);
                                             await loadSkills(); // Reload the skills section
                                             updateSideContainer(); // Update the entire side-container
                                         })
@@ -1779,6 +2155,91 @@
                                             console.error('Error:', error);
                                         });
                                 }
+
+
+                                async function addSkillToDom(skill) {
+                                    // Create a new skill element
+                                    const skillDiv = document.createElement('div');
+                                    skillDiv.className = 'skill';
+                                    skillDiv.innerHTML = `
+        <span>${skill}</span>
+        <span class="material-symbols-outlined close-icon" onclick="deleteSkill('loading...')">close</span>
+    `;
+
+                                    // Add this new skill to the skills container
+                                    const container = document.getElementById('skills-container');
+                                    container.appendChild(skillDiv);
+
+                                    // Save the new skill to the database
+                                    try {
+                                        const response = await fetch('/skills', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ skill: skill })
+                                        });
+
+                                        if (!response.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+
+                                        // Update the skill element with the new ID
+                                        const responseData = await response.json();
+                                        skillDiv.querySelector('.close-icon').setAttribute('onclick', `deleteSkill(${responseData.id})`);
+
+                                        console.log('Skill added:', skill);
+                                    } catch (error) {
+                                        console.error('Error:', error);
+                                    }
+
+                                    // Update the entire side-container
+                                    updateSideContainer();
+                                }
+
+
+                                function showSkillsModal(skills) {
+                                    // Create a modal container if it doesn't exist
+                                    let modal = document.getElementById('skills-modal');
+                                    if (!modal) {
+                                        modal = document.createElement('div');
+                                        modal.id = 'skills-modal';
+                                        modal.className = 'modal';
+                                        document.body.appendChild(modal);
+                                    }
+
+                                    // Modal content
+                                    let modalContent = `
+  <div class="modal-content">
+    <span class="close-modal" style="font-size: 40px;">&times;</span>
+    <h2>Select Skills</h2>
+    <div class="skills-list">`;
+
+
+                                    // Add skills to the modal
+                                    skills.forEach(skill => {
+                                        modalContent += `
+<div class="skill-item">
+    ${skill}
+    <span class="material-symbols-outlined add-skill-icon" onclick="addSkillToDom('${skill}')">
+        add_circle
+    </span>
+</div>`;
+
+                                    });
+                                    modalContent += `</div><div style="margin-top: 10px;"><button type="button" class="btn btn-danger close-modal">Close</button></div>`;
+                                    modal.innerHTML = modalContent;
+
+
+                                    // Show the modal
+                                    modal.style.display = 'block';
+
+                                    // Close modal on clicking the close button
+                                    modal.querySelectorAll('.close-modal').forEach(button => {
+                                        button.onclick = function () {
+                                            modal.style.display = 'none';
+                                        };
+                                    });
+                                }
+
 
                             </script>
 
@@ -1832,9 +2293,13 @@
     <a href="/login" class="btn btn-primary">Log In</a>
     {% endif %}
 
-
+    <!-- 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    -->
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
