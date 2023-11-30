@@ -2246,7 +2246,7 @@ def autofill():
 
         # Call OpenAI's chat completion
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Replace with your desired model
+            model="gpt-3.5-turbo-1106",  # Replace with your desired model
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},
@@ -2295,7 +2295,7 @@ def generate_cover_letter_ext():
         ]
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1000
+            model="gpt-3.5-turbo-1106", messages=messages, temperature=0.7, max_tokens=1000
         )
 
         # Extract the generated response from the OpenAI API
