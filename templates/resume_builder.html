@@ -2274,10 +2274,29 @@
             <div class="col-md-8">
 
                 <!-- Icon to View Resume as PDF -->
-                <span class="material-symbols-outlined view-resume-icon"
-                    onclick="window.open('/download_resume_pdf', '_blank')">
-                    picture_as_pdf
-                </span>
+                <div class="generate-icon-container" style="display: table; width: 100%;">
+                    <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                        <span style="font-size: 2em; color: white; margin-right: 4px; font-weight: bold;">Click to
+                            Generate</span>
+                        <span class="material-symbols-outlined view-resume-icon"
+                            onclick="window.open('/download_resume_pdf', '_blank')">
+                            picture_as_pdf
+                        </span>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <div class="side-container" style="border: 1px solid #000; border-top: 3px solid #000; height: 600px;">
                     <!-- Including the resume template here -->
                     <div>{% include 'resume.html' %}</div>

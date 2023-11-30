@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | myCareerMax</title>
@@ -50,11 +52,33 @@
         .custom-file-label {
             text-align: left;
         }
+
+        button .material-symbols-outlined {
+            position: relative;
+            top: 5px;
+            /* Adjust the top position as needed */
+        }
+
+        button .btn-secondary {
+            position: relative;
+            top: -20px;
+            /* Adjust the top position as needed */
+        }
+
+        #preferences-container button {
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin-top: 40px;
+            /* Adjust the margin-top value as needed */
+        }
     </style>
 
 </head>
 
 <body>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
@@ -106,9 +130,12 @@
             </ul>
         </div>
     </nav>
-    <!-- Add a hyperlinked text above the container with white color and cursor pointer on hover -->
     <div class="text-center mt-3">
-        <a href="/dashboard" class="btn btn-link" style="color: white; cursor: pointer;">&lt; Back to Dashboard</a>
+        <button type="button" class="btn-lg btn-success"><a href="/dashboard"
+                style="color: white; cursor: pointer;"><span class="material-symbols-outlined">
+                    arrow_back_ios
+                </span>Back
+                to Dashboard</a></button>
     </div>
     <div class="container mt-5">
         <div class="row justify-content-center">
@@ -120,12 +147,17 @@
                         <div class="custom-file">
                             <input type="file" class="custom-file-input mx-auto" name="docx_file" id="docx_file"
                                 accept=".docx" required>
-                            <label class="custom-file-label" style="color: gray;" for="docx_file">Select Resume and
+                            <label class="custom-file-label" style="color: gray;" for="docx_file"><span
+                                    class="material-symbols-outlined">
+                                    upload_file
+                                </span> Select Resume and
                                 Upload</label>
                         </div>
                     </div>
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <button type="submit" class="btn-lg btn-primary"><span class="material-symbols-outlined">
+                                upload_file
+                            </span> Upload</button>
                     </div>
                 </form>
                 <!-- Display Active Resume -->
@@ -133,16 +165,19 @@
                     <p>Active Resume: {{ most_recent_filename or '' }}</p>
                 </div>
                 <hr>
-                <!-- Edit button
-                <button type="button" id="edit-button">Edit</button>-->
 
-                <!-- Delete button
-                <button type="button" id="delete-button">Delete</button> -->
+                <!-- Edit Preferences button-->
+                <div id="preferences-container">
+                    <button type="button" id="edit-button" class="btn-lg btn-dark">
+                        <span class="material-symbols-outlined">menu_open</span>
+                        Edit Preferences
+                    </button>
+                </div>
 
                 <!-- Edit form (outside any other form) -->
-                <form id="edit-form" method="post" style="display: none;" class="mb-3">
-                    <!-- Hidden User ID Field -->
-                    <input type="hidden" id="userId" name="user_id" value=""> <!-- Add this line -->
+                <form id="edit-form" method="post" class="mb-3">
+                    <input type="hidden" id="userId" name="user_id" value="{{ user_id }}">
+
                     <!-- Full Name -->
                     <div class="form-group">
                         <label for="full-name-edit">Full Name:</label>
@@ -151,8 +186,9 @@
 
                     <!-- Most Recent Position Held -->
                     <div class="form-group">
-                        <label for="full-name-edit">Full Name:</label>
-                        <input type="text" id="full-name-edit" name="full_name" class="form-control shadow-sm">
+                        <label for="recent-position-edit">Most Recent Position Held:</label>
+                        <input type="text" id="recent-position-edit" name="recent_position"
+                            class="form-control shadow-sm">
                     </div>
 
                     <!-- Desired Job Title -->
@@ -179,9 +215,9 @@
                         </select>
                     </div>
 
-                    <!-- Minimum Desired Compensation/Year -->
+                    <!-- Desired Compensation/Year -->
                     <div class="form-group">
-                        <label for="desired-compensation-edit">Minimum Desired Compensation/Year:</label>
+                        <label for="desired-compensation-edit">Desired Compensation/Year:</label>
                         <select id="desired-compensation-edit" name="desired_compensation"
                             class="form-control shadow-sm">
                             <option value="50000-75000">$50,000-$75,000</option>
@@ -211,6 +247,9 @@
                     <!-- Submit Button -->
                     <div class="form-group">
                         <input type="submit" value="Submit" class="btn btn-primary">
+
+                        <!-- Delete button-->
+                        <button type="button" id="delete-button" class="btn btn-danger">Delete</button>
                     </div>
                 </form>
             </div>
@@ -224,77 +263,171 @@
             const editButton = $("#edit-button");
             const deleteButton = $("#delete-button");
             const editForm = $("#edit-form");
-            const userIdInput = $("#userId"); // Input field for user ID
+            let globalUserId = $("#userId").val();  // Use a global variable to store user_id
+
+            console.log("Initial User ID:", globalUserId);
 
             editForm.hide();
 
             function fetchUserDetails() {
-                $.get("/get-user-details", function (response) {
+                console.log("User ID in fetchUserDetails:", globalUserId);
+
+                if (!globalUserId) {
+                    console.error("User ID is empty when fetching user details");
+                    return;
+                }
+
+                $.get(`/get-user-details?user_id=${globalUserId}`, function (response) {
                     if (response.success) {
-                        const user = response.user;
-                        $("#full-name-edit").val(user.full_name);
-                        $("#recent-position-edit").val(user.recent_position);
-                        $("#desired-job-title-edit").val(user.desired_job_title);
-                        $("#desired-job-location-edit").val(user.desired_job_location);
-                        $("#desired-work-type-edit").val(user.desired_work_type);
-                        $("#desired-compensation-edit").val(user.desired_compensation);
-                        $("input[name='job_alert_notifications'][value='" + user.job_alert_notifications + "']").prop("checked", true);
+                        // Update the form fields with the fetched data
+                        $("#full-name-edit").val(response.user.full_name);
+                        $("#recent-position-edit").val(response.user.recent_position);
+                        $("#desired-job-title-edit").val(response.user.desired_job_title);
+                        $("#desired-job-location-edit").val(response.user.desired_job_location);
+                        $("#desired-work-type-edit").val(response.user.desired_work_type);
+                        $("#desired-compensation-edit").val(response.user.desired_compensation);
+                        $("input[name='job_alert_notifications'][value='" + response.user.job_alert_notifications + "']").prop("checked", true);
                     } else {
                         console.error('Error fetching user details:', response.error);
                     }
                 });
             }
 
-            editButton.click(function () {
-                fetchUserDetails();
-                editForm.show();
-                editButton.hide();
-                deleteButton.hide();
-            });
-
-            editForm.submit(function (event) {
+            editForm.submit(async function (event) {
                 event.preventDefault();
-
                 let formData = $(this).serialize();
-                const url = userIdInput.val() ? "/update-user-details" : "/create_user_details";
+
+                console.log("Serialized Form Data:", formData);
+                formData += '&user_id=' + globalUserId;
+
+                console.log("Form Data:", formData);
+
+                if (!globalUserId) {
+                    console.error("User ID is empty on form submit");
+                    return;
+                }
+
+                const userDoesExist = await userExists(globalUserId);
+                const url = userDoesExist ? "/update-user-details" : "/create_user_details";
 
                 $.post(url, formData, function (response) {
+                    console.log("Response from server:", response);
                     if (response.success) {
                         console.log("Operation successful.");
-                        editForm.hide();
-                        editButton.show();
-                        deleteButton.show();
+                        if (!globalUserId && response.user_id) {
+                            // Update the global user ID after successful creation
+                            globalUserId = response.user_id;
+                        }
+                        // Additional logic for handling response
                     } else {
                         console.error("Operation failed:", response.error);
                     }
                 });
             });
 
-            function deleteUserDetails() {
-                const userId = userIdInput.val(); // Retrieve the user ID
+            function userExists(userId) {
+                console.log("User ID in userExists:", userId);
 
-                if (userId) {
+                return new Promise((resolve, reject) => {
+                    if (!userId) {
+                        console.error("User ID is empty when checking if user exists");
+                        resolve(false);
+                        return;
+                    }
+
                     $.ajax({
-                        url: "/delete-user-details",
-                        type: 'DELETE',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ user_id: userId }),
+                        url: `/get-user-details?user_id=${userId}`,
+                        type: 'GET',
                         success: function (response) {
-                            if (response.success) {
-                                console.log("User details deleted successfully.");
-                                // Additional logic after successful deletion
-                            } else {
-                                console.error("Failed to delete user details:", response.error);
-                            }
+                            resolve(response.success);
                         },
-                        error: function (xhr, status, error) {
-                            console.error("Error in deletion request:", error);
+                        error: function () {
+                            resolve(false);
                         }
                     });
-                } else {
-                    console.error("User ID is not available for the delete operation.");
-                }
+                });
             }
+
+            editForm.submit(async function (event) {
+                event.preventDefault();
+                console.log("User ID before form submit:", globalUserId);
+
+                let formData = $(this).serialize();
+                formData += '&user_id=' + globalUserId;
+
+                console.log("Form Data:", formData);
+
+                if (!globalUserId) {
+                    console.error("User ID is empty on form submit");
+                    return;
+                }
+
+                const userDoesExist = await userExists(globalUserId);
+                const url = userDoesExist ? "/update-user-details" : "/create_user_details";
+
+                $.post(url, formData, function (response) {
+                    console.log("Response from server:", response);
+                    // Handle the response...
+                });
+            });
+
+            editButton.click(function () {
+                fetchUserDetails();
+                editForm.show();
+                editButton.hide();
+                deleteButton.show();
+            });
+
+
+
+            function deleteUserDetails() {
+                console.log("User ID in deleteUserDetails:", globalUserId);
+
+                if (!globalUserId) {
+                    console.error("User ID is empty in deleteUserDetails");
+                    return;
+                }
+
+                $.ajax({
+                    url: "/delete_user_details",  // Make sure this matches the Flask route exactly
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ user_id: globalUserId }),
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("User details deleted successfully.");
+
+                            // Clear the globalUserId and any other related state here
+                            globalUserId = null;
+                            // Reset form fields or other UI elements as needed
+                            resetFormFields();
+
+                            // Optionally, redirect the user or update the UI to reflect the deletion
+                            // window.location.href = '/some-other-page';
+                            // or
+                            // updateUIAfterDeletion();
+                        } else {
+                            console.error("Failed to delete user details:", response.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error in deletion request:", error);
+                    }
+                });
+            }
+
+            function resetFormFields() {
+                $("#edit-form")[0].reset();
+                // Reset other UI elements if necessary
+            }
+
+            // Function to update the UI after deletion (if needed)
+            function updateUIAfterDeletion() {
+                // Implement UI updates here
+                // For example, hide certain elements, show success messages, etc.
+            }
+
+
 
             deleteButton.click(function () {
                 if (confirm("Are you sure you want to delete your details?")) {

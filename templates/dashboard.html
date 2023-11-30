@@ -204,6 +204,10 @@
             /* Remove fixed height */
         }
 
+        .job-cards-row:last-child {
+            margin-bottom: 120px;
+        }
+
         .job-card {
             flex: 0 0 auto;
             width: 400px;
@@ -534,7 +538,7 @@
                             can choose to incorporate. This feature accelerates the resume-building process and ensures
                             inclusion of key
                             elements sought by ATS systems. Experience the upgraded Resume Builder
-                            <a href="/ai-builder">
+                            <a href="/resume-builder">
                                 <span
                                     style="background-color: white; color: blue; border-radius: 10px; padding: 3px; text-decoration: underline;">Here</span>
                             </a>.
@@ -599,7 +603,7 @@
                 data.forEach(function (doc) {
                     let downloadLinks = "";
 
-                    if (doc.Document === "Custom Cover Letter" || doc.Document === "Cover Letter (Cover Letter Builder)") {
+                    if (doc.document_type.toLowerCase().includes("cover letter")) {
                         downloadLinks += `
                 <li class="list-group-item">
                     <a href="/download_document/${doc.id}?format=docx">
@@ -614,7 +618,7 @@
                     </a>
                 </li>
             `;
-                    } else if (doc.Document === "Tailored Resume" || doc.Document === "Resume (Resume Builder)") {
+                    } else if (doc.document_type.toLowerCase().includes("resume")) {
                         downloadLinks += `
                 <li class="list-group-item">
                     <a href="/download_html2pdf/${doc.id}?format=pdf">
@@ -627,6 +631,7 @@
                     $("#saved-documents-list").append(downloadLinks);
                 });
             });
+
 
         </script>
         <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
@@ -668,39 +673,34 @@
                             </td>
 
                             <!-- DOCX Download Link -->
+                            <!-- DOCX Download Link -->
                             <td>
-                                {% if doc.document_type == 'Custom Cover Letter' or doc.document_type == 'Cover
-                                Letter
-                                (Cover
-                                Letter Builder)' %}
+                                {% if 'cover letter' in doc.document_type|lower %}
                                 <a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">
                                     <img src="/static/images/docx.svg" alt="Download DOCX" class="icon-shadow"
                                         width="24" height="24">
                                 </a>
                                 {% else %}
-                                &nbsp; <!-- No DOCX download for resumes -->
+                                &nbsp; <!-- No DOCX download for other document types -->
                                 {% endif %}
                             </td>
 
+
                             <!-- PDF Download Link -->
                             <td>
-                                {% if doc.document_type == 'Tailored Resume' or doc.document_type == 'Resume (Resume
-                                Builder)'
-                                %}
+                                {% if 'resume' in doc.document_type|lower %}
                                 <a href="{{ url_for('download_html2pdf', document_id=doc.id, format='pdf') }}">
                                     <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24"
                                         height="24">
                                 </a>
-                                {% elif doc.document_type == 'Custom Cover Letter' or doc.document_type == 'Cover
-                                Letter
-                                (Cover
-                                Letter Builder)' %}
+                                {% elif 'cover letter' in doc.document_type|lower %}
                                 <a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">
                                     <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24"
                                         height="24">
                                 </a>
                                 {% endif %}
                             </td>
+
 
                             <!-- Delete Button -->
                             <td>
@@ -790,6 +790,11 @@
 </script>
 <script>
     console.log("Job cards loaded.");
+
+    // Add margin-bottom to the last row of job cards after rendering
+    const jobCardsRows = document.getElementsByClassName('job-cards-row');
+    const lastJobCardsRow = jobCardsRows[jobCardsRows.length - 1];
+    lastJobCardsRow.style.marginBottom = '130px';
 </script>
 <!-- Modal -->
 <div id="jobModal" class="modal">

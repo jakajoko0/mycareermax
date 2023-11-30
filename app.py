@@ -619,16 +619,15 @@ class WorkExperience(db.Model):
     end_date = db.Column(db.Date)
 
 class UserDetails(db.Model):
-    __tablename__ = 'UserDetails'  # Specify the actual table name here
-    UserID = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'UserDetails'
+    UserID = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     FullName = db.Column(db.String(255))
     RecentPosition = db.Column(db.String(255))
     DesiredJobTitle = db.Column(db.String(255))
     DesiredJobLocation = db.Column(db.String(255))
     DesiredWorkType = db.Column(db.String(50))
-    MinimumDesiredCompensation = db.Column(db.String(50))
+    DesiredCompensation = db.Column(db.String(50))
     JobAlertNotifications = db.Column(db.String(3))
-
 
 
 
@@ -3488,7 +3487,38 @@ def delete_user_details():
 def update_user_details():
     if request.method == 'POST':
         # Get data from the form
-        user_id = request.form.get('user_id')  # Get the user ID from the form data
+        user_id = request.form.get('user_id')
+
+        # Convert user_id to integer and handle potential errors
+        try:
+            user_id = int(user_id)
+        except (TypeError, ValueError):
+            return jsonify({'success': False, 'error': 'Invalid user ID format'}), 400
+
+        # Fetch the specific user's details based on user_id
+        user_details = UserDetails.query.get(user_id)
+        if user_details:
+            # Update user details
+            user_details.FullName = request.form.get('full_name')
+            user_details.RecentPosition = request.form.get('recent_position')
+            user_details.DesiredJobTitle = request.form.get('desired_job_title')
+            user_details.DesiredJobLocation = request.form.get('desired_job_location')
+            user_details.DesiredWorkType = request.form.get('desired_work_type')
+            user_details.DesiredCompensation = request.form.get('desired_compensation')
+            user_details.JobAlertNotifications = request.form.get('job_alert_notifications')
+
+            # Commit the changes to the database
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'User details updated successfully'})
+        else:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+
+    return jsonify({'success': False, 'error': 'Invalid request method'}), 400
+
+@app.route('/create_user_details', methods=['POST'])
+def create_user_details():
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')  # Make sure this is being sent from the front-end
         full_name = request.form.get('full_name')
         recent_position = request.form.get('recent_position')
         desired_job_title = request.form.get('desired_job_title')
@@ -3497,84 +3527,60 @@ def update_user_details():
         desired_compensation = request.form.get('desired_compensation')
         job_alert_notifications = request.form.get('job_alert_notifications')
 
-        # Fetch the specific user's details based on user_id
-        user_details = UserDetails.query.get(user_id)
-        if user_details:
-            # Update user details
-            user_details.FullName = full_name
-            user_details.RecentPosition = recent_position
-            user_details.DesiredJobTitle = desired_job_title
-            user_details.DesiredJobLocation = desired_job_location
-            user_details.DesiredWorkType = desired_work_type
-            user_details.MinimumDesiredCompensation = desired_compensation
-            user_details.JobAlertNotifications = job_alert_notifications
+        if not user_id:
+            return jsonify({'success': False, 'message': 'User ID is required'}), 400
 
-            # Commit the changes to the database
-            db.session.commit()
+        # Convert user_id to an integer
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Invalid User ID'}), 400
 
-            # Return a JSON response for AJAX requests
-            return jsonify({'success': True, 'message': 'User details updated successfully'})
-
-        else:
-            # User not found
-            return jsonify({'success': False, 'error': 'User not found'}), 404
-
-    # Handle other cases or errors here
-    return jsonify({'success': False, 'error': 'Invalid request method'}), 400
-
-
-@app.route('/create_user_details', methods=['POST'])
-def create_user_details():
-    if request.method == 'POST':
-        # Get data from the form
-        full_name = request.form.get('full_name')
-        recent_position = request.form.get('recent_position')
-        desired_job_title = request.form['desired_job_title']
-        desired_job_location = request.form['desired_job_location']
-        desired_work_type = request.form['desired_work_type']
-        minimum_desired_compensation = request.form['desired_compensation']
-        job_alert_notifications = request.form['job_alert_notifications']
-
-        # Create a new UserDetails object
         new_user_details = UserDetails(
+            UserID=user_id,
             FullName=full_name,
             RecentPosition=recent_position,
             DesiredJobTitle=desired_job_title,
             DesiredJobLocation=desired_job_location,
             DesiredWorkType=desired_work_type,
-            MinimumDesiredCompensation=minimum_desired_compensation,
+            DesiredCompensation=desired_compensation,
             JobAlertNotifications=job_alert_notifications
         )
 
-        # Add the new UserDetails object to the database
         db.session.add(new_user_details)
         db.session.commit()
 
-        flash('User details created successfully', 'success')
-        return jsonify({'success': True, 'message': 'User details created successfully', 'user_id': new_user_details.UserID})
+        return jsonify({'success': True, 'message': 'User details created successfully'})
 
-    return render_template('create_user_details.html')
+    return jsonify({'success': False, 'message': 'Invalid request method'}), 400
 
 @app.route('/get-user-details')
 def get_user_details():
     user_id = request.args.get('user_id')
-    user_details = UserDetails.query.get(user_id)
-    if user_details:
-        return jsonify({
-            'success': True,
-            'user': {
-                'full_name': user_details.FullName,
-                'recent_position': user_details.RecentPosition,
-                'desired_job_title': user_details.DesiredJobTitle,
-                'desired_job_location': user_details.DesiredJobLocation,
-                'desired_work_type': user_details.DesiredWorkType,
-                'desired_compensation': user_details.MinimumDesiredCompensation,
-                'job_alert_notifications': user_details.JobAlertNotifications
-            }
-        })
+    if user_id:
+        try:
+            user_id = int(user_id)
+            user_details = UserDetails.query.get(user_id)
+            if user_details:
+                return jsonify({
+                    'success': True,
+                    'user': {
+                        'full_name': user_details.FullName,
+                        'recent_position': user_details.RecentPosition,
+                        'desired_job_title': user_details.DesiredJobTitle,
+                        'desired_job_location': user_details.DesiredJobLocation,
+                        'desired_work_type': user_details.DesiredWorkType,
+                        'desired_compensation': user_details.DesiredCompensation,
+                        'job_alert_notifications': user_details.JobAlertNotifications
+                    }
+                })
+            else:
+                return jsonify({'success': False, 'error': 'User details not found'}), 404
+        except ValueError:
+            # Handle the case where user_id is not an integer
+            return jsonify({'success': False, 'error': 'Invalid user ID format'}), 400
     else:
-        return jsonify({'success': False, 'error': 'User details not found'}), 404
-
+        return jsonify({'success': False, 'error': 'User ID not provided'}), 400
 
 
 
@@ -3720,6 +3726,20 @@ def process_resume():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+        # # # # ## # # PERSONALIZED JOB SEARCH # # # ## # # #
+@app.route('/get-user-preferences')
+def get_user_preferences():
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id:
+        user_details = UserDetails.query.filter_by(UserID=user_id).first()
+        if user_details:
+            return jsonify({
+                'desired_job_title': user_details.DesiredJobTitle,
+                'desired_job_location': user_details.DesiredJobLocation,
+                'desired_work_type': user_details.DesiredWorkType
+            })
+    return jsonify({'error': 'User not authenticated or preferences not set'})
 
 
 

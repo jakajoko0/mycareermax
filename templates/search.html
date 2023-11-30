@@ -646,10 +646,15 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             const searchButton = document.getElementById('search-button');
+            const jobQueryInput = document.getElementById('job-query');
+            const jobLocationInput = document.getElementById('job-location');
+            const remoteJobsOnlyCheckbox = document.getElementById('remote-jobs-only');
             const jobsList = document.getElementById('jobs-list');
             const selectedJobDetails = document.getElementById('selected-job-details');
             let page = 1;
             let isFetchingJobs = false;
+            let userPreferences = {};
+            let currentSearchParams = {}; // Global variable to store current search parameters
 
             function updateAllSaveIcons() {
                 const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '{}');
@@ -781,12 +786,32 @@
                 }
                 toggleCloseButton(selectedJobDetails.style.display === 'block');
             }
-            // Function to fetch job listings based on the current search criteria
-            function fetchJobListings() {
-                console.log('Fetching initial job listings');
-                const jobQuery = document.getElementById('job-query').value;
-                const jobLocation = document.getElementById('job-location').value;
-                const remoteJobsOnly = document.getElementById('remote-jobs-only').checked;
+
+            // Fetch User Preferences and Initialize Search
+            fetch('/get-user-preferences')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                        resetAndFetchJobListings(); // Perform search with default parameters
+                    } else {
+                        // Store user preferences globally
+                        userPreferences = data;
+
+                        // Perform the initial job search using preferences
+                        // but do not set the input values for job-query and job-location
+                        fetchJobListings(data.desired_job_title, data.desired_job_location, data.desired_work_type === 'Remote');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user preferences:', error);
+                    resetAndFetchJobListings(); // Perform search with default parameters
+                });
+
+            // Updated fetchJobListings function
+            function fetchJobListings(jobQuery = '', jobLocation = '', remoteJobsOnly = false) {
+                // Store the current search parameters globally
+                currentSearchParams = { jobQuery, jobLocation, remoteJobsOnly };
 
                 const queryParams = new URLSearchParams({
                     query: jobQuery,
@@ -823,18 +848,24 @@
 
             // Event listener for the search button
             if (searchButton) {
-                searchButton.addEventListener('click', resetAndFetchJobListings);
+                searchButton.addEventListener('click', function () {
+                    // Perform the search with the manually entered values
+                    const currentJobQuery = jobQueryInput.value;
+                    const currentJobLocation = jobLocationInput.value;
+                    const currentRemoteJobsOnly = remoteJobsOnlyCheckbox.checked;
+
+                    fetchJobListings(currentJobQuery, currentJobLocation, currentRemoteJobsOnly);
+                });
             }
 
+            // Modified fetchMoreJobListings function
             function fetchMoreJobListings() {
-                if (isFetchingJobs) return; // Prevent multiple simultaneous requests
-                isFetchingJobs = true; // Set flag to true
-                page++; // Increment page number for the next API call
+                if (isFetchingJobs) return;
+                isFetchingJobs = true;
+                page++;
 
-                // Make an API call similar to fetchJobListings but for the next page
-                const jobQuery = document.getElementById('job-query').value;
-                const jobLocation = document.getElementById('job-location').value;
-                const remoteJobsOnly = document.getElementById('remote-jobs-only').checked;
+                // Use the current search parameters stored in the global variable
+                const { jobQuery, jobLocation, remoteJobsOnly } = currentSearchParams;
 
                 const queryParams = new URLSearchParams({
                     query: jobQuery,
@@ -846,14 +877,15 @@
                 fetch(`/fetch-job-listings-get?${queryParams.toString()}`, { method: 'GET' })
                     .then(response => response.json())
                     .then(data => {
-                        displayJobListings(data.data || [], true); // Append new jobs to the existing list
-                        isFetchingJobs = false; // Reset the flag after successful fetch
+                        displayJobListings(data.data || [], true);
+                        isFetchingJobs = false;
                     })
                     .catch(error => {
                         console.error('Error fetching more job listings:', error);
-                        isFetchingJobs = false; // Reset the flag even if the fetch fails
+                        isFetchingJobs = false;
                     });
             }
+
 
 
             // Function to select the first job in the list
@@ -897,8 +929,9 @@
             function setupInfiniteScroll() {
                 const jobsList = document.getElementById('jobs-list');
                 jobsList.addEventListener('scroll', () => {
-                    // Add a buffer amount to the condition to handle fast scrolling
+                    console.log('Scroll event triggered'); // Debugging line
                     if (jobsList.scrollTop + jobsList.clientHeight >= jobsList.scrollHeight - 200) {
+                        console.log('Fetching more job listings'); // Debugging line
                         fetchMoreJobListings();
                     }
                 });
@@ -1356,15 +1389,64 @@
                 }
             });
 
-            // Bind click event to save icons
-            document.querySelectorAll('.save-icon').forEach(saveIcon => {
-                saveIcon.addEventListener('click', function () {
-                    const jobId = this.getAttribute('data-job-id');
-                    const isCurrentlySaved = localStorage.getItem(`jobSaved_${jobId}`) === 'true';
-                    saveJob(jobId, isCurrentlySaved);
-                });
+            // Attach a click event listener to the jobsList
+            document.getElementById('jobs-list').addEventListener('click', function (event) {
+                const target = event.target;
+
+                // Check if the clicked element is a save icon
+                if (target.classList.contains('save-icon')) {
+                    event.preventDefault();
+                    const jobCard = target.closest('.job');
+                    const jobId = jobCard.getAttribute('data-job-id');
+                    const isCurrentlySaved = target.textContent === 'bookmark';
+
+                    // Immediate UI update
+                    target.textContent = isCurrentlySaved ? 'bookmark_added' : 'bookmark';
+
+                    // Background API call
+                    toggleJobSave(jobId, isCurrentlySaved, target);
+                }
             });
-            fetchJobListings();
+
+
+            function toggleJobSave(jobId, isCurrentlySaved, saveIcon) {
+                // Fetch the job card element
+                const jobCard = document.querySelector(`.job[data-job-id="${jobId}"]`);
+
+                // Construct jobData from the job card
+                const jobData = {
+                    job_id: jobId,
+                    job_title: jobCard.querySelector('.job-title').textContent,
+                    job_description: jobCard.querySelector('.job-description').textContent, // adjust the selector as per your HTML
+                    job_link: jobCard.querySelector('.job-link').getAttribute('href'), // adjust the selector as per your HTML
+                    job_loc: jobCard.querySelector('.job-location').textContent, // adjust the selector as per your HTML
+                    company_name: jobCard.querySelector('.employer-name').textContent,
+                    link: window.location.href, // assuming this is the current page URL
+                    employer_logo: jobCard.querySelector('.employer-logo').getAttribute('src') // adjust the selector as per your HTML
+                };
+
+                const endpoint = isCurrentlySaved ? '/save-job' : '/remove-saved-job';
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jobData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            console.error('Failed to update job save status:', data.error);
+                            // Revert UI change in case of error
+                            saveIcon.textContent = isCurrentlySaved ? 'bookmark' : 'bookmark_added';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating job save status:', error);
+                        // Revert UI change in case of error
+                        saveIcon.textContent = isCurrentlySaved ? 'bookmark' : 'bookmark_added';
+                    });
+            }
+
 
             setupInfiniteScroll();
             checkScreenSize();
