@@ -48,7 +48,7 @@ from flask import flash, get_flashed_messages
 from bs4 import BeautifulSoup
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-app = Flask(__name__)
+
 
 
 
@@ -3743,6 +3743,6 @@ def get_user_preferences():
 
 
 
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
