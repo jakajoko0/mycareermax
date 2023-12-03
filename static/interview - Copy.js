@@ -59,7 +59,13 @@ $("#interview-form").on("submit", function (event) {
     error: function (xhr, textStatus, error) {
       $("#loading-spinner").hide(); // <-- Add this line
 
+    if (xhr.status === 403) {
+      // Handle the specific case of a 403 error
+      alert("Access Denied. This feature is available for Premium Plus Plan subscribers only.");
+    } else {
+      // Handle other errors
       alert("An error occurred. Please try again.");
+    }
       $("input[type='submit']")
         .val("Simulate Interview")
         .prop("disabled", false);

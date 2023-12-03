@@ -140,7 +140,8 @@ def fetch_job_listings(user_preferences):
         return []
 
 
-def send_job_alert_email(email, job_listings):
+def send_job_alert_email(email, job_listings, sender_alias="mycareermax-jobs@mycareermax.com"):
+
     """
     Sends an email containing job listings to a user.
 
@@ -151,11 +152,11 @@ def send_job_alert_email(email, job_listings):
 
     smtp_server = "smtp.office365.com"
     smtp_port = 587
-    smtp_username = "mycareermax_alerts@mycareermax.com"
-    smtp_password = "&Skally02&"  # Replace with your actual email credentials
-    sender_email = smtp_username
+    smtp_username = os.getenv("SMTP_USERNAME")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    sender_email = sender_alias if sender_alias else smtp_username
     recipients = [email]
-    subject = "Your Weekly Job Matches Are Here!"
+    subject = "Your myCAREERMAX Matches Are Here!"
 
     # Add align="center" attribute to the img tag to center the image horizontally
     body = f"""
@@ -164,8 +165,22 @@ def send_job_alert_email(email, job_listings):
 <ul>
 {format_job_listings(job_listings)}
 </ul>
-"""
 
+    <p style="margin-top: 20px;">
+        If you need to update your job preferences or would like to be removed from these automated emails, please visit the 
+        <a href="https://app.mycareermax.com/myprofile">My Profile &gt; Edit Preferences</a> 
+        section on the <a href="https://app.mycareermax.com/login">myCAREERMAX</a>  website or mobile app. This way, we can ensure that we always send you the most relevant job opportunities.
+    </p>
+    
+    <p style="margin-top: 10px; color: purple;">
+        Thank you for allowing us to be a part of your career journey. We wish you the best in your job search and are here to support you every step of the way. Your success is our success, and we look forward to celebrating each milestone with you.
+    </p>
+
+    <p style="margin-top: 10px; color: purple;">
+        Cheers,<br>
+        The myCAREERMAX Team
+    </p>
+    """
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = ", ".join(recipients)
@@ -186,6 +201,7 @@ def send_job_alert_email(email, job_listings):
 # Function to format job listings as HTML
 def format_job_listings(job_listings):
     formatted_listings = "<ul style='list-style-type:none; padding: 0;'>"
+    default_logo = "https://drive.google.com/uc?export=download&id=1Xgk3urVjJ_Yy40FObqE4B6czESeyKoIc"
     for job in job_listings:
         title = job.get('job_title', 'No Title Available')
         company = job.get('employer_name', 'No Company Information')
@@ -194,24 +210,29 @@ def format_job_listings(job_listings):
         is_remote = 'Yes' if job.get('job_is_remote', False) else 'No'
         city = job.get('job_city', 'No City Info')
         publisher = job.get('job_publisher', 'Not Available')
+        employer_logo = job.get('employer_logo') or default_logo  # Use default logo if not available
 
         job_info = f"""
-        <li style='border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; border-radius: 5px;'>
-            <h3 style='margin-bottom: 0;'>{title}</h3>
-            <p style='margin-top: 5px;'><strong>{company}</strong> <br>
-            Employment Type: {employment_type}<br>
-            Remote: {is_remote}<br>
-            City: {city}<br>
-            Via: {publisher}</p>
-<a href='{apply_link}' style='text-decoration: none;'>
-  <button style='background-color: #4CAF50; color: white; padding: 8px 10px; border-radius: 5px; text-align: center; display: inline-block; font-size: 14px; margin: 4px 2px; cursor: pointer;'>Apply Here</button>
-</a>
-
+        <li style='border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; border-radius: 5px; display: flex; align-items: center;'>
+            <img src='{employer_logo}' alt='{company} Logo' style='max-width: 50px; max-height: 50px; margin-right: 10px;' onerror='this.src="{default_logo}";'>
+            <div>
+                <h3 style='margin-bottom: 0;'>{title}</h3>
+                <p style='margin-top: 5px;'><strong>{company}</strong> <br>
+                Employment Type: {employment_type}<br>
+                Remote: {is_remote}<br>
+                City: {city}<br>
+                Via: {publisher}</p>
+                <a href='{apply_link}' style='text-decoration: none;'>
+                    <button style='background-color: #4CAF50; color: white; padding: 8px 10px; border-radius: 5px; text-align: center; display: inline-block; font-size: 14px; margin: 4px 2px; cursor: pointer;'>Apply Here</button>
+                </a>
+            </div>
         </li>
         """
         formatted_listings += job_info
     formatted_listings += "</ul>"
     return formatted_listings
+
+
 
 
 

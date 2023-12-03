@@ -46,6 +46,7 @@ import json
 # noqa: F401
 from flask import flash, get_flashed_messages
 from bs4 import BeautifulSoup
+from flask import abort
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
@@ -319,8 +320,8 @@ def forgot_password():
 
         # Create email message
         msg = Message(
-            "myCAREERMAX Password Reset Request",
-            sender="password_reset@mycareermax.com",
+            "Password Reset Request",
+            sender="mycareermax_alerts@mycareermax.com",
             recipients=[email],
         )
         link = url_for("reset_token", token=token, _external=True)
@@ -330,7 +331,7 @@ def forgot_password():
             "---\n"
             "Note: This inbox is not monitored. Please do not reply to this email. "
             "If you have any questions or need further assistance, please contact us at "
-            "support@mycareermax.com"
+            "stephen@mycareermax.com"
         )
 
         # Send email
@@ -628,6 +629,20 @@ class UserDetails(db.Model):
     DesiredWorkType = db.Column(db.String(50))
     DesiredCompensation = db.Column(db.String(50))
     JobAlertNotifications = db.Column(db.String(3))
+
+class Subscription(db.Model):
+    __tablename__ = 'subscriptions'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
+    tier = db.Column(db.String(50))
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime)
+
+    user = db.relationship('User', backref=db.backref('subscription', uselist=False))
+
+    def is_active(self):
+        return self.end_date is None or datetime.utcnow() <= self.end_date
+
 
 
 
@@ -1616,6 +1631,10 @@ def generate_cover_letter():
 # INTERVIEW SIMULATOR OPENAI API CALLS
 @app.route("/simulate-interview", methods=["POST"])
 def simulate_interview():
+    # Check if the user is authorized for Tier 2
+    if not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Upgrade required for Premium Plus Plan"}), 403
+
     logging.info("Inside /simulate-interview route")  # Debugging
 
     if current_user.is_authenticated:
@@ -2077,6 +2096,8 @@ def extract_score_from_text(text):
 # MAX COUNSELOR BOT API CALL
 @app.route("/chat", methods=["POST"])
 def chat():
+    if not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Upgrade required for Premium Plus Plan"}), 403
     user_input = request.json.get("user_input")
     resume_content = request.json.get("resume_content")
 
@@ -2135,7 +2156,7 @@ def generate_pin():
 
     # Sending email
     msg = Message(
-        "Your PIN", sender="pin@mycareermax.com", recipients=[email]
+        "Your PIN", sender="mycareermax_alerts@mycareermax.com", recipients=[email]
     )
     msg.body = f"Your generated PIN is {pin}"
     mail.send(msg)
@@ -2453,6 +2474,9 @@ def update_job_status():
 @app.route("/job-details-coverletter", methods=["POST"])
 @login_required
 def job_details_coverletter():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     user_id = current_user.get_id()
     data = request.json
     job_id = data.get("jobId")
@@ -2527,6 +2551,9 @@ def read_html_template():
 @app.route("/job-details-resume", methods=["POST"])
 @login_required
 def job_details_resume():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     user_id = current_user.get_id()
     data = request.json
     job_id = data.get("jobId")
@@ -2628,13 +2655,14 @@ def get_user_documents():
             "id": doc.id,
             "document_name": doc.document_name,
             "document_type": doc.document_type,
-            "creation_date": doc.creation_date.strftime("%Y-%m-%d")  # Format the date
-            # Add other fields if necessary
+            "creation_date": doc.creation_date.strftime("%Y-%m-%d"),  # Format the date
+            "apply_link": doc.apply_link  # Add the apply_link field
         }
         for doc in user_documents
     ]
 
     return jsonify(documents_list)
+
 
     ############ RESUME BUILDER #####################################################################
 
@@ -2679,6 +2707,42 @@ def resume(user_id):
                            projects=projects,
                            certifications=certifications,
                            skills=skills)
+
+@app.route('/view-resume')
+def view_resume():
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id is None:
+        # Handle unauthenticated case
+        return "Please log in to view the resume", 401
+
+    # Call the 'resume' function to get the complete resume data
+    return resume(user_id)
+
+
+@app.route("/download_resume_pdf", methods=["GET"])
+def download_resume_pdf():
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id is None:
+        # Handle unauthenticated case
+        return "User not authenticated", 401
+
+    user_id = current_user.id if current_user.is_authenticated else None
+    if user_id is None:
+        # Handle unauthenticated case
+        return jsonify({"error": "User not authenticated"}), 401
+
+    # Use the existing 'resume' function to get the complete resume data in HTML format
+    # The 'resume' function should return an HTML string of the resume
+    html_content = resume(user_id)
+
+    # Convert the HTML to PDF using pdfkit
+    pdf_content = pdfkit.from_string(html_content, False)
+
+    # Stream the PDF back to the user
+    response = Response(stream_with_context(io.BytesIO(pdf_content)))
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "inline; filename=resume.pdf"
+    return response
 
     ################## RESUME INPUT PAGE ##########################
 
@@ -2818,11 +2882,13 @@ def delete_work_experience(experience_id):
     db.session.commit()
     return jsonify({'message': 'Work experience and associated bullet points deleted'}), 200
 
-from flask import jsonify, request
-import re  # Import regular expressions module
+
 
 @app.route('/generate-bullet-points', methods=['POST'])
 def generate_bullet_points():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     data = request.json
     job_title = data['job_title']
 
@@ -2858,6 +2924,9 @@ def generate_bullet_points():
 
 @app.route('/openai-enhance', methods=['POST'])
 def enhance_bullet_point():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     data = request.json
     bullet_text = data['text']
 
@@ -3274,6 +3343,9 @@ def delete_skill(skill_id):
 
 @app.route('/generate-skills', methods=['POST'])
 def generate_skills():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     data = request.json
     job_titles = data['job_titles']
 
@@ -3379,7 +3451,44 @@ def delete_summary(summary_id):
         db.session.rollback()
         return jsonify({'message': f'Error deleting summary: {str(e)}'}), 500
 
-############################## MY PROFILE ##########################################################################
+@app.route('/rephrase-summary', methods=['POST'])
+def process_summary():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
+    data = request.json
+    summary_text = data['summary']
+
+    # Revised prompt with specific instructions for output format
+    prompt = (f"Please rephrase the following summary from a resume to make it sound more professional. "
+              f"Provide the rephrased summary in a clear and concise manner, without any additional commentary or explanation.Very Important: Do not include any headers or titles before the revised summary. Your response should include just the rephrased summary and that is all. Do not include any text like 'Revised Summary:' before the summary.\n\n"
+              f"Original Summary: {summary_text}")
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.5,  # Adjusted for more precise output
+            max_tokens=150,    # Adjusted to limit the length of the response
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        
+        # Accessing the response content
+        rephrased_summary = completion.choices[0].message.content.strip()
+
+        return jsonify({'rephrased_summary': rephrased_summary})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+################ MY PROFILE ################################################################
 
 # # # # # # # # # RESUME UPLOAD - DOCX ## # # # # # # # # # # # #
 
@@ -3594,71 +3703,8 @@ def error():
     # Handle errors and display an appropriate error message
     return 'An error occurred. Please try again.'
 
-@app.route('/view-resume')
-def view_resume():
-    user_id = current_user.id if current_user.is_authenticated else None
-    if user_id is None:
-        # Handle unauthenticated case
-        return "Please log in to view the resume", 401
 
-    # Call the 'resume' function to get the complete resume data
-    return resume(user_id)
-
-
-@app.route("/download_resume_pdf", methods=["GET"])
-def download_resume_pdf():
-    user_id = current_user.id if current_user.is_authenticated else None
-    if user_id is None:
-        # Handle unauthenticated case
-        return "User not authenticated", 401
-
-    # Use the existing 'resume' function to get the complete resume data in HTML format
-    # The 'resume' function should return an HTML string of the resume
-    html_content = resume(user_id)
-
-    # Convert the HTML to PDF using pdfkitd
-    pdf_content = pdfkit.from_string(html_content, False)
-
-    # Stream the PDF back to the user
-    response = Response(stream_with_context(io.BytesIO(pdf_content)))
-    response.headers["Content-Type"] = "application/pdf"
-    response.headers["Content-Disposition"] = "inline"
-    return response
-
-@app.route('/rephrase-summary', methods=['POST'])
-def process_summary():
-    data = request.json
-    summary_text = data['summary']
-
-    # Revised prompt with specific instructions for output format
-    prompt = (f"Please rephrase the following summary from a resume to make it sound more professional. "
-              f"Provide the rephrased summary in a clear and concise manner, without any additional commentary or explanation.Very Important: Do not include any headers or titles before the revised summary. Your response should include just the rephrased summary and that is all. Do not include any text like 'Revised Summary:' before the summary.\n\n"
-              f"Original Summary: {summary_text}")
-
-    try:
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            temperature=0.5,  # Adjusted for more precise output
-            max_tokens=150,    # Adjusted to limit the length of the response
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
-        
-        # Accessing the response content
-        rephrased_summary = completion.choices[0].message.content.strip()
-
-        return jsonify({'rephrased_summary': rephrased_summary})
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+###################### RESUME REPORT ##################################
 @app.route('/extract-text', methods=['POST'])
 def extract_text():
     if 'file' not in request.files:
@@ -3726,8 +3772,7 @@ def process_resume():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-        # # # # ## # # PERSONALIZED JOB SEARCH # # # ## # # #
+# # # # ## # # PERSONALIZED JOB SEARCH - AUTO LOAD SAVED JOB PREFERENCES # # # ## # # #
 @app.route('/get-user-preferences')
 def get_user_preferences():
     user_id = current_user.id if current_user.is_authenticated else None
@@ -3741,7 +3786,66 @@ def get_user_preferences():
             })
     return jsonify({'error': 'User not authenticated or preferences not set'})
 
+        # # # # ## # # SUBSCRIPTION HANDLING # # # ## # # #
+
+#Feature Tiers
+
+#Free Tier:
+#Cover Letter Generator - (/generate-cover-letter)
+#Resume Report - (/process-resume)
+#Job Search and Application Tracker
+
+#Tier 1 (Premium):
+#All Free Features
+#Resume Builder - (/openai-enhance, /generate-bullet-points, /generate-skills, /rephrase-summary ) 
+#AI Job Search Generate Custom Docs - (/job-details-resume, /job-details-coverletter)
+
+#Tier 2 (Premium Plus):
+#All Tier 1 Features
+#Interview Prep Simulator - (/simulate-interview)
+#Career Counselor Chatbot - (/chat)
+
+@app.route('/update-subscription', methods=['POST'])
+@login_required
+def update_subscription():
+    try:
+        tier = request.json.get('tier')
+        end_date = request.json.get('end_date')  # Format as 'YYYY-MM-DD'
+
+        # Input validation
+        if not tier or not end_date:
+            abort(400, description="Missing required fields: tier and/or end_date.")
+
+        # Date parsing with error handling
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+        except ValueError:
+            abort(400, description="Invalid date format. Please use YYYY-MM-DD.")
+
+        # Update or create the subscription
+        if not current_user.subscription:
+            current_user.subscription = Subscription(user_id=current_user.id)
+
+        current_user.subscription.tier = tier
+        current_user.subscription.end_date = end_date_obj
+
+        db.session.commit()
+        return jsonify({"success": "Subscription updated"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+
+def is_authorized_for_tier(tier_required):
+    if current_user.is_authenticated:
+        subscription = current_user.subscription
+        if subscription and subscription.is_active() and subscription.tier == tier_required:
+            return True
+    return False
+
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+

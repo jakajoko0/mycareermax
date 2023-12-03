@@ -21,6 +21,29 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>'
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var coll = document.getElementsByClassName("collapsible")[0];
+            var icon = coll.getElementsByTagName("span")[1]; // Select the second span for the icon
+            // Initialize the collapsed state
+            var content = document.querySelector(".content");
+            var isCollapsed = false;
+
+            coll.addEventListener("click", function () {
+                if (isCollapsed) {
+                    content.style.display = "block";
+                    icon.innerHTML = 'unfold_less';  // Set icon to collapse
+                    isCollapsed = false;
+                } else {
+                    content.style.display = "none";
+                    icon.innerHTML = 'expand_all';  // Set icon to expand
+                    isCollapsed = true;
+                }
+            });
+        });
+    </script>
+
+
 
     <style>
         .table-container {
@@ -363,7 +386,7 @@
         .styled-button {
             display: inline-block;
             padding: 10px 20px;
-            background-image: linear-gradient(to bottom, #b700ff, #3776ff);
+            background-image: linear-gradient(to bottom, #00b00f, #00c210);
             color: white;
             border-color: #ffffff;
             text-decoration: none;
@@ -399,6 +422,45 @@
         .white-text {
             color: white;
             margin-bottom: 5px;
+        }
+
+        .collapsible-container {
+            text-align: center;
+            /* Center the button container */
+            margin-top: 20px;
+            /* Add some space above the button */
+        }
+
+        .collapsible {
+            background-image: linear-gradient(to right, #e1ff00, #deff3b);
+            /* background-color: #3300ff; */
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+            padding: 10px 15px;
+            text-align: center;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            border-radius: 10px;
+            margin: 10px auto;
+            /* Centering the button */
+            display: inline-block;
+            /* Make it a normal-sized button */
+        }
+
+
+        .content {
+            display: none;
+            overflow: hidden;
+            background-color: #000000;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
@@ -469,275 +531,291 @@
             </ul>
         </div>
     </nav>
-
     <div style="text-align:center;">
         <img alt="Your Logo" src="{{ url_for('static', filename='images/white-mycareermax.png') }}"
             style="max-width:100%;" />
-        <div class="container mt-5"
-            style="background-color: #000000; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); margin-bottom: 20px; padding: 10px;">
+
+        <!-- Collapsible Button Container -->
+        <div class="collapsible-container">
+            <button class="collapsible">
+                <span class="material-symbols-outlined">
+                    notifications
+                </span> We've been hard at work adding even more features to assist you in your job search. Click here
+                to
+                find out what we've been up to! <span class="material-symbols-outlined">
+                    expand_all
+                </span>
+            </button>
+        </div>
+
+        <!-- Collapsible Content -->
+        <div class="content">
             <div class="text-center white-text">
-                <!-- White Text Message with CSS class -->
-                <div style="font-size: 24px; margin-bottom: 25px">What's New?</div>
+                <!-- Centered White Text Message -->
+                <div class="text-center" style="font-size: 24px; margin-bottom: 25px">What's New?</div>
                 <div style="text-align: left;">
                     <p>
                         We're thrilled to introduce significant enhancements to our platform:
                     </p>
                     <ul style="margin-top: 0; padding-top: 0;">
-                        <li style="margin-bottom: 15px;"> <span
+                        <li style="margin-bottom: 15px;">
+                            <span
                                 style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">Redesigned
-                                Dashboard with
-                                New Job Tracker:</span> Our dashboard has undergone a comprehensive redesign,
-                            introducing a
-                            sophisticated Job Tracker tool. This upgrade
-                            enhances the job management experience by integrating the previously separate Saved Jobs
-                            section. All your saved jobs
-                            are automatically added to the tracker, with an advanced feature that analyzes job
-                            descriptions
-                            to provide a
-                            compatibility match score for each job. This allows you to efficiently track positions
-                            you've
-                            applied for and closely
-                            monitor your progress through each stage of the interview process, while also understanding
-                            how
-                            well your skills and
-                            experience align with each role.
-                            <a href="/dashboard#my-docs"
+                                Dashboard with New Job Tracker:</span>
+                            Our dashboard has undergone a comprehensive redesign, introducing a sophisticated Job
+                            Tracker
+                            tool. This upgrade enhances the job management experience by integrating the previously
+                            separate
+                            Saved Jobs section. All your saved jobs are automatically added to the tracker, with an
+                            advanced
+                            feature that analyzes job descriptions to provide a compatibility match score for each job.
+                            This
+                            allows you to efficiently track positions you've applied for and closely monitor your
+                            progress
+                            through each stage of the interview process, while also understanding how well your skills
+                            and
+                            experience align with each role. <a href="/dashboard#my-docs"
                                 style="background-color: white; color: blue; padding: 3px; border-radius: 10px; text-decoration: underline;">Check
                                 it out here</a>
                         </li>
 
-                        <li style="margin-bottom: 15px;"> <span
+                        <li style="margin-bottom: 15px;">
+                            <span
                                 style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">Enhanced
-                                Job Search
-                                Interface:</span> Experience a comprehensive UI transformation on our job search page,
-                            designed to present vital
+                                Job Search Interface:</span>
+                            Experience a comprehensive UI transformation on our job search page, designed to present
+                            vital
                             information at first glance. This update includes advanced features like efficient filtering
-                            options, seamless
-                            infinite scrolling, and personalized document management for each job listing, streamlining
-                            the
-                            entire job search
-                            process. Discover the improved functionality and user experience on our
-                            <a href="/search">
-                                <span
+                            options, seamless infinite scrolling, and personalized document management for each job
+                            listing,
+                            streamlining the entire job search process. Discover the improved functionality and user
+                            experience on our <a href="/search"><span
                                     style="background-color: white; color: blue; border-radius: 10px; padding: 3px; text-decoration: underline;">new
-                                    Job Search page</span>
-                            </a>.
+                                    Job Search page</span></a>.
                         </li>
 
-                        <li style="margin-bottom: 15px;"> <span
+                        <li style="margin-bottom: 15px;">
+                            <span
                                 style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">Revamped
-                                Resume
-                                Builder:</span> This intuitive tool guides users through each step of resume creation,
-                            offering a real-time
+                                Resume Builder:</span>
+                            This intuitive tool guides users through each step of resume creation, offering a real-time
                             preview for instant edits and refinements. As you craft your resume, see how each addition
                             or
-                            modification appears.
-                            The builder is further enhanced with ChatGPT4's suggestions for summaries, skills, and
-                            bullet
-                            points, which users
-                            can choose to incorporate. This feature accelerates the resume-building process and ensures
-                            inclusion of key
-                            elements sought by ATS systems. Experience the upgraded Resume Builder
-                            <a href="/resume-builder">
-                                <span
-                                    style="background-color: white; color: blue; border-radius: 10px; padding: 3px; text-decoration: underline;">Here</span>
-                            </a>.
+                            modification appears. The builder is further enhanced with ChatGPT4's suggestions for
+                            summaries,
+                            skills, and bullet points, which users can choose to incorporate. This feature accelerates
+                            the
+                            resume-building process and ensures inclusion of key elements sought by ATS systems.
+                            Experience
+                            the upgraded Resume Builder <a href="/resume-builder"><span
+                                    style="background-color: white; color: blue; border-radius: 10px; padding: 3px; text-decoration: underline;">Here</span></a>.
                         </li>
-                        <li style="margin-bottom: 15px;"> <span
+                        <li style="margin-bottom: 15px;">
+                            <span
                                 style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">New
-                                myCareerMax Resume
-                                Report:</span> Elevate your job application with our groundbreaking myCareerMax Resume
-                            Report. This innovative
+                                myCareerMax Resume Report:</span>
+                            Elevate your job application with our groundbreaking myCareerMax Resume Report. This
+                            innovative
                             feature meticulously analyzes your uploaded resume, providing a detailed assessment of its
-                            compatibility with
-                            Applicant Tracking Systems (ATS). Gain invaluable insights with a comprehensive
-                            section-by-section breakdown,
-                            complete with feedback and individual scoring. We offer an overall ATS optimization
-                            percentage
-                            score, pinpointing
-                            the strengths and areas for improvement. Additionally, the report furnishes a concise
-                            summary of
-                            the analysis,
-                            accentuating key observations, and extracts a list of pivotal keywords recognized by ATS.
-                            What's
-                            more, receive a
-                            tailored list of recommended actions to boost your resume's ATS score, ensuring it's
-                            fine-tuned
-                            for success in any
-                            ATS. Transform your resume into a powerful tool in your job search arsenal with myCareerMax
-                            Resume Report.
-                            <a href="/resume-report"
+                            compatibility with Applicant Tracking Systems (ATS). Gain invaluable insights with a
+                            comprehensive section-by-section breakdown, complete with feedback and individual scoring.
+                            We
+                            offer an overall ATS optimization percentage score, pinpointing the strengths and areas for
+                            improvement. Additionally, the report furnishes a concise summary of the analysis,
+                            accentuating
+                            key observations, and extracts a list of pivotal keywords recognized by ATS. What's more,
+                            receive a tailored list of recommended actions to boost your resume's ATS score, ensuring
+                            it's
+                            fine-tuned for success in any ATS. Transform your resume into a powerful tool in your job
+                            search
+                            arsenal with myCareerMax Resume Report. <a href="/resume-report"
                                 style="background-color: white; color: blue; padding: 3px; border-radius: 10px; text-decoration: underline;">Get
                                 Your Free ATS Score Now</a>
                         </li>
 
+                        <!-- New Feature List Item -->
+                        <li style="margin-bottom: 15px;">
+                            <span
+                                style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">New
+                                Job Alert Email Notifications:</span>
+                            Stay ahead in your job search with our latest feature - email notifications for job alerts.
+                            Now,
+                            you can opt to receive emails with job recommendations tailored to your preferences. Simply
+                            set
+                            your desired job details in the 'Edit Preferences' section of your profile, and we'll do the
+                            rest. This feature ensures you never miss out on potential opportunities that align
+                            perfectly
+                            with your career aspirations. <a href="/myprofile"
+                                style="background-color: white; color: blue; padding: 3px; border-radius: 10px; text-decoration: underline;">Set
+                                Your Preferences Now</a>
+                        </li>
                     </ul>
-
-                    <!-- New ATS Optimized Resume Builder Link -->
-                    <p>
-                        Get started by uploading your resume to your profile. If you would like a resume refresh or need
-                        to
-                        create a new
-                        resume,
-                        <span style="background-color: white; border-radius: 5px; padding: 2px 4px;">
-                            <a href="/resume-builder" style="color: blue; text-decoration: underline;">click here</a>
-                        </span>
-                        to access our New ATS Optimized Resume Builder.
-                    </p>
                 </div>
-
-                <!-- View My Profile Button -->
-                <a href="{{ url_for('myprofile') }}" class="styled-button">View My Profile</a>
             </div>
+        </div>
+
+        <!-- New ATS Optimized Resume Builder Link (moved outside the container) -->
+        <p style="margin-top: 40px; text-align: center; color: white; font-size: 30px;">
+            <strong>Get Started Now By Uploading Your Resume To Your Profile</strong>
+        </p>
+        <div style="text-align: center;">
+            <span class="material-symbols-outlined" style="font-size: 48px; color: white;">
+                arrow_downward
+            </span>
         </div>
 
 
 
 
+        <!-- View My Profile Button (moved outside the container) -->
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="{{ url_for('myprofile') }}" class="styled-button">View My Profile</a>
+        </div>
+    </div>
 
 
-        <script>
+    <script>
 
-            // Fetch the user's documents and populate the list
-            $.get("/get_user_documents", function (data) {
-                data.forEach(function (doc) {
-                    let downloadLinks = "";
+        // Fetch the user's documents and populate the list
+        $.get("/get_user_documents", function (data) {
+            data.forEach(function (doc) {
+                let downloadLinks = "";
 
-                    if (doc.document_type.toLowerCase().includes("cover letter")) {
-                        downloadLinks += `
+                if (doc.document_type.toLowerCase().includes("cover letter")) {
+                    downloadLinks += `
                 <li class="list-group-item">
                     <a href="/download_document/${doc.id}?format=docx">
                         <img src="/static/images/docx.svg" alt="Download DOCX" class="icon-shadow" width="24" height="24">
                     </a>
                 </li>
             `;
-                        downloadLinks += `
+                    downloadLinks += `
                 <li class="list-group-item">
                     <a href="/download_document/${doc.id}?format=pdf">
                         <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24" height="24">
                     </a>
                 </li>
             `;
-                    } else if (doc.document_type.toLowerCase().includes("resume")) {
-                        downloadLinks += `
+                } else if (doc.document_type.toLowerCase().includes("resume")) {
+                    downloadLinks += `
                 <li class="list-group-item">
                     <a href="/download_html2pdf/${doc.id}?format=pdf">
                         <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24" height="24">
                     </a>
                 </li>
             `;
-                    }
+                }
 
-                    $("#saved-documents-list").append(downloadLinks);
-                });
+                $("#saved-documents-list").append(downloadLinks);
             });
+        });
 
 
-        </script>
-        <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px;">
-            <h2 style="color: #007BFF;">My Docs</h2>
-            <div class="table-responsive" id="my-docs">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Apply Link</th>
-                            <th>Document</th>
-                            <th>Job Title</th>
-                            <th>Company Name</th>
-                            <th>Interview Prep</th>
-                            <th>Download DOCX</th>
-                            <th>Download PDF</th>
-                            <th>Delete</th>
-                            <th>Creation Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for doc in documents %}
-                        <tr>
-                            <!-- Updated Apply Link with Icon -->
+    </script>
+    <div class="table-container" style="background-color: white; padding: 20px; border-radius: 10px; margin-top: 20px;">
+        <h2 style="color: #007BFF;">My Docs</h2>
+        <div class="table-responsive" id="my-docs">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <!-- <th>Apply Link</th> -->
+                        <th>Document</th>
+                        <th>Job Title</th>
+                        <th>Company Name</th>
+                        <th>Interview Prep</th>
+                        <th>Download DOCX</th>
+                        <th>Download PDF</th>
+                        <th>Delete</th>
+                        <th>Creation Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <!-- Updated Apply Link with Icon 
                             <td>
                                 <a href="{{ doc.apply_link }}" target="_blank">
                                     <span class="material-symbols-outlined icon-shadow">contract_edit</span>
                                 </a>
                             </td>
+-->
 
-                            <td>{{ doc.document_type }}</td>
-                            <td>{{ doc.job_title }}</td>
-                            <td>{{ doc.company_name }}</td>
-                            <td>
-                                <a href="/interview-prep" target="_blank">
-                                    <span class="material-symbols-outlined icon-shadow">
-                                        partner_exchange
-                                    </span>
-                                </a>
-                            </td>
-
-                            <!-- DOCX Download Link -->
-                            <!-- DOCX Download Link -->
-                            <td>
-                                {% if 'cover letter' in doc.document_type|lower %}
-                                <a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">
-                                    <img src="/static/images/docx.svg" alt="Download DOCX" class="icon-shadow"
-                                        width="24" height="24">
-                                </a>
-                                {% else %}
-                                &nbsp; <!-- No DOCX download for other document types -->
-                                {% endif %}
-                            </td>
-
-
-                            <!-- PDF Download Link -->
-                            <td>
-                                {% if 'resume' in doc.document_type|lower %}
-                                <a href="{{ url_for('download_html2pdf', document_id=doc.id, format='pdf') }}">
-                                    <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24"
-                                        height="24">
-                                </a>
-                                {% elif 'cover letter' in doc.document_type|lower %}
-                                <a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">
-                                    <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24"
-                                        height="24">
-                                </a>
-                                {% endif %}
-                            </td>
-
-
-                            <!-- Delete Button -->
-                            <td>
-                                <span class="material-symbols-outlined icon-shadow"
-                                    onclick="deleteDocument({{ doc.id }})">
-                                    delete
+                        <td>{{ doc.document_type }}</td>
+                        <td>{{ doc.job_title }}</td>
+                        <td>{{ doc.company_name }}</td>
+                        <td>
+                            <a href="/interview-prep" target="_blank">
+                                <span class="material-symbols-outlined icon-shadow">
+                                    partner_exchange
                                 </span>
-                            </td>
-                            <!-- Creation Date -->
-                            <td>{{ doc.creation_date }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </a>
+                        </td>
+
+                        <!-- DOCX Download Link -->
+                        <!-- DOCX Download Link -->
+                        <td>
+                            {% if 'cover letter' in doc.document_type|lower %}
+                            <a href="{{ url_for('download_document', document_id=doc.id, format='docx') }}">
+                                <img src="/static/images/docx.svg" alt="Download DOCX" class="icon-shadow" width="24"
+                                    height="24">
+                            </a>
+                            {% else %}
+                            &nbsp; <!-- No DOCX download for other document types -->
+                            {% endif %}
+                        </td>
+
+
+                        <!-- PDF Download Link -->
+                        <td>
+                            {% if 'resume' in doc.document_type|lower %}
+                            <a href="{{ url_for('download_html2pdf', document_id=doc.id, format='pdf') }}">
+                                <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24"
+                                    height="24">
+                            </a>
+                            {% elif 'cover letter' in doc.document_type|lower %}
+                            <a href="{{ url_for('download_document', document_id=doc.id, format='pdf') }}">
+                                <img src="/static/images/pdf.svg" alt="Download PDF" class="icon-shadow" width="24"
+                                    height="24">
+                            </a>
+                            {% endif %}
+                        </td>
+
+
+                        <!-- Delete Button -->
+                        <td>
+                            <span class="material-symbols-outlined icon-shadow" onclick="deleteDocument({{ doc.id }})">
+                                delete
+                            </span>
+                        </td>
+                        <!-- Creation Date -->
+                        <td>{{ doc.creation_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+    </div>
 
 
 
-        <script>
-            function deleteDocument(documentId) {
-                if (confirm("Are you sure you want to delete this document?")) {
-                    $.ajax({
-                        url: '/delete_document/' + documentId,
-                        type: 'DELETE',
-                        success: function (response) {
-                            if (response.success) {
-                                alert('Document deleted successfully!');
-                                location.reload(); // Reload the page to update the table
-                            } else {
-                                alert('Error deleting document. Please try again.');
-                            }
+    <script>
+        function deleteDocument(documentId) {
+            if (confirm("Are you sure you want to delete this document?")) {
+                $.ajax({
+                    url: '/delete_document/' + documentId,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Document deleted successfully!');
+                            location.reload(); // Reload the page to update the table
+                        } else {
+                            alert('Error deleting document. Please try again.');
                         }
-                    });
-                }
+                    }
+                });
             }
-        </script>
+        }
+    </script>
 </body>
 
 {% for status, jobs in saved_jobs_by_status.items() %}
