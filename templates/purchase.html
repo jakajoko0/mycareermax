@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Purchase Page</title>
+    <!-- Other head elements -->
+</head>
+
+<body>
+    <!-- Placeholder for Stripe Checkout -->
+    <div id="stripe-checkout" style="display: none;">
+        <p>Stripe Checkout</p>
+    </div>
+
+    <!-- Placeholder for In-app Purchase Instructions -->
+    <div id="app-instructions" style="display: none;">
+        <p>Instructions for Google Play Checkout</p>
+    </div>
+    <script>
+
+        // Detect the platform the user is on
+        function detectPlatform() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) {
+                return 'androidApp';
+            }
+            return 'web';
+        }
+
+        // Execute platform-based actions on page load
+        window.onload = function () {
+            var platform = detectPlatform();
+
+            if (platform === 'web') {
+                // Show Stripe checkout option
+                document.getElementById('stripe-checkout').style.display = 'block';
+            } else if (platform === 'androidApp') {
+                // Show instructions for in-app purchases
+                document.getElementById('app-instructions').style.display = 'block';
+            }
+        };
+    </script>
+</body>
+
+</html>

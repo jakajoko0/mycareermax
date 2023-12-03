@@ -261,6 +261,13 @@ def extension_test():
 def submitted():
     return render_template("submitted.html")
 
+@app.route("/purchase")
+@login_required 
+def purchase():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("purchase.html", user_id=user_id)
+
+
 
 def retrieve_latest_resume(user_id):
     try:
