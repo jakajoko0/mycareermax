@@ -43,7 +43,8 @@
         });
     </script>
 
-
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
 
     <style>
         .table-container {
@@ -462,6 +463,66 @@
         .text-center {
             text-align: center;
         }
+
+        .stripe-payment-cards-container {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .stripe-payment-card {
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Enhanced box shadow for better visibility */
+            background-color: white;
+            /* Card background */
+            color: black;
+            /* Card text color */
+            text-align: center;
+            /* Centering text */
+        }
+
+        .stripe-payment-card h3 {
+            margin-top: 0;
+        }
+
+        .stripe-payment-card p {
+            margin: 10px 0;
+            /* Spacing around the paragraph */
+        }
+
+        .stripe-payment-card button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            /* Rounded corners for the button */
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            /* Center the button */
+            margin: 4px 2px;
+            /* Spacing around the button */
+        }
+
+        h5 {
+            font-size: 50px;
+        }
+
+        h6 {
+            font-size: 30px;
+        }
+
+        h3 {
+            font-size: 15px;
+        }
     </style>
 </head>
 <script defer>
@@ -477,6 +538,7 @@
             }
         });
     });
+
 </script>
 
 <body>
@@ -489,6 +551,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/subscription"
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
@@ -534,13 +600,27 @@
     <div style="text-align:center;">
         <img alt="Your Logo" src="{{ url_for('static', filename='images/white-mycareermax.png') }}"
             style="max-width:100%;" />
-
+        <div style="text-align:center;">
+            <p style="margin-top: 40px; text-align: center; color: white; font-size: 20px;">
+                <strong>✨ myCareerMax Update: Introducing Our New Premium and Max Plans! You may keep using our free
+                    Standard
+                    features, or upgrade for more: Premium
+                    offers advanced AI tools, and Max includes personalized AI career guidance. All with a 30-day free
+                    trial! <a href="/subscription"
+                        style="color: white; text-decoration: underline; font-weight: bold;">CLICK HERE</a> for
+                    a full features list.</strong>
+            </p>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{{ url_for('subscription') }}" class="styled-button">Start Your 30 Day Free Trial Now</a>
+            </div>
+        </div>
         <!-- Collapsible Button Container -->
         <div class="collapsible-container">
             <button class="collapsible">
                 <span class="material-symbols-outlined">
                     notifications
-                </span> We've been hard at work adding even more features to assist you in your job search. Click here
+                </span> We've been hard at work adding even more features to assist you in your job search. Click
+                here
                 to
                 find out what we've been up to! <span class="material-symbols-outlined">
                     expand_all
@@ -568,11 +648,13 @@
                             separate
                             Saved Jobs section. All your saved jobs are automatically added to the tracker, with an
                             advanced
-                            feature that analyzes job descriptions to provide a compatibility match score for each job.
+                            feature that analyzes job descriptions to provide a compatibility match score for each
+                            job.
                             This
                             allows you to efficiently track positions you've applied for and closely monitor your
                             progress
-                            through each stage of the interview process, while also understanding how well your skills
+                            through each stage of the interview process, while also understanding how well your
+                            skills
                             and
                             experience align with each role. <a href="/dashboard#my-docs"
                                 style="background-color: white; color: blue; padding: 3px; border-radius: 10px; text-decoration: underline;">Check
@@ -585,7 +667,8 @@
                                 Job Search Interface:</span>
                             Experience a comprehensive UI transformation on our job search page, designed to present
                             vital
-                            information at first glance. This update includes advanced features like efficient filtering
+                            information at first glance. This update includes advanced features like efficient
+                            filtering
                             options, seamless infinite scrolling, and personalized document management for each job
                             listing,
                             streamlining the entire job search process. Discover the improved functionality and user
@@ -598,12 +681,15 @@
                             <span
                                 style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">Revamped
                                 Resume Builder:</span>
-                            This intuitive tool guides users through each step of resume creation, offering a real-time
-                            preview for instant edits and refinements. As you craft your resume, see how each addition
+                            This intuitive tool guides users through each step of resume creation, offering a
+                            real-time
+                            preview for instant edits and refinements. As you craft your resume, see how each
+                            addition
                             or
                             modification appears. The builder is further enhanced with ChatGPT4's suggestions for
                             summaries,
-                            skills, and bullet points, which users can choose to incorporate. This feature accelerates
+                            skills, and bullet points, which users can choose to incorporate. This feature
+                            accelerates
                             the
                             resume-building process and ensures inclusion of key elements sought by ATS systems.
                             Experience
@@ -616,17 +702,23 @@
                                 myCareerMax Resume Report:</span>
                             Elevate your job application with our groundbreaking myCareerMax Resume Report. This
                             innovative
-                            feature meticulously analyzes your uploaded resume, providing a detailed assessment of its
+                            feature meticulously analyzes your uploaded resume, providing a detailed assessment of
+                            its
                             compatibility with Applicant Tracking Systems (ATS). Gain invaluable insights with a
-                            comprehensive section-by-section breakdown, complete with feedback and individual scoring.
+                            comprehensive section-by-section breakdown, complete with feedback and individual
+                            scoring.
                             We
-                            offer an overall ATS optimization percentage score, pinpointing the strengths and areas for
+                            offer an overall ATS optimization percentage score, pinpointing the strengths and areas
+                            for
                             improvement. Additionally, the report furnishes a concise summary of the analysis,
                             accentuating
-                            key observations, and extracts a list of pivotal keywords recognized by ATS. What's more,
-                            receive a tailored list of recommended actions to boost your resume's ATS score, ensuring
+                            key observations, and extracts a list of pivotal keywords recognized by ATS. What's
+                            more,
+                            receive a tailored list of recommended actions to boost your resume's ATS score,
+                            ensuring
                             it's
-                            fine-tuned for success in any ATS. Transform your resume into a powerful tool in your job
+                            fine-tuned for success in any ATS. Transform your resume into a powerful tool in your
+                            job
                             search
                             arsenal with myCareerMax Resume Report. <a href="/resume-report"
                                 style="background-color: white; color: blue; padding: 3px; border-radius: 10px; text-decoration: underline;">Get
@@ -638,11 +730,14 @@
                             <span
                                 style="background-color: #3300ff; color: white; border-radius: 10px; padding: 3px;">New
                                 Job Alert Email Notifications:</span>
-                            Stay ahead in your job search with our latest feature - email notifications for job alerts.
+                            Stay ahead in your job search with our latest feature - email notifications for job
+                            alerts.
                             Now,
-                            you can opt to receive emails with job recommendations tailored to your preferences. Simply
+                            you can opt to receive emails with job recommendations tailored to your preferences.
+                            Simply
                             set
-                            your desired job details in the 'Edit Preferences' section of your profile, and we'll do the
+                            your desired job details in the 'Edit Preferences' section of your profile, and we'll do
+                            the
                             rest. This feature ensures you never miss out on potential opportunities that align
                             perfectly
                             with your career aspirations. <a href="/myprofile"
@@ -1037,6 +1132,15 @@
                 $(this).css('z-index', parseInt(backdropZIndex) + 10);
             }
         });
+    });
+</script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('unauthorized')) {
+            // Display the unauthorized message
+            alert("You need to be subscribed to Tier 2 to access this feature.");
+        }
     });
 </script>
 

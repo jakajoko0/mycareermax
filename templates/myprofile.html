@@ -74,7 +74,8 @@
             /* Adjust the margin-top value as needed */
         }
     </style>
-
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body>
@@ -88,6 +89,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/subscription"
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
@@ -172,6 +177,25 @@
                         <span class="material-symbols-outlined">menu_open</span>
                         Edit Preferences
                     </button>
+                </div>
+
+                <div style="text-align:center;">
+                    <a href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc" style="
+                                background: linear-gradient(to right, #001eff, #1fc749);
+                                border-radius: 10px;
+                                padding: 10px 20px;
+                                color: white;
+                                font-weight: bold;
+                                margin-top: 20px;
+                                margin-bottom: 20px;
+                                position: relative;
+                                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+                                             0 2px 2px rgba(0, 0, 0, 0.3),
+                                             0 4px 4px rgba(0, 0, 0, 0.4),
+                                             0 8px 8px rgba(0, 0, 0, 0.5);
+                              ">
+                        Manage Active Subscription
+                    </a>
                 </div>
 
                 <!-- Edit form (outside any other form) -->

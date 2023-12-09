@@ -1,4 +1,5 @@
-FROM python:3.10
+# Use Python 3.12 image as the base
+FROM python:3.12
 
 WORKDIR /app
 

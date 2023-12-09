@@ -15,6 +15,8 @@
   <div id="loading-spinner" style="display: none;">
     <div class="spinner"></div>
   </div>
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
@@ -234,6 +236,15 @@
       padding: 20px;
       /* Padding */
     }
+
+    .flash {
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      color: red;
+      /* or any color */
+      background-color: #f8f8f8;
+    }
   </style>
 
   <!-- Bootstrap CSS -->
@@ -313,6 +324,9 @@
 </script>
 
 <body>
+  {% for message in get_flashed_messages(category_filter=["info", "warning", "error"]) %}
+  <div class="flash {{ message[1] }}">{{ message[0] }}</div>
+  {% endfor %}
   <script defer>
     // Your existing JavaScript code
 
@@ -341,6 +355,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/subscription"
+              style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+          </li>
           <!-- Existing dropdown for the username -->
           <li class="nav-item dropdown">
             <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"

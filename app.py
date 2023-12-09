@@ -1,5 +1,7 @@
 # Import necessary libraries
 import os
+import stripe
+from apscheduler.schedulers.background import BackgroundScheduler
 from resume_builder import resume_builder  # Import the resume_builder function
 from dotenv import load_dotenv
 from flask import Response, stream_with_context
@@ -16,6 +18,9 @@ load_dotenv()
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 import logging
+#from opencensus.ext.azure.log_exporter import AzureLogHandler
+#from azure.identity import DefaultAzureCredential
+#from azure.keyvault.secrets import SecretClient
 from docx import Document
 import io
 from flask import send_file
@@ -52,6 +57,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 
+# Set up Azure log handler with your connection string
+#logger = logging.getLogger(__name__)
+#logger.addHandler(AzureLogHandler(connection_string='InstrumentationKey=24b52eea-a629-4426-816e-d819bef3b24c;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/'))
 
 
 def create_connection(max_retries=5, wait_time_in_seconds=5):
@@ -100,12 +108,20 @@ if __name__ == "__main__":
         print("Failed to establish connection.")
 
 
-# keys
+
+# RAPIDAPI
 RAPIDAPI_KEY = "04c645fbbdmshf581fe252de3b82p178cedjsn43d2da570f56"
 RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
 RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
 
-
+#stripe api
+stripe.api_version = "2023-10-16"
+stripe.api_key = "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"
+#stripe webhook
+endpoint_secret = 'whsec_sFYjxUvIBXWWdWUzWevSNWihQaxiDkhr'
+#Logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 # Create a Flask app instance and configure it
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -123,9 +139,9 @@ client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 CORS(app)
 
 
-@app.before_request
-def log_request_size():
-    app.logger.debug(f"Request size: {len(request.get_data())}")
+#@app.before_request
+#def log_request_size():
+ #   app.logger.debug(f"Request size: {len(request.get_data())}")
 
 
 # Configure Flask-Mail
@@ -160,10 +176,9 @@ pdf_options = {"encoding": "UTF-8"}
 # }
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
 
 # Initialize the logger
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 # Create a LoginManager instance
 login_manager = LoginManager()
@@ -249,9 +264,6 @@ def delete_user_and_associated_data(username):
         conn.close()
 
 
-    
-
-
 @app.route("/extension_test")
 def extension_test():
     return render_template("extension_test.html")
@@ -262,11 +274,31 @@ def submitted():
     return render_template("submitted.html")
 
 @app.route("/purchase")
-@login_required 
+#@login_required 
 def purchase():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("purchase.html", user_id=user_id)
 
+@app.route("/subscription")
+def subscription():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("subscription.html", user_id=user_id)    
+
+@app.route("/checkout")
+@login_required 
+def checkout():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("checkout.html", user_id=user_id)
+
+@app.route('/success', methods=['GET'])
+def success():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("success.html", user_id=user_id)
+
+@app.route('/cancel', methods=['GET'])
+def cancel():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("cancel.html", user_id=user_id)
 
 
 def retrieve_latest_resume(user_id):
@@ -375,7 +407,6 @@ def reset_token(token):
 
     return render_template("reset_token.html")
 
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     message = None
@@ -391,7 +422,6 @@ def register():
         elif password != confirm_password:
             message = "Passwords do not match!"
         else:
-            # Connect to the database
             with pyodbc.connect(conn_str) as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
@@ -399,21 +429,20 @@ def register():
                 if user:
                     message = "Username already exists!"
                 else:
-                    # Hash the password (assuming you're using bcrypt)
-                    hashed_password = bcrypt.hashpw(
-                        password.encode("utf-8"), bcrypt.gensalt()
-                    )
+                    # Hash the password
+                    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-                    # Insert user data into the database
+                    # Insert user data into the database (without Stripe customer ID)
                     cursor.execute(
                         "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                        (username, email, hashed_password),
+                        (username, email, hashed_password)
                     )
                     conn.commit()
                     message = "User registered successfully!"
                     return redirect(url_for("login"))
 
     return render_template("register.html", message=message)
+
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -497,6 +526,8 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     access_token = db.Column(db.String(255))
+    stripe_customer_id = db.Column(db.String(255))
+
 
     @property
     def is_authenticated(self):
@@ -636,6 +667,118 @@ class UserDetails(db.Model):
     DesiredCompensation = db.Column(db.String(50))
     JobAlertNotifications = db.Column(db.String(3))
 
+class Subscription(db.Model):
+    __tablename__ = 'subscriptions'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
+    tier = db.Column(db.String(50))
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime)
+
+    user = db.relationship('User', backref=db.backref('subscription', uselist=False))
+
+    def is_active(self):
+        return self.end_date is None or datetime.utcnow() <= self.end_date
+
+
+
+# Reverse mapping from Price IDs to Tier Names
+tier_from_price_id = {
+    'price_1OJOPqBmOXAq5RyDWYawmWvf': 'Tier1',
+    'price_1OJOPyBmOXAq5RyDzIAxE0tc': 'Tier2',
+    'price_1OJXflBmOXAq5RyDxEqGCZMg': 'FreePlan'
+}
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    payload = request.get_data(as_text=True)
+    sig_header = request.headers['STRIPE_SIGNATURE']
+    event = None
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+        data = event['data']
+        event_type = event['type']
+        data_object = data['object']
+
+        logger.info(f'Received Stripe webhook event: {event_type}')
+
+        if event_type in ['customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted']:
+            stripe_customer_id = data_object['customer']
+
+            # Retrieve the customer's email from Stripe
+            stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
+            customer_email = stripe_customer['email']
+
+            conn = create_connection()
+            cursor = conn.cursor()
+
+            # Update or Insert user with the new stripe_customer_id
+            cursor.execute("""
+                IF EXISTS (SELECT 1 FROM dbo.users WHERE email = ?)
+                    UPDATE dbo.users SET stripe_customer_id = ? WHERE email = ?
+                ELSE
+                    INSERT INTO dbo.users (email, stripe_customer_id) VALUES (?, ?)
+                """, customer_email, stripe_customer_id, customer_email, customer_email, stripe_customer_id)
+
+            # Fetch User ID using email address
+            cursor.execute("SELECT id FROM dbo.users WHERE email = ?", customer_email)
+            user_id = cursor.fetchone()[0]
+
+            logger.info(f'User ID {user_id} updated with Stripe customer ID: {stripe_customer_id}')
+
+            if event_type in ['customer.subscription.created', 'customer.subscription.updated']:
+                price_id = data_object['items']['data'][0]['price']['id']
+                tier = tier_from_price_id.get(price_id, 'Unknown')
+                start_date = datetime.fromtimestamp(data_object['current_period_start'])
+                end_date = datetime.fromtimestamp(data_object['current_period_end'])
+
+                # Check for existing subscription
+                cursor.execute("SELECT id FROM dbo.subscriptions WHERE user_id = ?", user_id)
+                subscription_result = cursor.fetchone()
+
+                if subscription_result:
+                    # Update existing subscription
+                    logger.info(f'Updating subscription: User ID {user_id}, Tier {tier}')
+                    cursor.execute(
+                        "UPDATE dbo.subscriptions SET tier = ?, start_date = ?, end_date = ? WHERE user_id = ?",
+                        tier, start_date, end_date, user_id
+                    )
+                else:
+                    # Create new subscription
+                    logger.info(f'Creating new subscription: User ID {user_id}, Tier {tier}')
+                    cursor.execute(
+                        "INSERT INTO dbo.subscriptions (user_id, tier, start_date, end_date) VALUES (?, ?, ?, ?)",
+                        user_id, tier, start_date, end_date
+                    )
+
+            elif event_type == 'customer.subscription.deleted':
+                logger.info(f'Processing subscription deletion for User ID {user_id}')
+                # Set the end date for all subscriptions of the user to now
+                current_time = datetime.utcnow()
+                cursor.execute(
+                    "UPDATE dbo.subscriptions SET end_date = ? WHERE user_id = ? AND (end_date > ? OR end_date IS NULL)",
+                    current_time, user_id, current_time
+                )
+
+            conn.commit()
+            conn.close()
+
+    except stripe.error.SignatureVerificationError as e:
+        logger.error(f'Signature verification failed: {e}')
+        return jsonify({'error': 'Invalid signature'}), 400
+    except Exception as e:
+        logger.exception(f'Internal server error: {e}')
+        return jsonify({'error': 'Internal server error'}), 500
+
+    logger.info('Stripe webhook processed successfully')
+    return jsonify({'status': 'success'})
+
+
+
+@app.route('/.well-known/<path:filename>')
+def well_known(filename):
+    directory = os.path.join(app.root_path, '.well-known')
+    return send_from_directory(directory, filename)
 
 
 @app.route("/get-username")
@@ -652,7 +795,7 @@ def get_username():
             else:
                 return jsonify({"success": False, "error": "User not found."})
     except Exception as e:
-        app.logger.error(f"Failed to fetch username: {e}")
+       # app.logger.error(f"Failed to fetch username: {e}")
         return jsonify({"success": False, "error": "Failed to fetch username."})
 
 
@@ -959,7 +1102,7 @@ def upload_dashresume():
                 )
                 conn.commit()
         except Exception as e:
-            app.logger.error(f"Failed to insert resume into database: {e}")
+        #   app.logger.error(f"Failed to insert resume into database: {e}")
             return jsonify({"success": False, "error": "Failed to upload resume."})
         return jsonify({"success": True, "filename": file.filename})
     return jsonify({"success": False, "error": "Invalid file format"})
@@ -979,7 +1122,7 @@ def get_latest_resume_name():
             else:
                 return jsonify({"success": False, "error": "No resume found."})
     except Exception as e:
-        app.logger.error(f"Failed to fetch resume name: {e}")
+    #    app.logger.error(f"Failed to fetch resume name: {e}")
         return jsonify({"success": False, "error": "Failed to fetch resume name."})
 
         # DELETE RESUME FROM DASHBOARD
@@ -996,7 +1139,7 @@ def delete_resume():
             conn.commit()
             return jsonify({"success": True})
     except Exception as e:
-        app.logger.error(f"Failed to delete resume: {e}")
+    #    app.logger.error(f"Failed to delete resume: {e}")
         return jsonify({"success": False, "error": "Failed to delete resume."})
 
 
@@ -1162,7 +1305,7 @@ def download_html2pdf(document_id):
             margin-bottom: 5px;
         }
 
-        /*------------------------SKILLS --------------------------*/
+        /*------------------------ILLS --------------------------*/
         .skills-list {
             list-style-type: none;
             padding: 0;
@@ -1404,6 +1547,11 @@ def cover_letter_generator():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("cover_letter_generator.html", user_id=user_id)
 
+@app.route("/managesub")
+def managesub():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("managesub.html", user_id=user_id)
+
 
 @app.route("/careerbot")
 def careerbot():
@@ -1418,6 +1566,9 @@ def resume_report():
 
 @app.route("/interview-prep")
 def interview_prep():
+    if not is_authorized_for_tier("Tier2"):
+        # Redirect to the home page (or any other page) with a specific query parameter
+        return redirect(url_for('dashboard', unauthorized=True))
     return render_template("interview_prep.html")
 
 
@@ -2084,6 +2235,8 @@ def extract_score_from_text(text):
 # MAX COUNSELOR BOT API CALL
 @app.route("/chat", methods=["POST"])
 def chat():
+    if not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Upgrade required for Premium Plus Plan"}), 403
     user_input = request.json.get("user_input")
     resume_content = request.json.get("resume_content")
 
@@ -2460,6 +2613,9 @@ def update_job_status():
 @app.route("/job-details-coverletter", methods=["POST"])
 @login_required
 def job_details_coverletter():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     user_id = current_user.get_id()
     data = request.json
     job_id = data.get("jobId")
@@ -2534,6 +2690,9 @@ def read_html_template():
 @app.route("/job-details-resume", methods=["POST"])
 @login_required
 def job_details_resume():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     user_id = current_user.get_id()
     data = request.json
     job_id = data.get("jobId")
@@ -2825,11 +2984,12 @@ def delete_work_experience(experience_id):
     db.session.commit()
     return jsonify({'message': 'Work experience and associated bullet points deleted'}), 200
 
-from flask import jsonify, request
-import re  # Import regular expressions module
 
 @app.route('/generate-bullet-points', methods=['POST'])
 def generate_bullet_points():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     data = request.json
     job_title = data['job_title']
 
@@ -2865,6 +3025,9 @@ def generate_bullet_points():
 
 @app.route('/openai-enhance', methods=['POST'])
 def enhance_bullet_point():
+   # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403   
     data = request.json
     bullet_text = data['text']
 
@@ -3281,6 +3444,9 @@ def delete_skill(skill_id):
 
 @app.route('/generate-skills', methods=['POST'])
 def generate_skills():
+    # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     data = request.json
     job_titles = data['job_titles']
 
@@ -3591,7 +3757,7 @@ def get_user_details():
 
 
 
-@app.route('/success')
+#@app.route('/success')
 def success():
     # This route can be a success page where you inform the user that their details were updated successfully
     return "User details updated successfully"
@@ -3634,6 +3800,9 @@ def download_resume_pdf():
 
 @app.route('/rephrase-summary', methods=['POST'])
 def process_summary():
+       # Check if user is authorized for either Tier 1 or Tier 2
+    if not is_authorized_for_tier("Tier1") and not is_authorized_for_tier("Tier2"):
+        return jsonify({"error": "Unauthorized access"}), 403
     data = request.json
     summary_text = data['summary']
 
@@ -3749,6 +3918,133 @@ def get_user_preferences():
     return jsonify({'error': 'User not authenticated or preferences not set'})
 
 
+# # # # ## # # STRIPE CHECKOUT # # # ## # # #
+def get_or_create_stripe_customer_id(email):
+    with create_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT stripe_customer_id FROM dbo.users WHERE email = ?", email)
+            row = cursor.fetchone()
+            if row and row.stripe_customer_id:
+                return row.stripe_customer_id
+            else:
+                customer = stripe.Customer.create(email=email)
+                stripe_customer_id = customer['id']
+                cursor.execute("UPDATE dbo.users SET stripe_customer_id = ? WHERE email = ?", stripe_customer_id, email)
+                conn.commit()
+                return stripe_customer_id
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    try:
+        user_email = request.form['email']
+        stripe_customer_id = get_or_create_stripe_customer_id(user_email)
+
+        price_id_mapping = {
+            'Tier1': 'price_1OJOPqBmOXAq5RyDWYawmWvf',
+            'Tier2': 'price_1OJOPyBmOXAq5RyDzIAxE0tc',
+        }
+
+        selected_plan = request.form['plan']
+        price_id = price_id_mapping.get(selected_plan)
+
+        if not price_id:
+            return "Invalid plan selected", 400
+
+        checkout_session = stripe.checkout.Session.create(
+            customer=stripe_customer_id,
+            payment_method_types=['card'],
+            line_items=[{'price': price_id, 'quantity': 1}],
+            mode='subscription',
+            success_url='https://app.mycareermax.com/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url='https://app.mycareermax.com/cancel',
+        )
+        return redirect(checkout_session.url, code=303)
+    except Exception as e:
+        print(e)
+        return jsonify(error="Server error", message=str(e)), 500
+
+@app.route('/create-portal-session', methods=['POST'])
+def customer_portal():
+    # For demonstration purposes, we're using the Checkout session to retrieve the customer ID.
+    # Typically this is stored alongside the authenticated user in your database.
+    checkout_session_id = request.form.get('session_id')
+    checkout_session = stripe.checkout.Session.retrieve(checkout_session_id)
+
+    # This is the URL to which the customer will be redirected after they are
+    # done managing their billing with the portal.
+    return_url = 'http://app.mycareermax.com/dashboard'
+
+    portalSession = stripe.billing_portal.Session.create(
+        customer=checkout_session.customer,
+        return_url=return_url,
+    )
+    return redirect(portalSession.url, code=303)
+
+
+@app.route('/get-user-email')
+def get_user_email():
+    # Retrieve the username from the session
+    username = session.get('username')
+    if not username:
+        return jsonify(success=False, error="User not logged in or username not found."), 401
+    
+    # Look up the email based on the username in the database
+    try:
+        with create_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT email FROM dbo.users WHERE username = ?", username)
+                row = cursor.fetchone()
+                if row:
+                    return jsonify(success=True, email=row.email)
+                else:
+                    return jsonify(success=False, error="User not found."), 404
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+
+# Function to create a Stripe customer
+def create_stripe_customer(email):
+    customer = stripe.Customer.create(email=email)
+    return customer['id']
+
+# Function to get or create Stripe customer ID
+def get_or_create_stripe_customer_id(email):
+    conn = create_connection()
+    if conn is not None:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT stripe_customer_id FROM dbo.users WHERE email = ?", email)
+            result = cursor.fetchone()
+            if result and result[0]:
+                return result[0]
+            else:
+                stripe_customer_id = create_stripe_customer(email)
+                cursor.execute("UPDATE dbo.users SET stripe_customer_id = ? WHERE email = ?", stripe_customer_id, email)
+                conn.commit()
+                return stripe_customer_id
+        conn.close()
+    else:
+        raise Exception("Database connection failed")
+
+
+
+def is_authorized_for_tier(tier_required):
+    if current_user.is_authenticated:
+        subscription = current_user.subscription
+        if subscription and subscription.is_active() and subscription.tier == tier_required:
+            return True
+    return False
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+#if __name__ == "__main__":
+ #   app.run(debug=True, host="0.0.0.0", port=5000)
+
+
+
+
+
+
+

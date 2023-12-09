@@ -11,7 +11,8 @@
     <title>myCareerMax | Job Search</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         hr {
             border: none;
@@ -558,6 +559,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/subscription"
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
@@ -626,8 +631,6 @@
             </div>
         </div>
 
-
-
     </div>
     <div class="spinner" style="display: none;"></div>
 
@@ -690,49 +693,86 @@
                 };
 
                 try {
+
                     // Generate Cover Letter
                     const coverLetterResponse = await fetch('/job-details-coverletter', {
+
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+
+                        ,
                         body: JSON.stringify(postData)
                     });
 
+                    if (coverLetterResponse.status === 403) {
+                        alert("This feature requires a subscription to the Premiere Tier");
+                        return;
+                    }
+
                     const coverLetterData = await coverLetterResponse.json();
+
                     if (coverLetterData.message === "Cover letter generated and saved successfully") {
                         console.log('Cover letter generated:', coverLetterData);
+
                         // Additional logic to display cover letter response
                         if (jobTitleElement) {
                             jobTitleElement.click();
                         }
-                    } else {
+                    }
+
+                    else {
                         console.error('Failed to generate cover letter:', coverLetterData);
                     }
 
                     // Generate Resume
                     const resumeResponse = await fetch('/job-details-resume', {
+
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+
+                        ,
                         body: JSON.stringify(postData)
                     });
 
+                    if (resumeResponse.status === 403) {
+                        alert("This feature requires a subscription to the Premiere Tier");
+                        return;
+                    }
+
                     const resumeData = await resumeResponse.json();
+
                     if (resumeData.message === "Resume generated and saved successfully") {
                         console.log('Resume generated:', resumeData);
+
                         // Additional logic to display resume response
                         if (jobTitleElement) {
                             jobTitleElement.click();
                         }
-                    } else {
+                    }
+
+                    else {
                         console.error('Failed to generate resume:', resumeData);
                     }
 
-                    localStorage.setItem(`documentGenerated_${jobId}`, 'true');
+                    localStorage.setItem(`documentGenerated_$ {
+                                                                 jobId
+                                                             }
+                            
+                                                             `, 'true');
                     console.log('Document generation status stored in local storage for job ID:', jobId);
 
-                } catch (error) {
+                }
+
+                catch (error) {
                     console.error('Error generating documents:', error);
                     alert('An error occurred while generating documents. Please check the console for more details.');
-                } finally {
+                }
+
+                finally {
                     document.querySelector('.spinner').style.display = 'none';
                 }
             }

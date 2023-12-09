@@ -29,6 +29,8 @@
     <!-- Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         body {
             font-family: 'Architects Daughter', cursive;
@@ -94,6 +96,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/subscription"
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
@@ -224,9 +230,18 @@
                 data: JSON.stringify({ "user_input": user_input, "resume_content": resume_content }),
                 success: function (response) {
                     $("#chat-box").append(`<div class="message bot-message"><strong>Max:</strong> ${response.response}</div>`);
+                },
+                error: function (xhr, status, error) {
+                    if (xhr.status === 403) {
+                        alert("Upgrade required for Premium Plus Plan to use this feature.");
+                    } else {
+                        console.error("Error:", error);
+                        $("#chat-box").append(`<div class="message bot-message"><strong>Error:</strong> An error occurred. Please try again.</div>`);
+                    }
                 }
             });
         }
+
     </script>
 
 

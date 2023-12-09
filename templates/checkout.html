@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>myCAREERMAX Plans</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300&display=swap" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-image: radial-gradient(circle, #3776ff, #d900ff);
+            color: black;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        h1 {
+            font-weight: bold;
+            color: white;
+        }
+
+        h3 {
+            font-weight: bold;
+        }
+
+        h5 {
+            font-weight: bold;
+        }
+
+        .card-header {
+            background-color: rgb(0, 8, 255);
+            /* Background color */
+            color: white;
+            /* Font color */
+        }
+
+        .card {
+            /* Adjust padding and margins as needed */
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+            data-target="#navbarNav" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div aria-labelledby="navbarDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div aria-labelledby="toolsDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/resume-report" style="color: #003c86;">Resume Report</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+    <section class="container-fluid my-5" id="web-content">
+        <h1 class="text-center mb-4">myCAREERMAX Plans</h1>
+
+        <div class="row">
+            <!-- Free Tier -->
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h3 class="text-center">Basic</h3>
+                        <h5 class="text-center">$0.00 / month</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>myDocuments:</strong> Manage your custom generated cover letters and resumes.</p>
+                        <p><strong>Cover Letter Generator:</strong> Generate a custom cover letter, unique to your
+                            background and the
+                            specific job provided.</p>
+                        <p><strong>Standard Resume Builder:</strong> Step by step resume builder that walks you through
+                            each section of a
+                            typical ATS optimized and
+                            formatted resume. Watch your resume being built dynamically in the resume preview as you add
+                            or remove content. A free
+                            PDF download of your resume is included as well.</p>
+                        <p><strong>Resume Report:</strong> Upload your resume and receive a detailed analysis, with
+                            feedback for each
+                            section of your resume,
+                            including section ratings and an overall ATS rating that gives you an idea of how ATS
+                            "friendly" your resume is. The
+                            report identifies the keywords that an ATS system would find, gives you a summary of its
+                            ratings decisions, and provides
+                            a detailed list of action items in order to improve your ATS score for next time.</p>
+                        <p><strong>Job Search:</strong> Global job search with an intuitive and easy to use interface.
+                            Search for jobs
+                            from anywhere in the world.
+                            Our job search compiles job listings from every major job board (Indeed, LinkedIn, Monster,
+                            etc.). If the job exists on
+                            the internet, you can find it here.</p>
+                        <p><strong>Application Tracker:</strong> Manage your Saved Jobs and track your progress.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tier 1 -->
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h3 class="text-center">Premium Plan</h3>
+                        <h5 class="text-center">$4.99 / month</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>myDocuments:</strong> Manage your custom generated cover letters and resumes.</p>
+                        <p><strong>Cover Letter Generator:</strong> Generate a custom cover letter, unique to your
+                            background and the
+                            specific job provided.</p>
+                        <p><strong>Standard Resume Builder:</strong> Step by step resume builder that walks you through
+                            each section of a
+                            typical ATS optimized and
+                            formatted resume. Watch your resume being built dynamically in the resume preview as you add
+                            or remove content. A free
+                            PDF download of your resume is included as well.</p>
+                        <p><strong>Resume Report:</strong> Upload your resume and receive a detailed analysis, with
+                            feedback for each
+                            section of your resume,
+                            including section ratings and an overall ATS rating that gives you an idea of how ATS
+                            "friendly" your resume is. The
+                            report identifies the keywords that an ATS system would find, gives you a summary of its
+                            ratings decisions, and provides
+                            a detailed list of action items in order to improve your ATS score for next time.</p>
+                        <p><strong>Job Search:</strong> Global job search with an intuitive and easy to use interface.
+                            Search for jobs
+                            from anywhere in the world.
+                            Our job search compiles job listings from every major job board (Indeed, LinkedIn, Monster,
+                            etc.). If the job exists on
+                            the internet, you can find it here.</p>
+                        <p><strong>Application Tracker:</strong> Manage your Saved Jobs and track your progress.</p>
+                        <p><strong>AI Resume Builder:</strong>Access to the Standard Resume Builder plus additional AI
+                            content generation features including suggested bullet
+                            points, skills list generator, and more.</p>
+                        <p><strong>AI Job Search + 1-Click AI Custom Docs:</strong> In addition to the Standard Job
+                            Search, this feature includes the ability to
+                            generate custom docs (Personalized Cover Letter and Tailored Resume) from each job posting.
+                            That's right, 1 click per
+                            job and you have all you need to apply.</p>
+                        <form action="/create-checkout-session" method="POST">
+                            <input type="hidden" name="plan" value="Tier1" />
+                            <input type="hidden" name="email" id="userEmailTier1" />
+                            <button type="submit" class="btn btn-primary btn-block">Add Premium Plan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tier 2 -->
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h3 class="text-center">Max Plan</h3>
+                        <h5 class="text-center">$8.99 / month</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>myDocuments:</strong> Manage your custom generated cover letters and resumes.</p>
+                        <p><strong>Cover Letter Generator:</strong> Generate a custom cover letter, unique to your
+                            background and the
+                            specific job provided.</p>
+                        <p><strong>Standard Resume Builder:</strong> Step by step resume builder that walks you through
+                            each section of a
+                            typical ATS optimized and
+                            formatted resume. Watch your resume being built dynamically in the resume preview as you add
+                            or remove content. A free
+                            PDF download of your resume is included as well.</p>
+                        <p><strong>Resume Report:</strong> Upload your resume and receive a detailed analysis, with
+                            feedback for each
+                            section of your resume,
+                            including section ratings and an overall ATS rating that gives you an idea of how ATS
+                            "friendly" your resume is. The
+                            report identifies the keywords that an ATS system would find, gives you a summary of its
+                            ratings decisions, and provides
+                            a detailed list of action items in order to improve your ATS score for next time.</p>
+                        <p><strong>Job Search:</strong> Global job search with an intuitive and easy to use interface.
+                            Search for jobs
+                            from anywhere in the world.
+                            Our job search compiles job listings from every major job board (Indeed, LinkedIn, Monster,
+                            etc.). If the job exists on
+                            the internet, you can find it here.</p>
+                        <p><strong>Application Tracker:</strong> Manage your Saved Jobs and track your progress.</p>
+                        <p><strong>AI Resume Builder:</strong>Access to the Standard Resume Builder plus additional AI
+                            content generation features including suggested bullet
+                            points, skills list generator, and more.</p>
+                        <p><strong>AI Job Search + 1-Click AI Custom Docs:</strong> In addition to the Standard Job
+                            Search, this feature includes the ability to
+                            generate custom docs (Personalized Cover Letter and Tailored Resume) from each job posting.
+                            That's right, 1 click per
+                            job and you have all you need to apply.</p>
+                        <p><strong>Interview Prep Simulator:</strong> Access to intervueME, our 1:1 real-time interview
+                            simulator.</p>
+                        <p><strong>Career Counselor Chatbot:</strong> Access to your own personal Career Counselor,
+                            available to you around the clock and trained
+                            to know you, you and your work history, including future goals, in order to provide you with
+                            the most useful
+                            information.</p>
+                        <form action="/create-checkout-session" method="POST">
+                            <input type="hidden" name="plan" value="Tier2" />
+                            <input type="hidden" name="email" id="userEmailTier2" />
+                            <button type="submit" class="btn btn-primary btn-block">Add Max Plan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container my-5" id="app-content" style="display: none;">
+        <h1 class="text-center mb-4">Subscription via Google Play</h1>
+        <p>Please subscribe to our services through the Google Play Store app on your device.</p>
+        <!-- Additional instructions or information as needed -->
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+<script>
+    function detectPlatform() {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        return /android/i.test(userAgent) ? 'androidApp' : 'web';
+    }
+
+    window.onload = function () {
+        var platform = detectPlatform();
+        if (platform === 'androidApp') {
+            document.getElementById('web-content').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+        }
+    };
+</script>
+<input type="hidden" id="userId" name="user_id" value="{{ user_id }}">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const user_id = $("#userId").val(); // Get the user_id from the hidden input
+        $.get(`/get-user-email?user_id=${user_id}`, function (response) {
+            if (response.success) {
+                // Set the email in the hidden inputs for the subscription forms
+                $("#userEmailTier1").val(response.email);
+                $("#userEmailTier2").val(response.email);
+            } else {
+                console.error('Error fetching user email:', response.error);
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>

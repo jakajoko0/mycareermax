@@ -15,6 +15,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         .delete-project-btn {
             background-color: red;
@@ -753,6 +755,7 @@
             /* To show a pointer cursor on hover */
         }
     </style>
+
 </head>
 
 <body>
@@ -785,6 +788,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/subscription"
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                </li>
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
@@ -1061,6 +1068,11 @@
                                             body: JSON.stringify({ summary: summaryText })
                                         })
                                             .then(response => {
+                                                if (response.status === 403) {
+                                                    // Display an alert if the user needs to upgrade to the Premium Plan
+                                                    alert("You must upgrade to the Premium Plan in order to access advanced AI features.");
+                                                    return;  // Stop further processing
+                                                }
                                                 if (!response.ok) {
                                                     throw new Error('Network response was not ok');
                                                 }
@@ -1077,13 +1089,8 @@
 
                                                 // Handle the "Use" button click in the modal
                                                 document.getElementById("use-rephrased-summary").onclick = function () {
-                                                    // Update the summary text area with the rephrased summary
                                                     document.getElementById("summary-text").value = data.rephrased_summary;
-
-                                                    // Call the addOrUpdateSummary function to submit the updated summary
                                                     addOrUpdateSummary();
-
-                                                    // Hide the modal
                                                     modal.style.display = "none";
                                                 };
 
@@ -1220,6 +1227,15 @@
                                             console.error('Error:', error);
                                         });
                                 }
+                                // Get a reference to the close button
+                                const closeButton = document.querySelector('.close');
+
+                                // Add a click event listener to close the modal
+                                closeButton.addEventListener('click', function () {
+                                    const modal = document.getElementById('rephraseModal');
+                                    modal.style.display = 'none';
+                                });
+
 
                             </script>
                         </div>
@@ -1310,22 +1326,29 @@
                                             console.error('Bullet text is undefined');
                                             return;
                                         }
-
                                         fetch('/openai-enhance', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ text: bulletText })
                                         })
                                             .then(response => {
+                                                if (response.status === 403) {
+                                                    // Display an alert if the user needs to upgrade to the Premium Plan
+                                                    alert("You must upgrade to Premium Plan in order to access advanced AI features.");
+                                                    return;  // Stop further processing
+                                                }
                                                 if (!response.ok) {
                                                     throw new Error('Network response was not ok');
                                                 }
                                                 return response.json();
                                             })
                                             .then(data => {
-                                                showEnhancedBulletModal(data.enhanced_text, bulletPointId, experienceId);
+                                                if (data) {
+                                                    showEnhancedBulletModal(data.enhanced_text, bulletPointId, experienceId);
+                                                }
                                             })
                                             .catch(error => console.error('Error:', error));
+
                                     }
 
 
@@ -1374,25 +1397,8 @@
                                                 loadWorkExperiences(); // This will add the sparkles bullets button
                                                 updateSideContainer();
 
-                                                // Fetch the suggested bullet points for the new job title
-                                                return fetch('/generate-bullet-points', {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({ job_title: jobTitle })
-                                                })
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const modal = document.getElementById("bulletPointsModal");
-                                                        modal.style.display = "block";
-                                                        const bulletsContainer = document.getElementById("suggested-bullets");
-                                                        bulletsContainer.innerHTML = '<h3 class="modal-title">Let us help you kick things off. Here are some commonly used bullet points for this role:</h3><ul>';
-                                                        data.bullet_points.forEach(bp => {
-                                                            bulletsContainer.innerHTML += `<li>${bp} <span class="material-symbols-outlined add-icon" onclick="addBulletToExperience('${bp.replace(/'/g, "\\'")}', ${newExperienceId})">add_circle</span></li>`;
-                                                        });
-                                                        bulletsContainer.innerHTML += '</ul>';
-                                                        bulletsContainer.innerHTML += '<button class="btn btn-danger btn-block close-modal-btn text-white" onclick="closeBulletPointsModal()">Close</button>';
-
-                                                    });
+                                                // Now fetch the suggested bullet points for the new job title
+                                                fetchSuggestedBullets(jobTitle, newExperienceId);
                                             })
                                             .catch(error => console.error('Error:', error));
                                     }
@@ -1587,14 +1593,23 @@
                                         }
                                     }
 
-
-                                    function fetchSuggestedBullets(jobTitle, experienceId) {
+                                    function fetchSuggestedBullets(jobTitle, experienceId, showError = false) {
                                         fetch('/generate-bullet-points', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ job_title: jobTitle })
                                         })
-                                            .then(response => response.json())
+                                            .then(response => {
+                                                if (response.status === 403) {
+                                                    if (showError) {
+                                                        // Show the alert for unauthorized access
+                                                        alert("Unauthorized access. Please upgrade your plan to access this feature.");
+                                                    }
+                                                    // Regardless of showError, throw an error to stop processing
+                                                    throw new Error('Unauthorized access');
+                                                }
+                                                return response.json();
+                                            })
                                             .then(data => {
                                                 const modal = document.getElementById("bulletPointsModal");
                                                 modal.style.display = "block";
@@ -1605,10 +1620,16 @@
                                                 });
                                                 bulletsContainer.innerHTML += '</ul>';
                                                 bulletsContainer.innerHTML += '<button class="btn btn-danger btn-block text-white close-modal-btn" onclick="closeBulletPointsModal()">Close</button>';
-
                                             })
-                                            .catch(error => console.error('Error:', error));
+                                            .catch(error => {
+                                                if (!showError) {
+                                                    // Only log the error to the console if showError is false
+                                                    console.error('Error:', error);
+                                                }
+                                                // If showError is true, do nothing here as the alert has already been shown
+                                            });
                                     }
+
 
 
 
@@ -2066,7 +2087,14 @@
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ job_titles: jobTitles })
                                         });
-
+                                        if (skillResponse.status === 403) {
+                                            // Display an alert if the user needs to upgrade to the Premium Plan
+                                            alert("You must upgrade to the Premium Plan in order to access advanced AI features.");
+                                            return;  // Stop further processing
+                                        }
+                                        if (!skillResponse.ok) {
+                                            throw new Error('Failed to generate skills');
+                                        }
                                         const skillsResponse = await skillResponse.json();
                                         showSkillsModal(skillsResponse.skills); // Pass only the skills array
 

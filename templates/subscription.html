@@ -1,0 +1,336 @@
+<html lang="en">
+
+<head>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Ultra&amp;display=swap" rel="stylesheet" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Plan Pricing | myCareerMax</title>'
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>'
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-image: linear-gradient(120deg, #b700ff, #3776ff);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .stripe-payment-cards-container {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .stripe-payment-card {
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Enhanced box shadow for better visibility */
+            background-color: white;
+            /* Card background */
+            color: black;
+            /* Card text color */
+            text-align: center;
+            /* Centering text */
+        }
+
+        .stripe-payment-card h3 {
+            margin-top: 0;
+        }
+
+        .stripe-payment-card p {
+            margin: 10px 0;
+            /* Spacing around the paragraph */
+        }
+
+        .stripe-payment-card button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            /* Rounded corners for the button */
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            /* Center the button */
+            margin: 4px 2px;
+            /* Spacing around the button */
+        }
+
+        h5 {
+            font-size: 50px;
+        }
+
+        h6 {
+            font-size: 30px;
+        }
+
+        h3 {
+            font-size: 25px;
+        }
+
+        p {
+            text-align: left;
+        }
+
+        li {
+            text-align: left;
+        }
+
+        @media (max-width: 1041px) {
+            .stripe-payment-cards-container {
+                flex-direction: column;
+                align-items: center;
+                /* This centers the cards vertically */
+            }
+
+            .stripe-payment-card {
+                width: 80%;
+                /* Adjust the width of the cards on smaller screens */
+                /* You can also adjust other styles here if necessary */
+            }
+        }
+
+        .card-2 button {
+            margin-top: 25px;
+            /* Adjust the value as needed */
+        }
+
+        .stripe-payment-card {
+            /* Existing styles */
+            position: relative;
+            /* Ensure this is set */
+        }
+
+        .most-popular-label {
+            display: block;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgb(85, 0, 255);
+            /* Corrected background color */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 1300px) {
+            .card-2 h6 {
+                margin-top: 30px;
+                /* Adjust the margin value as needed */
+            }
+        }
+
+        .card-2 {
+            background-color: rgba(147, 112, 219, 0.);
+            /* Light purple with 20% transparency */
+        }
+    </style>
+</head>
+<script defer>
+    $(document).ready(function () {
+        console.log("Fetching username...");
+        $.get("/get-username", function (response) {
+            console.log("Username response:", response);
+            if (response.success) {
+                const usernamePlaceholder = document.getElementById("username-placeholder");
+                usernamePlaceholder.textContent = "Hello, " + response.username;
+            } else {
+                console.error('Error fetching username:', response.error);
+            }
+        });
+    });
+
+</script>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="https://www.mycareermax.com" style="color: #003c86;">myCareerMax.com</a>
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+            data-target="#navbarNav" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/subscription"
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                </li>
+                <!-- Existing dropdown for the username -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
+                        <span id="username-placeholder">Login Here</span>
+                    </a>
+                    <div aria-labelledby="navbarDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
+                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
+                </li>
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
+                        data-toggle="dropdown" href="#" id="toolsDropdown" role="button" style="color: #003c86;">
+                        Tools
+                    </a>
+                    <div aria-labelledby="toolsDropdown" class="dropdown-menu">
+                        <a class="dropdown-item" href="/resume-report" style="color: #003c86;">Resume Report</a>
+                        <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                </li>
+                <!-- New link for CareerBot -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                </li>
+                <!-- End of Dropdown for username -->
+            </ul>
+        </div>
+    </nav>
+    <div style="text-align:center; margin-bottom: 20px;">
+        <img alt="Your Logo" src="{{ url_for('static', filename='images/white-mycareermax.png') }}"
+            style="max-width:100%;" />
+        <div style="text-align:center;">
+            <a href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc" style="
+        background: linear-gradient(to right, #001eff, #1fc749);
+        border-radius: 10px;
+        padding: 10px 20px;
+        color: white;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        position: relative;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+                     0 2px 2px rgba(0, 0, 0, 0.3),
+                     0 4px 4px rgba(0, 0, 0, 0.4),
+                     0 8px 8px rgba(0, 0, 0, 0.5);
+      ">
+                Manage Active Subscription
+            </a>
+        </div>
+
+        <div style="text-align:center;">
+            <!-- Stripe Payment Link Cards Container -->
+            <div class="stripe-payment-cards-container">
+                <!-- Card 1: Basic -->
+                <div class="stripe-payment-card">
+                    <h6>Basic Plan</h6>
+                    <h5><strong>Free</strong></h5>
+                    <h3>$0.00 per month</h3>
+                    <p>Search the largest jobs database & enjoy access to our highly rated Cover Letter Generator. Get
+                        your free ATS
+                        Resume Report, build the perfect Resume and keep track of your Interviews & Custom Docs.
+                        Transform your approach
+                        to job hunting today.</p>
+                    <button onclick="location.href='/dashboard'">Start Now</button>
+
+                    <p>This includes:</p>
+                    <ul style="list-style: none;">
+                        <li><span class="material-symbols-outlined">check_circle</span> Global Job Search
+                        </li>
+                        <li><span class="material-symbols-outlined">check_circle</span> Cover Letter Generator</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> Standard Resume Builder</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> ATS Resume Report
+                        </li>
+                        <li><span class="material-symbols-outlined">check_circle</span> Application Tracker</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> Custom Document Management</li>
+                        <!-- Add more list items as needed -->
+                    </ul>
+                </div>
+
+                <!-- Card 2: Premium -->
+                <div class="stripe-payment-card card-2">
+                    <span class="most-popular-label">Most Popular</span>
+                    <h6>Premium Plan</h6>
+                    <h5><strong>30 days free</strong></h5>
+                    <h3>Then $4.99 per month</h3>
+                    <p>Our most popular choice. In addition to everything we offer at the Basic Tier, the Premium Plan
+                        takes it up a notch and
+                        adds AI to the mix.
+                        Expedite your job searching with the assistance of OpenAI's latest ChatGPT language models.
+                        Repetitive tasks are thing
+                        of the past.</p>
+                    <button onclick="location.href='https://buy.stripe.com/8wMbMp1DsdeW1IAbIJ'">Start 30 Day Free
+                        Trial</button>
+                    <p>This includes:</p>
+                    <ul style="list-style: none;">
+                        <li><span class="material-symbols-outlined">check_circle</span> All Basic Tier Features</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> AI Job Search + 1-Click AI
+                            Custom Docs</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> AI Resume Builder</li>
+                        <!-- Add more list items as needed -->
+                    </ul>
+                </div>
+
+                <!-- Card 3: Max -->
+                <div class="stripe-payment-card">
+                    <h6>Max Plan</h6>
+                    <h5><strong>30 days free</strong></h5>
+                    <h3>Then $8.99 per month</h3>
+                    <p>If you're serious about landing your dream job, look no further. Unlimited, 24/7 access to every
+                        tool and feature available by myCAREERMAX. Unlock access to
+                        personalized, tailored, and
+                        custom documents on demand. Meet your very own, personal AI Career Counselor and prep with our
+                        highly rated interview
+                        simulator. This plan includes all the tools you'll need to succeed.
+                    </p>
+                    <button onclick="location.href='https://buy.stripe.com/00g8Addma1webja144'">Start 30 Day Free
+                        Trial</button>
+                    <p>This includes:</p>
+                    <ul style="list-style: none;">
+                        <li><span class="material-symbols-outlined">check_circle</span> All Basic and Premium Tier
+                            Features</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> Interview Prep Simulator</li>
+                        <li><span class="material-symbols-outlined">check_circle</span> Career Counselor Chatbot</li>
+                        <!-- Add more list items as needed -->
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
