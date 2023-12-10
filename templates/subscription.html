@@ -1,5 +1,3 @@
-<html lang="en">
-
 <head>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -27,51 +25,34 @@
     <style>
         body {
             font-family: 'Prompt', sans-serif;
-            background-image: linear-gradient(120deg, #b700ff, #3776ff);
+            background-color: #540AFF;
             background-size: cover;
             background-attachment: fixed;
         }
 
-        .text-center {
-            text-align: center;
-        }
-
-        .stripe-payment-cards-container {
-            display: flex;
-            justify-content: center;
-            text-align: center;
-            margin-top: 60px;
-        }
-
         .stripe-payment-card {
-            margin: 10px;
+            margin: 10px auto;
+            /* Centering */
             padding: 20px;
             border: 1px solid #ccc;
-            border-radius: 10px;
-            width: 45%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            /* Enhanced box shadow for better visibility */
-            background-color: white;
-            /* Card background */
-            color: black;
-            /* Card text color */
+            border-radius: 60px;
+            background-color: rgba(115, 0, 255, 0.465);
+            color: rgb(255, 255, 255);
             text-align: center;
-            /* Centering text */
+            max-width: 370px;
+            /* Max width */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .stripe-payment-card h3 {
-            margin-top: 0;
-        }
-
-        .stripe-payment-card p {
-            margin: 10px 0;
-            /* Spacing around the paragraph */
+        /* Additional container for stripe pricing table for full width */
+        .stripe-pricing-container {
+            width: 100%;
         }
 
         .stripe-payment-card button {
-            background-color: #4CAF50;
+            background-color: #00FF55;
             border: none;
-            color: white;
+            color: rgb(0, 0, 0);
             padding: 10px 20px;
             border-radius: 15px;
             /* Rounded corners for the button */
@@ -104,55 +85,15 @@
             text-align: left;
         }
 
-        @media (max-width: 1041px) {
-            .stripe-payment-cards-container {
-                flex-direction: column;
-                align-items: center;
-                /* This centers the cards vertically */
-            }
-
-            .stripe-payment-card {
-                width: 80%;
-                /* Adjust the width of the cards on smaller screens */
-                /* You can also adjust other styles here if necessary */
-            }
-        }
-
-        .card-2 button {
-            margin-top: 25px;
-            /* Adjust the value as needed */
-        }
-
-        .stripe-payment-card {
-            /* Existing styles */
-            position: relative;
-            /* Ensure this is set */
-        }
-
-        .most-popular-label {
-            display: block;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgb(85, 0, 255);
-            /* Corrected background color */
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        @media (max-width: 1300px) {
-            .card-2 h6 {
-                margin-top: 30px;
-                /* Adjust the margin value as needed */
-            }
-        }
-
-        .card-2 {
-            background-color: rgba(147, 112, 219, 0.);
-            /* Light purple with 20% transparency */
+        hr {
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.466), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.517));
+            /* Gradient effect */
+            margin-top: 20px;
+            /* Spacing above the line */
+            margin-bottom: 20px;
+            /* Spacing below the line */
         }
     </style>
 </head>
@@ -228,106 +169,35 @@
             </ul>
         </div>
     </nav>
-    <div style="text-align:center; margin-bottom: 20px;">
-        <img alt="Your Logo" src="{{ url_for('static', filename='images/white-mycareermax.png') }}"
-            style="max-width:100%;" />
-        <div style="text-align:center;">
-            <a href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc" style="
-        background: linear-gradient(to right, #001eff, #1fc749);
-        border-radius: 10px;
-        padding: 10px 20px;
-        color: white;
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        position: relative;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
-                     0 2px 2px rgba(0, 0, 0, 0.3),
-                     0 4px 4px rgba(0, 0, 0, 0.4),
-                     0 8px 8px rgba(0, 0, 0, 0.5);
-      ">
-                Manage Active Subscription
-            </a>
+    <div class="content-container">
+        <div class="stripe-payment-card">
+            <h6>Basic Plan</h6>
+            <h5><strong>Free</strong></h5>
+            <h3>$0.00 per month</h3>
+            <h3>No Payment Info Required</h3>
+            <hr>
+            <p>This is the default access for all new users. Search the largest jobs database & enjoy access to our
+                highly rated Cover Letter Generator. Get your free
+                ATS
+                Resume Report, build the perfect Resume and keep track of your Interviews & Custom Docs. Transform your
+                approach to job hunting today.</p>
+            <button onclick="location.href='/dashboard'">Start Now</button>
+
+            <p>This includes:</p>
+            <ul style="list-style: none;">
+                <li><span class="material-symbols-outlined">check_circle</span> Global Job Search</li>
+                <li><span class="material-symbols-outlined">check_circle</span> Cover Letter Generator</li>
+                <li><span class="material-symbols-outlined">check_circle</span> Standard Resume Builder</li>
+                <li><span class="material-symbols-outlined">check_circle</span> ATS Resume Report</li>
+                <li><span class="material-symbols-outlined">check_circle</span> Application Tracker</li>
+                <li><span class="material-symbols-outlined">check_circle</span> Custom Document Management</li>
+            </ul>
         </div>
-
-        <div style="text-align:center;">
-            <!-- Stripe Payment Link Cards Container -->
-            <div class="stripe-payment-cards-container">
-                <!-- Card 1: Basic -->
-                <div class="stripe-payment-card">
-                    <h6>Basic Plan</h6>
-                    <h5><strong>Free</strong></h5>
-                    <h3>$0.00 per month</h3>
-                    <p>Search the largest jobs database & enjoy access to our highly rated Cover Letter Generator. Get
-                        your free ATS
-                        Resume Report, build the perfect Resume and keep track of your Interviews & Custom Docs.
-                        Transform your approach
-                        to job hunting today.</p>
-                    <button onclick="location.href='/dashboard'">Start Now</button>
-
-                    <p>This includes:</p>
-                    <ul style="list-style: none;">
-                        <li><span class="material-symbols-outlined">check_circle</span> Global Job Search
-                        </li>
-                        <li><span class="material-symbols-outlined">check_circle</span> Cover Letter Generator</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> Standard Resume Builder</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> ATS Resume Report
-                        </li>
-                        <li><span class="material-symbols-outlined">check_circle</span> Application Tracker</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> Custom Document Management</li>
-                        <!-- Add more list items as needed -->
-                    </ul>
-                </div>
-
-                <!-- Card 2: Premium -->
-                <div class="stripe-payment-card card-2">
-                    <span class="most-popular-label">Most Popular</span>
-                    <h6>Premium Plan</h6>
-                    <h5><strong>30 days free</strong></h5>
-                    <h3>Then $4.99 per month</h3>
-                    <p>Our most popular choice. In addition to everything we offer at the Basic Tier, the Premium Plan
-                        takes it up a notch and
-                        adds AI to the mix.
-                        Expedite your job searching with the assistance of OpenAI's latest ChatGPT language models.
-                        Repetitive tasks are thing
-                        of the past.</p>
-                    <button onclick="location.href='https://buy.stripe.com/8wMbMp1DsdeW1IAbIJ'">Start 30 Day Free
-                        Trial</button>
-                    <p>This includes:</p>
-                    <ul style="list-style: none;">
-                        <li><span class="material-symbols-outlined">check_circle</span> All Basic Tier Features</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> AI Job Search + 1-Click AI
-                            Custom Docs</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> AI Resume Builder</li>
-                        <!-- Add more list items as needed -->
-                    </ul>
-                </div>
-
-                <!-- Card 3: Max -->
-                <div class="stripe-payment-card">
-                    <h6>Max Plan</h6>
-                    <h5><strong>30 days free</strong></h5>
-                    <h3>Then $8.99 per month</h3>
-                    <p>If you're serious about landing your dream job, look no further. Unlimited, 24/7 access to every
-                        tool and feature available by myCAREERMAX. Unlock access to
-                        personalized, tailored, and
-                        custom documents on demand. Meet your very own, personal AI Career Counselor and prep with our
-                        highly rated interview
-                        simulator. This plan includes all the tools you'll need to succeed.
-                    </p>
-                    <button onclick="location.href='https://buy.stripe.com/6oE3fTa9Y7UC3QI5km'">Start 30 Day Free
-                        Trial</button>
-                    <p>This includes:</p>
-                    <ul style="list-style: none;">
-                        <li><span class="material-symbols-outlined">check_circle</span> All Basic and Premium Tier
-                            Features</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> Interview Prep Simulator</li>
-                        <li><span class="material-symbols-outlined">check_circle</span> Career Counselor Chatbot</li>
-                        <!-- Add more list items as needed -->
-                    </ul>
-                </div>
-
-            </div>
+        <div>
+            <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+            <stripe-pricing-table pricing-table-id="prctbl_1OLf4cBmOXAq5RyD9HHakxB3"
+                publishable-key="pk_live_51OJLAaBmOXAq5RyDtfyMqbVynBiGx5gqu7RRU84gMCr7F3SQYh8shDFtAVPwi8HYLXtVWxx28N3K4StkkgcKBOef006z5X8MjI">
+            </stripe-pricing-table>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
