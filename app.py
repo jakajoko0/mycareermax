@@ -116,9 +116,9 @@ RAPIDAPI_URL = "https://jsearch.p.rapidapi.com/search"
 
 #stripe api
 stripe.api_version = "2023-10-16"
-stripe.api_key = "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"
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 #stripe webhook
-endpoint_secret = 'whsec_sFYjxUvIBXWWdWUzWevSNWihQaxiDkhr'
+endpoint_secret = os.environ.get('STRIPE_ENDPOINT_SECRET')
 #Logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -280,6 +280,7 @@ def purchase():
     return render_template("purchase.html", user_id=user_id)
 
 @app.route("/subscription")
+@login_required 
 def subscription():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("subscription.html", user_id=user_id)    
@@ -1420,32 +1421,25 @@ def download_html2pdf(document_id):
     else:
         return "Invalid format specified", 400
 
+
 @app.route("/dashboard", methods=["GET"])
 @login_required  # Only logged-in users can access this route
 def dashboard():
     user_id = current_user.id
     
+    # Check if the user has an active subscription
+    show_upgrade = not has_active_subscription()
+
     # Fetch user documents
     user_documents = UserDocuments.query.filter_by(user_id=user_id).all()
     documents_list = [
-        {
-            "id": doc.id,
-            "document_name": doc.document_name,
-            "document_content": doc.document_content,
-            "document_type": doc.document_type,
-            "creation_date": doc.creation_date,
-            "job_title": doc.job_title,
-            "company_name": doc.company_name,
-            "apply_link": doc.apply_link,
-        }
-        for doc in user_documents
+        # Your existing document list comprehension
     ]
 
     # Fetch saved jobs by status
     saved_jobs_by_status = get_saved_jobs_by_status(user_id)
     
-    return render_template("dashboard.html", documents=documents_list, saved_jobs_by_status=saved_jobs_by_status)
-
+    return render_template("dashboard.html", documents=documents_list, saved_jobs_by_status=saved_jobs_by_status, show_upgrade=show_upgrade)
 
 
 
@@ -1531,40 +1525,36 @@ def home():
 
 
 @app.route("/search", methods=["GET"])
+@login_required
 def search():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("search.html", user_id=user_id)
 
-@app.route("/careerclick")
-def careerclick():
-    user_id = current_user.id if current_user.is_authenticated else None
-    return render_template("careerclick.html", user_id=user_id)
-
 
 
 @app.route("/cover-letter-generator")
+@login_required
 def cover_letter_generator():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("cover_letter_generator.html", user_id=user_id)
 
-@app.route("/managesub")
-def managesub():
-    user_id = current_user.id if current_user.is_authenticated else None
-    return render_template("managesub.html", user_id=user_id)
 
 
 @app.route("/careerbot")
+@login_required
 def careerbot():
     user_id = current_user.id if current_user.is_authenticated else None
     return render_template("careerbot.html", user_id=user_id)
 
 
 @app.route("/resume-report")
+@login_required
 def resume_report():
     return render_template("resume_report.html")
 
 
 @app.route("/interview-prep")
+@login_required
 def interview_prep():
     if not is_authorized_for_tier("Tier2"):
         # Redirect to the home page (or any other page) with a specific query parameter
@@ -1575,16 +1565,6 @@ def interview_prep():
 @app.route("/create")
 def create():
     return render_template("create.html")
-
-
-@app.route("/apptracker")
-def apptracker():
-    return render_template("apptracker.html")
-
-
-@app.route("/myjobs")
-def myjobs():
-    return render_template("myjobs.html")
 
 
 @app.route("/sitemap.xml", methods=["GET"])
@@ -2849,6 +2829,7 @@ def resume(user_id):
     ################## RESUME INPUT PAGE ##########################
 
 @app.route('/resume-builder')
+@login_required
 def resume_builder():
     user_id = current_user.id if current_user.is_authenticated else None
     projects = []
@@ -4026,7 +4007,7 @@ def get_or_create_stripe_customer_id(email):
         raise Exception("Database connection failed")
 
 
-
+############### Check Tier Level To Grant Or Deny Access to Route/Feature#################
 def is_authorized_for_tier(tier_required):
     if current_user.is_authenticated:
         subscription = current_user.subscription
@@ -4034,6 +4015,30 @@ def is_authorized_for_tier(tier_required):
             return True
     return False
 
+from datetime import datetime
+
+
+############### Check if the given user has an active subscription #################
+def has_active_subscription():
+    """Check if the current logged-in user has an active subscription."""
+    if current_user.is_authenticated:
+        with create_connection() as connection:
+            cursor = connection.cursor()
+            try:
+                query = """
+                    SELECT COUNT(1)
+                    FROM dbo.subscriptions
+                    WHERE user_id = ? AND (end_date IS NULL OR end_date > ?)
+                """
+                current_time = datetime.utcnow()
+                cursor.execute(query, (current_user.id, current_time))  # Assuming the user ID is stored in current_user.id
+                result = cursor.fetchone()
+                return result[0] > 0
+            except Exception as e:
+                print(f"Error checking for active subscription: {e}")
+                return False
+    else:
+        return False  # User not logged in, no active subscription
 
 
 if __name__ == "__main__":
