@@ -53,6 +53,10 @@ from flask import flash, get_flashed_messages
 from bs4 import BeautifulSoup
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 
 
 
@@ -269,6 +273,13 @@ def extension_test():
     return render_template("extension_test.html")
 
 
+@app.route("/test")
+@login_required 
+def test():
+    user_id = current_user.id if current_user.is_authenticated else None
+    return render_template("test.html", user_id=user_id)    
+
+
 @app.route("/submitted")
 def submitted():
     return render_template("submitted.html")
@@ -423,7 +434,7 @@ def register():
         elif password != confirm_password:
             message = "Passwords do not match!"
         else:
-            with pyodbc.connect(conn_str) as conn:
+            with pyodbc.connect(conn_str) as conn:  # Replace 'conn_str' with your connection string
                 cursor = conn.cursor()
                 cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
                 user = cursor.fetchone()
@@ -433,16 +444,78 @@ def register():
                     # Hash the password
                     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-                    # Insert user data into the database (without Stripe customer ID)
+                    # Insert user data into the database
                     cursor.execute(
                         "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
                         (username, email, hashed_password)
                     )
                     conn.commit()
+
+                    # Send welcome email
+                    send_welcome_email(email, username)
+
                     message = "User registered successfully!"
                     return redirect(url_for("login"))
 
     return render_template("register.html", message=message)
+
+def send_welcome_email(email, username):
+    logo_url = "https://drive.google.com/uc?export=download&id=1j2K2iMKHHyQr8Lg3VEmylmlfZSgNf89A"
+    subject = "Welcome to myCareerMax!"
+
+    body = f"""
+<html>
+
+<body>
+    <img src="{logo_url}" alt="myCareerMax Logo" style="width: 200px; height: auto;">
+    <h1>Welcome to myCAREERMAX, {username}!</h1>
+    <p>Thank you for joining us. We are excited to have you on board and look forward to helping you achieve your career
+        goals.</p>
+    <p>To get started, please login at <a href='https://app.mycareermax.com/login'>https://app.mycareermax.com/login</a>
+        and upload your resume to your profile at <a
+            href='https://app.mycareermax.com/myprofile'>https://app.mycareermax.com/myprofile</a>.</p>
+    <p>Next, check out our <a href='https://app.mycareermax.com/subscription'>Pricing Models</a> to determine what suits
+        your needs. Remember, you can always switch between tiers and cancel immediately at any time. No contracts.</p>
+    <p>Your account, by default, is set up with Basic access which includes access to our Resume Builder, Cover Letter
+        Generator, Application Tracker, Document Management, Resume Reports, and more! You have plenty to check out
+        before deciding if you need to upgrade.</p>
+    <p>We recommend getting your resume uploaded to your profile so the system can begin to learn your background. While
+        you're here Edit your preferences if you'd like personalized job matches emailed to you.</p>
+    <p>Another great place to start is to get your free ATS Resume Report Score. Just navigate to the <a
+            href='https://app.mycareermax.com/resume-report'>Resume Report</a> and upload your resume. This will give
+        you a good starting point for where to focus your efforts to improve your resume.</p>
+    <p>Your login grants you access to both our Android app, downloadable from the google play store, in addition to the
+        desktop version. In some cases, you may find it easier to use the desktop version of the app when editing
+        documents or building your resume. However, all features are available on both platforms.<br><br><strong>Google
+            Play Store:</strong>
+        https://play.google.com/store/apps/details?id=com.mycareermax.mycareermax<br><strong>Desktop Webapp:</strong>
+        https://app.mycareermax.com
+    <p>If you have any questions or need assistance, feel free to reach out to us at <a
+            href='mailto:support@mycareermax.com'>support@mycareermax.com</a>.</p><br><br>
+    <img src="https://drive.google.com/uc?export=download&id=1UE6ngETO-X67S5MsuhDaYSFacZlSu4Qn"
+        alt="Tiered Pricing Model" style="width: auto; height: auto;">
+    <br>
+    <br>
+    <div>
+        <a href="https://app.mycareermax.com/subscription" target="_blank">
+            <img src="https://drive.google.com/uc?export=download&id=1l5wsDey4pUGhur40KB8GlyGe3diIEM38"
+                alt="Start Free Trial button" style="width: 200px; height: auto;">
+        </a>
+    </div>
+
+
+    <br>
+    <p>Cheers,<br><img src="https://drive.google.com/uc?export=download&id=1j2K2iMKHHyQr8Lg3VEmylmlfZSgNf89A"
+            alt="myCareerMax Logo" style="width: 200px; height: auto;">
+        <br>https://app.mycareermax.com<br>support@mycareermax.com
+    </p>
+</body>
+
+</html>
+    """
+
+    send_email(email, subject, body)
+
 
 
 
@@ -681,6 +754,33 @@ class Subscription(db.Model):
     def is_active(self):
         return self.end_date is None or datetime.utcnow() <= self.end_date
 
+ ###### CONFIRMATION EMAIL FOR STRIPE SUBSCRIPTIONS #########
+
+def send_email(recipient_email, subject, body_html):
+    sender_email = os.getenv("SMTP_USERNAME")
+    sender_password = os.getenv("SMTP_PASSWORD")
+    smtp_server = "smtp.office365.com"
+    smtp_port = 587
+
+    message = MIMEMultipart('alternative')
+    message['From'] = sender_email
+    message['To'] = recipient_email
+    message['Subject'] = subject
+
+    # Attach HTML content
+    message.attach(MIMEText(body_html, 'html'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, recipient_email, message.as_string())
+        server.quit()
+        logger.info(f"HTML email sent to {recipient_email}")
+    except Exception as e:
+        logger.error(f"Failed to send HTML email: {e}")
+
+
 
 
 # Reverse mapping from Price IDs to Tier Names
@@ -689,6 +789,7 @@ tier_from_price_id = {
     'price_1OJOPyBmOXAq5RyDzIAxE0tc': 'Tier2',
     'price_1OJXflBmOXAq5RyDxEqGCZMg': 'FreePlan'
 }
+
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -764,6 +865,58 @@ def webhook():
             conn.commit()
             conn.close()
 
+                        # Email content based on the event type
+# Email content based on the event type
+            email_subject = ""
+            email_body = ""
+
+            logo_url = "https://drive.google.com/uc?export=download&id=1iLCwuXEw86m4K130aNGcTASvYy8e5QaF"
+            manage_subscription_url = "https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc"
+
+            if event_type == 'customer.subscription.created':
+                email_subject = "Your myCAREERMAX Subscription Has Been Created!"
+                email_body = f"""
+    <html>
+        <body>
+            <img src="{logo_url}" alt="myCAREERMAX Logo">
+            <p>Welcome to myCAREERMAX! Your subscription has been successfully created. Please use the link below to manage your subscription. You can also find this in your profile within your myCAREERMAX account: <a href='https://app.mycareermax.com/myprofile'>Profile Link</a></p>
+            <a href="{manage_subscription_url}" style="background-color: #4CAF50; border: none; color: white; padding: 10px 20px; text-decoration: none; font-size: 16px; border-radius: 5px; display: inline-block;">Manage My Subscription</a>
+            <p>For any questions or issues, please contact <a href='mailto:support@mycareermax.com'>support@mycareermax.com</a>. We are standing by to assist!</p>
+            <p>We wish you the best of luck and hope that we can make things easier for you during the stressful job searching process.</p>
+            <p>Cheers,<br>The myCAREEMAX Team<br><a href='https://app.mycareermax.com'>app.mycareermax.com</a><br><a href='mailto:support@mycareermax.com'>support@mycareermax.com</a></p>
+        </body>
+    </html>
+    """
+            elif event_type == 'customer.subscription.updated':
+                email_subject = "Your myCAREERMAX Subscription Has Been Updated"
+                email_body = f"""
+    <html>
+        <body>
+            <img src="{logo_url}" alt="myCAREERMAX Logo">
+            <p>Your myCAREERMAX subscription has been updated. Please use the link below to manage your subscription.</p>
+            <a href="{manage_subscription_url}" style="background-color: #4CAF50; border: none; color: white; padding: 10px 20px; text-decoration: none; font-size: 16px; border-radius: 5px; display: inline-block;">Manage My Subscription</a>
+            <p>Cheers,<br>The myCAREERMAX Team<br><a href='https://app.mycareermax.com'>app.mycareermax.com</a><br><a href='mailto:support@mycareermax.com'>support@mycareermax.com</a></p>
+        </body>
+    </html>
+    """
+            elif event_type == 'customer.subscription.deleted':
+                email_subject = "myCAREERMAX Subscription Cancelled"
+                email_body = f"""
+    <html>
+        <body>
+            <img src="{logo_url}" alt="myCAREERMAX Logo">
+            <p>Your myCAREERMAX subscription has been cancelled. We are sad to see you go, but we can only hope it's because you landed your dream job and don't need our help anymore! We only ask you to remember us the next time you're on the hunt. Until then we wish you the best of luck on your journey.</p>
+            <p>Cheers,<br>The myCAREERMAX Team<br><a href='https://app.mycareermax.com'>app.mycareermax.com</a><br><a href='mailto:support@mycareermax.com'>support@mycareermax.com</a></p>
+        </body>
+    </html>
+    """
+
+
+            # Send email if there's a subject and body
+            if email_subject and email_body:
+                send_email(customer_email, email_subject, email_body)
+
+
     except stripe.error.SignatureVerificationError as e:
         logger.error(f'Signature verification failed: {e}')
         return jsonify({'error': 'Invalid signature'}), 400
@@ -773,6 +926,7 @@ def webhook():
 
     logger.info('Stripe webhook processed successfully')
     return jsonify({'status': 'success'})
+
 
 
 
@@ -3917,8 +4071,9 @@ def get_or_create_stripe_customer_id(email):
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
-        user_email = request.form['email']
-        stripe_customer_id = get_or_create_stripe_customer_id(user_email)
+        #user_email = request.form['email']
+        user_id = request.form['user_id']  # Capture user_id from the form
+        #stripe_customer_id = get_or_create_stripe_customer_id(user_email)
 
         price_id_mapping = {
             'Tier1': 'price_1OJOPqBmOXAq5RyDWYawmWvf',
@@ -3932,17 +4087,18 @@ def create_checkout_session():
             return "Invalid plan selected", 400
 
         checkout_session = stripe.checkout.Session.create(
-            customer=stripe_customer_id,
             payment_method_types=['card'],
             line_items=[{'price': price_id, 'quantity': 1}],
             mode='subscription',
             success_url='https://app.mycareermax.com/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url='https://app.mycareermax.com/cancel',
+            metadata={'user_id': user_id},  # Include the user_id in the metadata
         )
-        return redirect(checkout_session.url, code=303)
+        return jsonify(checkoutSessionUrl=checkout_session.url)
     except Exception as e:
         print(e)
         return jsonify(error="Server error", message=str(e)), 500
+
 
 @app.route('/create-portal-session', methods=['POST'])
 def customer_portal():
@@ -4041,8 +4197,12 @@ def has_active_subscription():
         return False  # User not logged in, no active subscription
 
 
+#if __name__ == "__main__":
+ #   app.run(host="0.0.0.0", port=5000)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=4242)
+
 
 #if __name__ == "__main__":
  #   app.run(debug=True, host="0.0.0.0", port=5000)
