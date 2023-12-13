@@ -56,7 +56,9 @@ from flask_sqlalchemy import SQLAlchemy
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 
@@ -1767,7 +1769,6 @@ def sitemap():
     except Exception as e:
         return str(e)
 
-
 # RESUMETUNER OPENAI API CALLS
 @app.route("/analyze-resume", methods=["POST"])
 def analyze_resume():
@@ -2561,6 +2562,56 @@ def autofill():
         # Handle any exceptions that may occur
         return jsonify({"error": str(e)}), 500
 
+
+@app.route('/api/autoapply', methods=['POST'])
+def autoapply():
+    try:
+        logging.info("Received request for /api/autoapply")
+        
+        data = request.json
+        logging.info(f"Request data: {data}")
+
+        pin = data.get('pin', '')
+        job_description = data.get('job_description', '')
+        questions = data.get('questions', [])
+
+        logging.info(f"Pin: {pin}, Job Description: {job_description}, Questions: {questions}")
+
+        resume_text = get_resume_text(pin)
+        if resume_text is None:
+            logging.warning("User not found or resume not available for pin: %s", pin)
+            return jsonify({"error": "User not found or resume not available"}), 404
+
+        # Format questions for OpenAI model
+        formatted_questions = "\n".join([f"{q['id']}: {q['question']}" for q in questions])
+
+        # Prepare the message for the OpenAI model
+        system_message = "You are an AI developed by Open AI, trained to be an expert at completing job application questions."
+        user_message = f"Given the provided resume, job_description, and set of questions with their identifiers, answer each question or request individually and include the identifier before each answer. Here is an example of an answer including the identifier\n\n'email: example@example.com'\n\nUse the resume as your reference for these questions and tailor the answers to the provided job description where it's necessary to do so. Your response should be written in first person and you should provide each answer in the same order that you received the questions. Your response should include only the identifier and answer text, nothing more.\n\nResume:\n{resume_text}\n\nJob Description:\n{job_description}\n\nQuestions:\n{formatted_questions}"
+
+        logging.info("Preparing to call OpenAI's chat completions")
+
+        # Call OpenAI's chat completion
+        completion = client.chat.completions.create(
+            model="gpt-4-1106-preview",  # Replace with your desired model
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
+            ]
+        )
+
+        logging.info("Received response from OpenAI's chat completions")
+
+        response_text = completion.choices[0].message.content
+        answers = response_text.split("\n")
+
+        logging.info("Successfully processed the response")
+
+        return jsonify({"answers": answers})
+
+    except Exception as e:
+        logging.error("Error occurred in /api/autoapply: %s", str(e))
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/generate_cover_letter_ext", methods=["POST"])
@@ -4197,11 +4248,11 @@ def has_active_subscription():
         return False  # User not logged in, no active subscription
 
 
-#if __name__ == "__main__":
- #   app.run(host="0.0.0.0", port=5000)
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=4242)
+    app.run(host="0.0.0.0", port=5000)
+
+#if __name__ == "__main__":
+ #   app.run(host="0.0.0.0", port=4242)
 
 
 #if __name__ == "__main__":

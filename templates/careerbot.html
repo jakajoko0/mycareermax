@@ -233,7 +233,7 @@
                 },
                 error: function (xhr, status, error) {
                     if (xhr.status === 403) {
-                        alert("Upgrade required for Premium Plus Plan to use this feature.");
+                        alert("Upgrade to the Max tier to access your personal career coach.\n\nFree for 30 days!");
                     } else {
                         console.error("Error:", error);
                         $("#chat-box").append(`<div class="message bot-message"><strong>Error:</strong> An error occurred. Please try again.</div>`);

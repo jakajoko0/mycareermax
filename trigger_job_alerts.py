@@ -160,21 +160,34 @@ def send_job_alert_email(email, job_listings, sender_alias="mycareermax-jobs@myc
 
     # Add align="center" attribute to the img tag to center the image horizontally
     body = f"""
-<img src="https://drive.google.com/uc?export=download&id=1Q-RAGQesLg0dXQk-Hbgvh2RoWYqp7032" alt="Job Listing Header" style="max-width: 100%; height: auto; margin-bottom: 20px;" align="center">
+<img src="https://drive.google.com/uc?export=download&id=1nDDZ17Q4mAxgdUObNgwxL9Irq3cHgypC" alt="Job Listing Header" style="max-width: 100%; height: auto; margin-bottom: 20px;" align="center">
 
 <ul>
 {format_job_listings(job_listings)}
 </ul>
-
+    <a href="https://app.mycareermax.com/search" target="_blank">
+        <img src="https://drive.google.com/uc?export=download&id=1uzkSo4RkLdKjebLeQE-dQzT8sVxU-GRM"
+            alt="View More Jobs Button" style="width: 200px; height: auto;">
+    </a>
     <p style="margin-top: 20px;">
         If you need to update your job preferences or would like to be removed from these automated emails, please visit the 
         <a href="https://app.mycareermax.com/myprofile">My Profile &gt; Edit Preferences</a> 
         section on the <a href="https://app.mycareermax.com/login">myCAREERMAX</a>  website or mobile app. This way, we can ensure that we always send you the most relevant job opportunities.
     </p>
+    <p style="margin-top: 10px;">
+        Don't forget to check out our new subscription tiers, with access to advanced AI tools to boost your chances of
+        landing your dream job!
+    </p>
+    <a href="https://app.mycareermax.com/subscription" target="_blank">
+        <img src="https://drive.google.com/uc?export=download&id=1l5wsDey4pUGhur40KB8GlyGe3diIEM38"
+            alt="Start Free Trial button" style="width: 200px; height: auto;">
+    </a>
+
     
     <p style="margin-top: 10px; color: purple;">
         Thank you for allowing us to be a part of your career journey. We wish you the best in your job search and are here to support you every step of the way. Your success is our success, and we look forward to celebrating each milestone with you.
     </p>
+
 
     <p style="margin-top: 10px; color: purple;">
         Cheers,<br>

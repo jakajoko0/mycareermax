@@ -1,79 +1,55 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Ultra&amp;display=swap" rel="stylesheet" />
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Plan Pricing | myCareerMax</title>'
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>'
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body>
-    <input type="hidden" id="userId" value="{{ user_id }}">
-    <!-- Include a hidden input for the selected plan's price ID -->
-    <input type="hidden" id="selectedPlan" value="Tier1">
-    <!-- Replace with your actual price ID -->
+    <img src="https://drive.google.com/uc?export=download&id=1nDDZ17Q4mAxgdUObNgwxL9Irq3cHgypC" alt="Job Listing Header"
+        style="max-width: 100%; height: auto; margin-bottom: 20px;" align="center">
 
-    <form id="checkoutForm" action="/create-checkout-session" method="POST">
-        <button type="submit">Subscribe</button>
-    </form>
+    <ul>
+        {format_job_listings(job_listings)}
+    </ul>
 
-    <script>
-        $(document).ready(function () {
-            console.log("Fetching username...");
-            $.get("/get-username", function (response) {
-                console.log("Username response:", response);
-                if (response.success) {
-                    const usernamePlaceholder = document.getElementById("username-placeholder");
-                    usernamePlaceholder.textContent = "Hello, " + response.username;
-                } else {
-                    console.error('Error fetching username:', response.error);
-                }
-            });
+    <a href="https://app.mycareermax.com/search" target="_blank">
+        <img src="https://drive.google.com/uc?export=download&id=1uzkSo4RkLdKjebLeQE-dQzT8sVxU-GRM"
+            alt="View More Jobs button" style="width: 200px; height: auto;">
+    </a>
 
-            // Handle the form submission
-            $('#checkoutForm').on('submit', function (e) {
-                e.preventDefault(); // Prevent default form submission
+    <p style="margin-top: 20px;">
+        If you need to update your job preferences or would like to be removed from these automated emails, please visit
+        the
+        <a href="https://app.mycareermax.com/myprofile">My Profile &gt; Edit Preferences</a>
+        section on the <a href="https://app.mycareermax.com/login">myCAREERMAX</a> website or mobile app. This way, we
+        can
+        ensure that we always send you the most relevant job opportunities.
+    </p>
+    <p style="margin-top: 10px;">
+        Don't forget to check out our new subscription tiers, with access to advanced AI tools to boost your chances of
+        landing your dream job!
+    </p>
+    <a href="https://app.mycareermax.com/subscription" target="_blank">
+        <img src="https://drive.google.com/uc?export=download&id=1l5wsDey4pUGhur40KB8GlyGe3diIEM38"
+            alt="Start Free Trial button" style="width: 200px; height: auto;">
+    </a>
 
-                var userId = $('#userId').val(); // Get the user ID from the hidden input
-                var selectedPlan = $('#selectedPlan').val(); // Get the selected plan's price ID
 
-                // Send a POST request to the server with both userId and selectedPlan
-                $.post('/create-checkout-session', {
-                    user_id: userId,
-                    plan: selectedPlan
-                }, function (data) {
-                    // Assuming your server responds with the URL to the Stripe checkout session
-                    if (data && data.checkoutSessionUrl) {
-                        window.location.href = data.checkoutSessionUrl; // Redirect to Stripe checkout
-                    } else {
-                        // Handle error (e.g., display a message to the user)
-                        alert("Error during checkout.");
-                    }
-                }).fail(function (response) {
-                    // Handle failure (e.g., display a message to the user)
-                    alert("Checkout request failed.");
-                });
-            });
-        });
-    </script>
+    <p style="margin-top: 10px; color: purple;">
+        Thank you for allowing us to be a part of your career journey. We wish you the best in your job search and are
+        here
+        to support you every step of the way. Your success is our success, and we look forward to celebrating each
+        milestone
+        with you.
+    </p>
+
+
+    <p style="margin-top: 10px; color: purple;">
+        Cheers,<br>
+        The myCAREERMAX Team
+    </p>
 </body>
 
 </html>

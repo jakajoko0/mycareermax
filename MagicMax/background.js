@@ -133,3 +133,47 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     }
   });
 });
+
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.type === 'showSpinner') {
+    // Existing spinner code
+    showSpinner();
+  } else if (request.type === 'copyToClipboard') {
+    // Existing clipboard code
+    copyTextToClipboard(request.text);
+  } else if (request.type === 'autoApply') {
+    // New auto-apply functionality
+    chrome.storage.local.get(['pin', 'job_description'], async function(result) {
+      const storedPin = result.pin;
+      const storedJobDescription = result.job_description || '';
+      const questions = request.questions;
+
+      if (!storedPin || !storedJobDescription) {
+        console.error('Pin or job description not found in local storage.');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://yourflaskserver.com/autoapply', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            pin: storedPin,
+            job_description: storedJobDescription,
+            questions: questions
+          }),
+        });
+
+        const data = await response.json();
+        chrome.tabs.sendMessage(sender.tab.id, { type: "autoApplyResponse", data: data });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  }
+});
+
+
