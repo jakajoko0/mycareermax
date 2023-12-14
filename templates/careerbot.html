@@ -96,29 +96,40 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                {% if show_upgrade %}
                 <li class="nav-item">
                     <a class="nav-link" href="/subscription"
-                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);">
+                        <strong>UPGRADE</strong>
+                    </a>
                 </li>
+                {% endif %}
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
                         data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
+                        {% if current_user.is_authenticated %}
+                        <span id="username-placeholder">Welcome</span> <!-- Generic welcome message -->
+                        {% else %}
                         <span id="username-placeholder">Login Here</span>
+                        {% endif %}
                     </a>
                     <div aria-labelledby="navbarDropdown" class="dropdown-menu">
-                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        {% if current_user.is_authenticated %}
+                        <!-- Display these links only if the user is logged in -->
                         <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
-                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/myprofile" style="color: #0d00ff;">My Profile</a>
+                        {% if has_subscription %}
+                        <a class="dropdown-item" href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc"
+                            style="color: #0d00ff;">Manage
+                            Subscription</a>{% endif %}
+                        <a class="dropdown-item" href="/delete_account" style="color: #0d00ff;">Delete Account</a>
+                        {% else %}
+                        <!-- Display only the Login link if the user is not logged in -->
+                        <a class="dropdown-item" href="/login" style="color: #0d00ff;">Login</a>
+                        {% endif %}
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
@@ -128,17 +139,20 @@
                     </a>
                     <div aria-labelledby="toolsDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/resume-report" style="color: #003c86;">Resume Report</a>
+                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">Resume Builder</a>
+                        <a class="dropdown-item" href="/cover-letter-generator" style="color: #003c86;">Cover Letter
+                            Generator</a>
                         <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                        <a class="dropdown-item" href="/careerbot" style="color: #003c86;">Career Coach</a>
+
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
-                <!-- New link for CareerBot -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
-                <!-- End of Dropdown for username -->
             </ul>
         </div>
     </nav>

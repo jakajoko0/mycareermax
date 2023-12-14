@@ -3000,8 +3000,6 @@ def update_resume():
     # Use the 'resume' function to get the complete resume data
     return resume(user_id)
 
-
-
 def resume(user_id):
     # Query the database for each section
     personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
@@ -3792,25 +3790,28 @@ def myprofile_resume_upload():
 
 
         # # # # ## # # DISPLAY RESUME NAME # # # ## # # #
+from flask import render_template
+from flask_login import current_user
+# Import other necessary modules and functions
+
 @app.route('/myprofile')
 def myprofile():
     user_id = current_user.id if current_user.is_authenticated else None
 
+    # Check if the user has an active subscription
+    has_subscription = has_active_subscription() if user_id is not None else False
+
     # Retrieve the most recent resume filename for the current user
+    most_recent_filename = None
     if user_id is not None:
         most_recent_resume = UserResumes.query.filter_by(user_id=user_id).order_by(UserResumes.uploaded_at.desc()).first()
         if most_recent_resume:
             most_recent_filename = most_recent_resume.filename
-        else:
-            most_recent_filename = None
-    else:
-        most_recent_filename = None
 
     # Query the most recent UserDetails record
     most_recent_user_details = UserDetails.query.order_by(UserDetails.UserID.desc()).first()
 
-    return render_template('myprofile.html', user_id=user_id, most_recent_filename=most_recent_filename, most_recent_user_details=most_recent_user_details)
-
+    return render_template('myprofile.html', user_id=user_id, most_recent_filename=most_recent_filename, most_recent_user_details=most_recent_user_details, has_subscription=has_subscription)
 
 
 
@@ -3953,15 +3954,26 @@ def error():
     # Handle errors and display an appropriate error message
     return 'An error occurred. Please try again.'
 
-@app.route('/view-resume')
-def view_resume():
-    user_id = current_user.id if current_user.is_authenticated else None
-    if user_id is None:
-        # Handle unauthenticated case
-        return "Please log in to view the resume", 401
 
-    # Call the 'resume' function to get the complete resume data
-    return resume(user_id)
+@app.route('/view-resume')
+@login_required  # Optional, based on your authentication setup
+def view_resume_page():
+    user_id = current_user.id
+    personal_info = PersonalInformation.query.filter_by(user_id=user_id).first()
+    work_experiences = WorkExperience.query.filter_by(user_id=user_id).all()
+    projects = Projects.query.filter_by(user_id=user_id).all()
+    educations = Education.query.filter_by(user_id=user_id).all()
+    certifications = Certifications.query.filter_by(user_id=user_id).all()
+    skills = Skills.query.filter_by(user_id=user_id).all()
+
+    # Render the 'view_resume.html' template and pass the fetched data
+    return render_template('view_resume.html', 
+                           personal_info=personal_info, 
+                           work_experiences=work_experiences,
+                           projects=projects, 
+                           educations=educations,
+                           certifications=certifications,
+                           skills=skills)
 
 
 @app.route("/download_resume_pdf", methods=["GET"])
@@ -4246,6 +4258,14 @@ def has_active_subscription():
                 return False
     else:
         return False  # User not logged in, no active subscription
+
+@app.context_processor
+def inject_subscription_status():
+    has_subscription = False
+    if current_user.is_authenticated:
+        has_subscription = has_active_subscription()
+    return dict(has_subscription=has_subscription)
+
 
 
 if __name__ == "__main__":

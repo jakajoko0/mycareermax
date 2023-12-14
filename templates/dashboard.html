@@ -574,20 +574,17 @@
                         <!-- Display these links only if the user is logged in -->
                         <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/subscription" style="color: #0d00ff;">My Profile</a>
-                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
+                        <a class="dropdown-item" href="/myprofile" style="color: #0d00ff;">My Profile</a>
+                        {% if has_subscription %}
+                        <a class="dropdown-item" href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc"
+                            style="color: #0d00ff;">Manage
+                            Subscription</a>{% endif %}
                         <a class="dropdown-item" href="/delete_account" style="color: #0d00ff;">Delete Account</a>
                         {% else %}
                         <!-- Display only the Login link if the user is not logged in -->
                         <a class="dropdown-item" href="/login" style="color: #0d00ff;">Login</a>
                         {% endif %}
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
@@ -597,23 +594,27 @@
                     </a>
                     <div aria-labelledby="toolsDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/resume-report" style="color: #003c86;">Resume Report</a>
+                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">Resume Builder</a>
+                        <a class="dropdown-item" href="/cover-letter-generator" style="color: #003c86;">Cover Letter
+                            Generator</a>
                         <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                        <a class="dropdown-item" href="/careerbot" style="color: #003c86;">Career Coach</a>
+
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
-                <!-- New link for CareerBot -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
-                <!-- End of Dropdown for username -->
             </ul>
         </div>
     </nav>
     <div style="text-align:center;">
         <img alt="Your Logo" src="{{ url_for('static', filename='images/white-mycareermax.png') }}"
             style="max-width:100%;" />
+        {% if show_upgrade %}
         <div style="text-align:center;">
             <p style="margin-top: 40px; text-align: center; color: white; font-size: 20px;">
                 <strong>✨ myCareerMax Update: Introducing Our New Premium and Max Plans! You may keep using our free
@@ -624,10 +625,14 @@
                         style="color: white; text-decoration: underline; font-weight: bold;">CLICK HERE</a> for
                     a full features list.</strong>
             </p>
+
             <div style="text-align: center; margin-top: 20px;">
                 <a href="{{ url_for('subscription') }}" class="styled-button">Start Your 30 Day Free Trial Now</a>
             </div>
+
+
         </div>
+        {% endif %}
         <!-- Collapsible Button Container -->
         <div class="collapsible-container">
             <button class="collapsible">
@@ -778,7 +783,7 @@
 
         <!-- View My Profile Button (moved outside the container) -->
         <div style="text-align: center; margin-top: 10px;">
-            <a href="{{ url_for('myprofile') }}" class="styled-button">View My Profile</a>
+            <a href="{{ url_for('myprofile') }}" class="styled-button">Get Started!</a>
         </div>
     </div>
 

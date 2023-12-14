@@ -10,6 +10,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script>
+        function updateLabel(input) {
+            var fileName = input.files[0].name;
+            document.getElementById('fileInputLabel').textContent = fileName;
+        }
+    </script>
     <style>
         /* Set the text color to white for the entire page */
         body {
@@ -89,29 +95,40 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                {% if show_upgrade %}
                 <li class="nav-item">
                     <a class="nav-link" href="/subscription"
-                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);"><strong>UPGRADE</strong></a>
+                        style="background-color: green; border-radius: 5px; color: white; padding: 5px; display: inline-block; text-decoration: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);">
+                        <strong>UPGRADE</strong>
+                    </a>
                 </li>
+                {% endif %}
                 <!-- Existing dropdown for the username -->
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle"
                         data-toggle="dropdown" href="#" id="navbarDropdown" role="button" style="color: #003c86;">
+                        {% if current_user.is_authenticated %}
+                        <span id="username-placeholder">Welcome</span> <!-- Generic welcome message -->
+                        {% else %}
                         <span id="username-placeholder">Login Here</span>
+                        {% endif %}
                     </a>
                     <div aria-labelledby="navbarDropdown" class="dropdown-menu">
-                        <a class="dropdown-item" href="/dashboard#my-docs" style="color: #003c86;">My AI Docs</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/login" style="color: #00b018;">Login</a>
+                        {% if current_user.is_authenticated %}
+                        <!-- Display these links only if the user is logged in -->
                         <a class="dropdown-item" href="/logout" style="color: #0d00ff;">Logout</a>
-                        <a class="dropdown-item" href="/delete_account" style="color: #ff0000;">Delete Account</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/myprofile" style="color: #0d00ff;">My Profile</a>
+                        {% if has_subscription %}
+                        <a class="dropdown-item" href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc"
+                            style="color: #0d00ff;">Manage
+                            Subscription</a>{% endif %}
+                        <a class="dropdown-item" href="/delete_account" style="color: #0d00ff;">Delete Account</a>
+                        {% else %}
+                        <!-- Display only the Login link if the user is not logged in -->
+                        <a class="dropdown-item" href="/login" style="color: #0d00ff;">Login</a>
+                        {% endif %}
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
@@ -121,42 +138,65 @@
                     </a>
                     <div aria-labelledby="toolsDropdown" class="dropdown-menu">
                         <a class="dropdown-item" href="/resume-report" style="color: #003c86;">Resume Report</a>
+                        <a class="dropdown-item" href="/resume-builder" style="color: #003c86;">Resume Builder</a>
+                        <a class="dropdown-item" href="/cover-letter-generator" style="color: #003c86;">Cover Letter
+                            Generator</a>
                         <a class="dropdown-item" href="/interview-prep" style="color: #003c86;">Interview Prep</a>
+                        <a class="dropdown-item" href="/careerbot" style="color: #003c86;">Career Coach</a>
+
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/create" style="color: #003c86;">Create✨</a>
+                    <a class="nav-link" href="/search" style="color: #003c86;">AI Job Search</a>
                 </li>
-                <!-- New link for CareerBot -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/careerbot" style="color: #003c86;">Max</a>
+                    <a class="nav-link" href="/dashboard" style="color: #003c86;">myDashboard</a>
                 </li>
-                <!-- End of Dropdown for username -->
             </ul>
         </div>
     </nav>
-    <div class="text-center mt-3">
+    <div class="text-center mt-3" style="margin-bottom: 20px;"> <!-- Added margin-bottom here -->
         <button type="button" class="btn-lg btn-success"><a href="/dashboard"
                 style="color: white; cursor: pointer;"><span class="material-symbols-outlined">
                     arrow_back_ios
                 </span>Back
                 to Dashboard</a></button>
     </div>
+    {% if has_subscription %}
+    <div style="text-align:center;">
+        <a href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc" style="
+                                    background: linear-gradient(to right, #001eff, #1fc749);
+                                    border-radius: 2px;
+                                    padding: 10px 20px;
+                                    color: white;
+                                    font-weight: bold;
+                                    margin-top: 20px;
+                                    margin-bottom: 20px;
+                                    position: relative;
+                                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+                                                 0 2px 2px rgba(0, 0, 0, 0.3),
+                                                 0 4px 4px rgba(0, 0, 0, 0.4),
+                                                 0 8px 8px rgba(0, 0, 0, 0.5);
+                                  ">
+            Manage Active Subscription
+        </a>
+    </div>
+    {% endif %}
+
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <!-- First Form: Resume Upload -->
                 <form method="POST" enctype="multipart/form-data" action="/myprofile_resume_upload">
-                    <div class="form-group text-center"> <!-- Center the label -->
+                    <div class="form-group text-center">
                         <label for="docx_file" class="d-block">Upload a .DOCX File of your Resume</label>
                         <div class="custom-file">
                             <input type="file" class="custom-file-input mx-auto" name="docx_file" id="docx_file"
-                                accept=".docx" required>
-                            <label class="custom-file-label" style="color: gray;" for="docx_file"><span
-                                    class="material-symbols-outlined">
+                                accept=".docx" required onchange="updateLabel(this)">
+                            <label class="custom-file-label" style="color: gray;" for="docx_file"
+                                id="fileInputLabel"><span class="material-symbols-outlined">
                                     upload_file
-                                </span> Select Resume and
-                                Upload</label>
+                                </span> Select Resume and Upload</label>
                         </div>
                     </div>
                     <div class="text-center">
@@ -169,33 +209,42 @@
                 <div class="text-center" style="color: green;">
                     <p>Active Resume: {{ most_recent_filename or '' }}</p>
                 </div>
-                <hr>
+                <hr style="height: 2px; background-color: black; border: none;">
+                <div style="text-align: center; margin-bottom: 20px;"> <!-- Center align and add bottom margin -->
+                    <img src="/static/images/mycareermax_resume.svg" alt="myCAREERMAX Resume" class="icon-shadow"
+                        width="250" height="50">
+                </div>
+                <p style="text-align: center;">View, Print, or Share your myCAREERMAX Resume</p>
+
+                <div style="text-align: center;">
+                    <a href="/view-resume" style="
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #5900ff;        
+        color: rgb(255, 255, 255);
+        text-decoration: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6), 0 6px 20px rgba(0, 0, 0, 0.6);
+        font-weight: bold;
+        text-transform: uppercase;
+    ">
+                        <span class="material-symbols-outlined" style="font-size: 50px;">
+                            <!-- Adjust the font size here -->
+                            export_notes
+                        </span>
+                    </a>
+                </div>
+
+
+
+                <hr style="height: 2px; background-color: black; border: none;">
 
                 <!-- Edit Preferences button-->
-                <div id="preferences-container">
+                <div id="preferences-container" style="margin-bottom: 20px;"> <!-- Added margin-bottom here -->
                     <button type="button" id="edit-button" class="btn-lg btn-dark">
                         <span class="material-symbols-outlined">menu_open</span>
                         Edit Preferences
                     </button>
-                </div>
-
-                <div style="text-align:center;">
-                    <a href="https://billing.stripe.com/p/login/14k9CvcZx9NrdhK3cc" style="
-                                background: linear-gradient(to right, #001eff, #1fc749);
-                                border-radius: 10px;
-                                padding: 10px 20px;
-                                color: white;
-                                font-weight: bold;
-                                margin-top: 20px;
-                                margin-bottom: 20px;
-                                position: relative;
-                                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
-                                             0 2px 2px rgba(0, 0, 0, 0.3),
-                                             0 4px 4px rgba(0, 0, 0, 0.4),
-                                             0 8px 8px rgba(0, 0, 0, 0.5);
-                              ">
-                        Manage Active Subscription
-                    </a>
                 </div>
 
                 <!-- Edit form (outside any other form) -->
@@ -203,7 +252,7 @@
                     <input type="hidden" id="userId" name="user_id" value="{{ user_id }}">
 
                     <!-- Full Name -->
-                    <div class="form-group">
+                    <div class="form-group" style="margin-top: 20px;"> <!-- Added margin-top here -->
                         <label for="full-name-edit">Full Name:</label>
                         <input type="text" id="full-name-edit" name="full_name" class="form-control shadow-sm">
                     </div>
@@ -273,7 +322,7 @@
                         <input type="submit" value="Submit" class="btn btn-primary">
 
                         <!-- Delete button-->
-                        <button type="button" id="delete-button" class="btn btn-danger">Delete</button>
+                        <button type="button" id="delete-button" class="btn btn-danger">Clear</button>
                     </div>
                 </form>
             </div>
@@ -455,9 +504,33 @@
 
             deleteButton.click(function () {
                 if (confirm("Are you sure you want to delete your details?")) {
-                    deleteUserDetails();
+                    // Send an AJAX request to delete user details
+                    $.ajax({
+                        url: '/delete_user_details',
+                        type: 'DELETE',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ user_id: globalUserId }),
+                        success: function (response) {
+                            if (response.success) {
+                                // Show a confirmation popup
+                                alert("User details deleted successfully.");
+
+                                // Optionally, update the UI or redirect the user
+                                // Reset form fields or other UI elements as needed
+                                // ...
+                            } else {
+                                // Handle error case
+                                alert("Failed to delete user details: " + response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle request error
+                            alert("An error occurred: " + error);
+                        }
+                    });
                 }
             });
+
 
             fetchUserDetails();
         });
