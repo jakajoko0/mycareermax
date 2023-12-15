@@ -787,8 +787,8 @@ def send_email(recipient_email, subject, body_html):
 
 # Reverse mapping from Price IDs to Tier Names
 tier_from_price_id = {
-    'price_1OJOPqBmOXAq5RyDWYawmWvf': 'Tier1',
-    'price_1OJOPyBmOXAq5RyDzIAxE0tc': 'Tier2',
+    'price_1ONOX1BmOXAq5RyDeaKREuas': 'Tier1',
+    'price_1ONNT4BmOXAq5RyDCb0omBEl': 'Tier2',
     'price_1OJXflBmOXAq5RyDxEqGCZMg': 'FreePlan'
 }
 
@@ -4277,10 +4277,3 @@ if __name__ == "__main__":
 
 #if __name__ == "__main__":
  #   app.run(debug=True, host="0.0.0.0", port=5000)
-
-
-
-
-
-
-

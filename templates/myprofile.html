@@ -317,13 +317,14 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="form-group">
-                        <input type="submit" value="Submit" class="btn btn-primary">
-
-                        <!-- Delete button-->
+                        <input type="submit" value="Submit" class="btn btn-primary" id="submit-button">
                         <button type="button" id="delete-button" class="btn btn-danger">Clear</button>
                     </div>
+
+                    <!-- Placeholders for messages -->
+                    <div id="submit-message" style="margin-bottom: 40px;"></div>
+                    <div id="clear-message" style="margin-bottom: 40px;"></div>
                 </form>
             </div>
         </div>
@@ -332,6 +333,22 @@
 
 
     <script>
+        $(document).ready(function () {
+            // Handle the Submit button click
+            $('#submit-button').click(function () {
+                // Display a message
+                $('#submit-message').text('Saved');
+                $('#clear-message').text(''); // Clear the other message if it's displayed
+            });
+
+            // Handle the Delete button click
+            $('#delete-button').click(function () {
+                // Display a message
+                $('#clear-message').text('Cleared. Refresh Page To Update');
+                $('#submit-message').text(''); // Clear the other message if it's displayed
+            });
+        });
+
         $(document).ready(function () {
             const editButton = $("#edit-button");
             const deleteButton = $("#delete-button");
